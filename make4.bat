@@ -1,0 +1,7 @@
+set LUA_VERSION=4
+set LUA_INC=%LUA4INC%
+set LUA_LIB=%LUA4LIB%
+set LUA_LIBD=%LUA4LIBD%
+set DEBUG=YES
+
+nmake %1 %2 %3 %4 %5 %6
