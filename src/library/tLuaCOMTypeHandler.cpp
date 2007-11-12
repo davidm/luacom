@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 // RCS Info
-static char *rcsid = "$Id: tLuaCOMTypeHandler.cpp,v 1.1 2005/03/01 15:11:39 mascarenhas Exp $";
+static char *rcsid = "$Id: tLuaCOMTypeHandler.cpp,v 1.2 2007/11/12 19:48:33 ignacio Exp $";
 static char *rcsname = "$Name:  $";
 
 
@@ -289,9 +289,9 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
             break;
           }
 
-		  void *pProxMgr;
+		  IUnknownPtr pProxMgr;
 		  ILuaDispatch *pLuaDispatch;
-		  if((pdisp->QueryInterface(IID_IProxyManager, &pProxMgr)==E_NOINTERFACE) &&
+		  if((pdisp->QueryInterface(IID_IProxyManager, (void**)&pProxMgr)==E_NOINTERFACE) &&
 			  SUCCEEDED(pdisp->QueryInterface(IID_ILuaDispatch, (void**)&pLuaDispatch)) &&
 			  SUCCEEDED(pLuaDispatch->PushIfSameState(L)))
 			break;
@@ -324,9 +324,9 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
 
           if(SUCCEEDED(hr))
           {
-   		    void *pProxMgr;
+   		    IUnknownPtr pProxMgr;
 		    ILuaDispatch *pLuaDispatch;
-		    if((pdisp->QueryInterface(IID_IProxyManager, &pProxMgr)==E_NOINTERFACE) &&
+		    if((pdisp->QueryInterface(IID_IProxyManager, (void**)&pProxMgr)==E_NOINTERFACE) &&
 			    SUCCEEDED(pdisp->QueryInterface(IID_ILuaDispatch, (void**)&pLuaDispatch)) &&
   			    SUCCEEDED(pLuaDispatch->PushIfSameState(L)))
 			  break;
