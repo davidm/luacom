@@ -5,7 +5,7 @@
  */
 
 // RCS Info
-static char *rcsid = "$Id: tLuaDispatch.cpp,v 1.1 2005/03/01 15:11:39 mascarenhas Exp $";
+static char *rcsid = "$Id: tLuaDispatch.cpp,v 1.2 2007/11/16 20:01:04 ignacio Exp $";
 static char *rcsname = "$Name:  $";
 
 
@@ -27,7 +27,13 @@ tLuaDispatch::ProvideClassInfo2::ProvideClassInfo2(ITypeInfo* p_coclassinfo,
                                                    IUnknown* p_pUnk)
 {
   coclassinfo = p_coclassinfo;
+  coclassinfo->AddRef();
   pUnk = p_pUnk;
+}
+
+tLuaDispatch::ProvideClassInfo2::~ProvideClassInfo2()
+{
+  coclassinfo->Release();
 }
 
 STDMETHODIMP tLuaDispatch::ProvideClassInfo2::QueryInterface(
