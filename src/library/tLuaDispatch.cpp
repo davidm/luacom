@@ -5,7 +5,7 @@
  */
 
 // RCS Info
-static char *rcsid = "$Id: tLuaDispatch.cpp,v 1.2 2007/11/16 20:01:04 ignacio Exp $";
+static char *rcsid = "$Id: tLuaDispatch.cpp,v 1.3 2007/11/16 20:29:36 ignacio Exp $";
 static char *rcsname = "$Name:  $";
 
 
@@ -472,6 +472,7 @@ tLuaDispatch::tLuaDispatch(lua_State* p_L, ITypeInfo * pTypeinfo, int ref)
 
       funcinfo[num_methods].name = new char[str_size + 1];
       wcstombs(funcinfo[num_methods].name, names[0], str_size+1);
+	  SysFreeString(names[0]);
 
       num_methods++;
     }
