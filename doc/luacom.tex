@@ -4,7 +4,7 @@
 \usepackage{a4wide}
 \usepackage{times}
 \usepackage[english]{babel}
-\usepackage[a4paper=true,pdfsubject="The LuaCOM Manual",pdfauthor="Vinicius Almendra and Renato Cerqueira and Fabio Mascarenhas",pdftitle="The LuaCOM Manual",colorlinks=true,citecolor=black,linkcolor=black,pagecolor=black,urlcolor=black]{hyperref}
+\usepackage[pdfstartview=FitH,a4paper=true,pdfsubject="The LuaCOM Manual",pdfauthor="Vinicius Almendra and Renato Cerqueira and Fabio Mascarenhas",pdftitle="The LuaCOM Manual",colorlinks=true,citecolor=black,linkcolor=black,pagecolor=black,urlcolor=black]{hyperref}
 
 \special{!userdict begin /bop-hook{gsave 210 40 translate
 65 rotate /Times-Roman findfont 216 scalefont setfont
@@ -18,6 +18,8 @@
 
 \newcommand{\ident}[1]{\mbox{\texttt{#1}}}
 %\newcommand{\ident}[1]{\texttt{#1}}
+
+% IMPROVE: use \xspace here to avoid trailing \
 \newcommand{\techname}[1]{\mbox{#1}}
 
 \newcommand{\lua}{\techname{Lua}}
@@ -30,6 +32,7 @@
 \newcommand{\dispinterface}{\ident{dispinterface}}
 \newcommand{\dispinterfaces}{\ident{dispinterfaces}}
 
+\newcommand{\registered}{$^{\textregistered}$}
 
 
 \title{\luacom \ User Manual \\
@@ -130,13 +133,13 @@ samples can be found in the documentation for the previous version of
 
   \luacom\ is an add-on to the Lua language. To be used, either the binary
   library of \luacom\ must be linked with the host program, just like
-  the Lua library and other add-ons, or you should load a \luacom dynamic
+  the Lua library and other add-ons, or you should load a \luacom\ dynamic
   library through Lua 5's require/loadlib mechanism. To use dynamic
   loading in Lua 4 you should implement a similar mechanism. There
   are different versions of the \luacom\ binary for the different
   versions of the Lua library, so pay attention to link the right one.
 
-  If you are linking \luacom to your program, the next step is to modify
+  If you are linking \luacom\ to your program, the next step is to modify
   the source code of the host program to
   call \luacom's \emph{and} COM initialization and termination
   functions, which are part of the C/C++ API. To do so, include the
@@ -195,11 +198,11 @@ registered in the system registry and are associated with an unique
 Class Identifier, known as CLSID. A CLSID may also be associated with
 a string known as Programmatic Identifier or ProgID. This last one is
 the easiest way to reference a COM object. E.g., the ProgID for
-Microsoft\copyright\ Word\copyright\ is ``\ident{Word.Application}''.
+Microsoft\registered\ Word is ``\ident{Word.Application}''.
 
-If one do not know in advance what is the CLSID or the ProgID of the
-object of interest, them it's possible to use tools like OleView to
-find the object, although the best place to find it is in the object's
+If one does not know in advance what is the CLSID or the ProgID of the
+object of interest, then it's possible to use tools like OleView to
+find the object, though the best place to find it is in the object's
 documentation.
 
 
@@ -232,7 +235,7 @@ illustrates this:
 \section{Getting Help about an Object}
 
 To use a COM object, the first thing one must know is its
-\emph{interface}, that is, its set of methods and properties. This
+\emph{interface}---that is, its set of methods and properties. This
 information normally is available in the documentation of the object,
 but sometimes one do not have access to this documentation. \luacom\
 can offer some help if the object has type information. If the object
@@ -359,7 +362,7 @@ exit.
   The standard API is further divided in two classes: the Lua API and
   the C/C++ API. The C/C++ API is used primarily for initialization of
   the library and for low-level construction of \luacom\ objects. It
-  is declared in the header file \ident{luacom\.h}. The Lua API
+  is declared in the header file \ident{luacom.h}. The Lua API
   permits Lua programs to access all the functionality of \luacom. It
   is implemented as a set of functions inside a global table named
   \verb+luacom+; hereafter these functions will be called LuaCOM
@@ -500,7 +503,7 @@ exit.
 
   \verb+ViewTypeLib+
     & \ttext{Runs DumpTypeLib and shows the created file using
-    Internet Explorer\copyright.} \\ \hline
+    Internet Explorer\registered.} \\ \hline
 
   \verb+pairs+ & \ttext{Does the same as pairs for COM Enumerators.}
   \\ \hline
@@ -1016,8 +1019,8 @@ calendar:NextMonth()
 Notice that \verb+addConnection+ also returns a cookie. A call to
 \verb+releaseConnection+ needs both the event sink and the cookie to release the
 connection. The old (pre-1.3) syntax of \verb+releaseConnection+ (ommiting the event sink
-and cookie) still works, but will only release the last connection made (but there will
-not be leaks, all connections are released when the object is garbage-collected).
+and cookie) still works but will only release the last connection made (but there will
+not be leaks; all connections are released when the object is garbage-collected).
 
 \paragraph{Message loop}
 To receive events, it is necessary to have a message loop in the thread
@@ -1533,7 +1536,7 @@ supported Lua GUI toolkit (IUP, for now).
 
 \section{Is it really useful?}
 Some might argue that it would be better to implement COM object in
-languages like C++ or Visual Basic\copyright . That's true in many
+languages like C++ or Visual Basic\registered . That's true in many
 situations, and false in several others. First, dealing with COM is
 not easy and \luacom\ hides most its complexities; besides that, there
 is another compelling reason for using \luacom\, at least in some
@@ -1681,7 +1684,7 @@ events.
 
 The most common way to build a type library is to write an IDL
 describing the type library and them use an IDL compiler, such as
-Microsoft's\copyright\ MIDL. Notice that all the interfaces must be
+Microsoft's\registered\ MIDL. Notice that all the interfaces must be
 dispinterfaces, that is, must inherit from \idispatch, and must have
 the flag \texttt{oleautomation}.
 
@@ -1916,7 +1919,7 @@ are found, please report them through \luacom's home page.
 
 \begin{itemize}
 
-\item \luacom\ only implements late-bound interfaces, but accepts a
+\item \luacom\ only implements late-bound interfaces but accepts a
 QueryInterface for early-bound ones. This erroneous behavior is due
 to the way a VB client sends events to the server. See subsection
 \ref{sec:visu-basicc-issue};
@@ -1950,9 +1953,9 @@ Besides the enhancements listed in the sections \ref{sect:limitations} and
 \section{Important issues about \luacom}
 
 \luacom\ is very similar to using other Automation-enabled languages
-or environments (Visual Basic\copyright, VBA, VBScript\copyright,
+or environments (Visual Basic\registered, VBA, VBScript\texttrademark,
 pycom etc). Nevertheless, there are some subtle differences that might
-confuse the programmer: different syntax, unexpected behavior etc. To
+confuse the programmer: different syntax, unexpected behavior, etc. To
 ease the task of the \luacom\ user, we grouped the information related
 to these isses here.
 
@@ -2024,7 +2027,7 @@ of \ident{a} and \ident{b}, also returned by the call.
 see section \ref{sec:extens-interf}.
 
 
-\subsection{Visual Basic\copyright\ issue}
+\subsection{Visual Basic\registered\ issue}
 \label{sec:visu-basicc-issue}
 A COM server implemented with \luacom\ can be used in VB with no
 trouble:
@@ -2131,7 +2134,7 @@ to open the help information associated with a component;
 
 \item objects implementing \ident{IEnumVARIANT} interface are now
 supported. This means that collections can be used in \luacom\ in a
-similar way as the are in VBScript\copyright;
+similar way as the are in VBScript\texttrademark;
 
 \item implemented a log mechanism to simplify debugging;
 
@@ -2139,7 +2142,7 @@ similar way as the are in VBScript\copyright;
 parameters\footnote{Notice that \luacom\ does not implement named
 parameters; it just takes them when called from a COM client and
 puts them.}. This caused problems when receiving Microsoft
-Excel\copyright\ events;
+Excel\registered\ events;
 
 \item now it's possible to specify the context used to create an
 instance of a COM object (whether it should be created as a local
@@ -2187,8 +2190,8 @@ single table called \verb+luacom+, although they are still accessible
 globally as \texttt{luacom\_<function>} in the Lua 4 version of the
 library;
 
-\item now it's possible to create instances of Microsoft\copyright\
-Office\copyright\ applications (Excel\copyright, Powerpoint\copyright\
+\item now it's possible to create instances of Microsoft\registered\
+Office\registered\ applications (Excel\registered, PowerPoint\registered\
 etc.). It was only possible to use them via GetObject; now you can
 create a new instance of these applications using
 \texttt{luacom.CreateObject};
@@ -2245,7 +2248,7 @@ objects in \lua
 \begin{itemize}
 \item conversion to Lua 4;
 \item better handling of different kinds of type information (e.g. now
-can access Microsoft Internet Explorer\copyright\ object);
+can access Microsoft Internet Explorer\registered\ object);
 \item now handles more gracefully exceptions and errors;
 \item added support for optional parameters with default values;
 \item \luacom\ does not initializes \com\ libraries anymore; this is
