@@ -5,7 +5,7 @@
  */
 
 // RCS Info
-static char *rcsid = "$Id: tLuaDispatch.cpp,v 1.4 2007/12/20 06:51:15 dmanura Exp $";
+static char *rcsid = "$Id: tLuaDispatch.cpp,v 1.5 2007/12/20 22:39:28 ignacio Exp $";
 static char *rcsname = "$Name:  $";
 
 
@@ -732,6 +732,8 @@ HRESULT tLuaDispatch::method(const char* name,
     return DISP_E_EXCEPTION;
   }
   
+  // compute the number of values to be popped at the end
+  int numValuesToRemove = lua_gettop(L) - member + 1;
 
   // return values will be put in the place of the function
   // and beyond
@@ -755,6 +757,9 @@ HRESULT tLuaDispatch::method(const char* name,
   // sets out values
   if(lua_type(L, return_value_pos) != LUA_TNONE)
     typehandler->setOutValues(L, funcdesc, pdispparams, return_value_pos);
+	
+  // pops results from the stack
+  lua_pop(L, numValuesToRemove);
 
   return S_OK;
 }
