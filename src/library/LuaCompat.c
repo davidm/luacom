@@ -14,8 +14,10 @@
 #include <lua.h>
 #include <lauxlib.h>
 
-#ifdef COMPAT-5.1
+#if !(defined(LUA_VERSION_NUM) && LUA_VERSION_NUM >= 501)
+#ifdef COMPAT51
 #include "compat-5.1.h"
+#endif
 #endif
 
 #include "LuaCompat.h"
@@ -256,10 +258,10 @@ void luaCompat_getType(lua_State* L, int index)
   LUASTACK_CLEAN(L, 1);
 }
 
-long luaCompat_getType2(lua_State* L, int index)
+void* luaCompat_getType2(lua_State* L, int index)
 { /* lua4 */
   int tag = lua_tag(L, index);
-  return tag;
+  return (void*)tag;
 }
 
 
@@ -466,11 +468,14 @@ int luaCompat_checkTagToCom(lua_State *L, int luaval)
 
 /* Lua 5 version of the API */
 
-void luaCompat_openlib(lua_State* L, const char* libname, luaL_reg* funcs)
+void luaCompat_openlib(lua_State* L, const char* libname, const struct luaL_reg* funcs)
 { /* lua5 */
   LUASTACK_SET(L);
 
-#ifdef COMPAT-5.1
+
+#if defined(LUA_VERSION_NUM) && LUA_VERSION_NUM >= 501
+  luaL_register(L, libname, funcs);
+#elif defined(COMPAT51)
   luaL_module(L, libname, funcs, 0);
 #else
   luaL_openlib(L, libname, funcs, 0);
@@ -636,16 +641,16 @@ void luaCompat_getType(lua_State* L, int index)
   LUASTACK_CLEAN(L, 1);
 }
 
-long luaCompat_getType2(lua_State* L, int index)
+const void* luaCompat_getType2(lua_State* L, int index)
 { /* lua5 */
-  long result = 0;
+  const void* result = 0;
 
   LUASTACK_SET(L);
 
   if(!lua_getmetatable(L, index))
     lua_pushnil(L);
 
-  result = (long) lua_topointer(L, -1);
+  result = lua_topointer(L, -1);
   lua_pop(L, 1);
 
   LUASTACK_CLEAN(L, 0);
@@ -816,7 +821,7 @@ void luaCompat_setglobal(lua_State* L)
 
 int luaCompat_checkTagToCom(lua_State *L, int luaval) 
 { /* lua5 */
-  int has;
+  /* unused: int has; */
 
   if(!lua_getmetatable(L, luaval)) return 0;
 

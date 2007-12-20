@@ -18,7 +18,7 @@ public:
 	virtual ~tStringBuffer();
 
 protected:
-	long size;
+	size_t size;
 	char * buffer;
 };
 

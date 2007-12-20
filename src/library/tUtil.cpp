@@ -3,12 +3,14 @@
 //////////////////////////////////////////////////////////////////////
 
 // RCS Info
-static char *rcsid = "$Id: tUtil.cpp,v 1.1 2005/03/01 15:11:39 mascarenhas Exp $";
+static char *rcsid = "$Id: tUtil.cpp,v 1.2 2007/12/20 06:51:15 dmanura Exp $";
 static char *rcsname = "$Name:  $";
 
 
 #include <assert.h>
+#if !defined(__WINE__) || defined(__MSVCRT__)
 #include <process.h>
+#endif
 
 #include "tUtil.h"
 #include "tLuaCOMException.h"
@@ -276,8 +278,12 @@ void tUtil::ShowHelp(const char *filename, unsigned long context)
       sprintf(context_param, "-mapid %d", context);
     else
       context_param[0] = '\0';
-  
+#if !defined(__WINE__) || defined(__MSVCRT__)
     _spawnlp(_P_NOWAIT, "hh.exe", "hh.exe", context_param, filename, NULL);
+#else
+    MessageBox(NULL, "FIX - not implemented - _spawnlp", "LuaCOM", MB_ICONEXCLAMATION);
+    #warning FIX - not implemented - _spawnlp
+#endif
   }
   else if(_stricmp(extension, ".hlp") == 0)
   {

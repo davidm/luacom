@@ -24,7 +24,7 @@ tStringBuffer::~tStringBuffer()
 
 void tStringBuffer::copyToBuffer(char * source)
 {
-  long new_size = strlen(source) + 1;
+  size_t new_size = strlen(source) + 1;
 
   if(new_size > size)
   {

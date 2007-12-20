@@ -37,7 +37,7 @@ public:
     lua_State* L, 
     DISPPARAMS& rDispParams,
     FUNCDESC *pfuncdesc,
-    tLuaObjList& params,
+    tLuaObjList params,
     int invkind
     );
 
@@ -113,7 +113,7 @@ protected:
     bool from_stack = false
     );
 
-  void string2safearray(const char* str, long len, VARIANTARG& varg);
+  void string2safearray(const char* str, size_t len, VARIANTARG& varg);
   void safearray2string(lua_State* L, VARIANTARG & varg);
 
   ITypeInfo * m_typeinfo;

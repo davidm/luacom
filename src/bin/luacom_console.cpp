@@ -1,5 +1,5 @@
 /*
-** $Id: luacom_console.cpp,v 1.1 2005/03/01 15:11:37 mascarenhas Exp $
+** $Id: luacom_console.cpp,v 1.2 2007/12/20 06:51:15 dmanura Exp $
 ** Lua stand-alone interpreter
 ** See Copyright Notice in lua.h
 */
@@ -22,6 +22,7 @@ extern "C"{
 
 
 #include "lauxlib.h"
+#include "LuaCompat.h"
 }
 #include "luacom.h"
 
@@ -78,6 +79,14 @@ void make_lua_error(lua_State* L, const char *error)
 
 #endif
 
+#if defined(LUA_VERSION_NUM) && LUA_VERSION_NUM >= 501
+static int lua_dostring(lua_State* L, const char* code) {
+  return luaL_dostring(L, code);
+}
+static int lua_dofile(lua_State* L, const char* filename) {
+  return luaL_dofile(L, filename);
+}
+#endif
 
 
 /////////////////////////////////////////////////////////////////////
@@ -336,7 +345,10 @@ int main (int argc, char *argv[])
 
   SetConsoleTitle(LUACOM_VERSION);
 
-#if defined(LUA4)
+#if defined(LUA_VERSION_NUM) && LUA_VERSION_NUM >= 501
+  lua_State *lua_state = lua_open();
+  luaL_openlibs(lua_state);
+#elif defined(LUA4)
   lua_State *lua_state = lua_open(0);
   lua_baselibopen (lua_state);
   lua_mathlibopen (lua_state);

@@ -9,9 +9,9 @@
  */
 
 // RCS Info
-static char *rcsid = "$Id: luacom.cpp,v 1.1 2005/03/01 15:11:38 mascarenhas Exp $";
+static char *rcsid = "$Id: luacom.cpp,v 1.2 2007/12/20 06:51:15 dmanura Exp $";
 static char *rcsname = "$Name:  $";
-static char *g_version = "1.2b";
+static char *g_version = "1.3";
 
 #include <string.h>
 #include <stdlib.h>
@@ -49,6 +49,7 @@ extern "C"
 #include "tLuaCOMEnumerator.h"
 #include "tLuaTLB.h"
 
+#include <wchar.h> // for MINGW/Wine
 
 // some string constants
 
@@ -173,7 +174,7 @@ static void luacom_APIerror(lua_State* L, const char* message)
 static int luacom_ShowHelp(lua_State *L)
 {
   char *pHelpFile = NULL; 
-  unsigned long context = 0;
+  DWORD context = 0;
 
   tLuaCOM* luacom = (tLuaCOM *) LuaBeans::check_tag(L, 1);
 
@@ -542,7 +543,7 @@ static int luacom_CreateObject(lua_State *L)
 
   const char *progId = luaL_check_lstr(L, 1, NULL);
   const char *creation_mode = lua_tostring(L, 2);
-  const bool untyped = lua_toboolean(L, 3);
+  const bool untyped = lua_toboolean(L, 3) != 0;
 
   if(creation_mode != NULL)
   {
@@ -680,7 +681,7 @@ static int luacom_addConnection(lua_State *L)
 
   DWORD cookie = client->addConnection(server);
 
-  if(cookie == NULL)
+  if(cookie == 0)
   {
     luacom_APIerror(L, "Could not establish connection");
     return 0;
@@ -787,7 +788,7 @@ static int luacom_NewObjectOrControl(lua_State *L, int type)
     CHK_COM_CODE(hr);
 
     typelib = tCOMUtil::LoadTypeLibFromCLSID(clsid);
-    CHK_LCOM_ERR((long)typelib, "Could not load type library.");
+    CHK_LCOM_ERR(typelib, "Could not load type library.");
     
 
     // gets coclass typeinfo
@@ -898,7 +899,7 @@ static int luacom_NewControl(lua_State *L) {
 static int luacom_ExposeObject(lua_State *L)
 {
   tLuaCOMClassFactory* luacom_cf = NULL;
-  DWORD cookie = -1;
+  DWORD cookie = (DWORD)-1;
 
   // check parameters
   tLuaCOM* luacom = (tLuaCOM *) LuaBeans::check_tag(L, 1);
@@ -1024,7 +1025,7 @@ static int luacom_RegisterObject(lua_State *L)
 
     lua_pushstring(L, "Control");
 	lua_gettable(L, 1);
-	bool control = luaCompat_toCBool(L, -1);
+	bool control = luaCompat_toCBool(L, -1) != 0;
 
     // gets the registration information from the registration table
     lua_pushstring(L, "VersionIndependentProgID");
@@ -2006,7 +2007,7 @@ try
     CHECK(lcom, INTERNAL_ERROR);
 
       // sets the parameter list excluding the 'self' param
-    tLuaObjList& params = tLuaObjList(first_param, num_params);
+    tLuaObjList params = tLuaObjList(first_param, num_params);
 
     num_return_values = lcom->call(L, dispid, invkind, pfuncdesc, params);
 
@@ -2375,7 +2376,7 @@ static bool luacom_runningInprocess(lua_State* L) {
 	lua_getregistry(L);
 	lua_pushstring(L,"inproc");
 	lua_gettable(L,-2);
-	bool inproc = lua_toboolean(L,-1);
+	bool inproc = lua_toboolean(L,-1) != 0;
 	lua_pop(L,2);
 	return inproc;
 }

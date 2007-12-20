@@ -5,7 +5,7 @@
  */
 
 // RCS Info
-static char *rcsid = "$Id: tLuaDispatch.cpp,v 1.3 2007/11/16 20:29:36 ignacio Exp $";
+static char *rcsid = "$Id: tLuaDispatch.cpp,v 1.4 2007/12/20 06:51:15 dmanura Exp $";
 static char *rcsname = "$Name:  $";
 
 
@@ -20,6 +20,10 @@ extern "C"
 {
 #include "LuaCompat.h"
 }
+
+#ifdef __MINGW32__ // hack for MinGW
+#define GUIDKIND_DEFAULT_SOURCE_DISP_IID 1
+#endif
 
 long tLuaDispatch::NEXT_ID = 0;
 
@@ -43,12 +47,12 @@ STDMETHODIMP tLuaDispatch::ProvideClassInfo2::QueryInterface(
   return pUnk->QueryInterface(riid, ppvObj);
 }
 
-STDMETHODIMP_(unsigned long) tLuaDispatch::ProvideClassInfo2::AddRef(void)
+STDMETHODIMP_(ULONG) tLuaDispatch::ProvideClassInfo2::AddRef(void)
 {
   return pUnk->AddRef();
 }
 
-STDMETHODIMP_(unsigned long) tLuaDispatch::ProvideClassInfo2::Release(void)
+STDMETHODIMP_(ULONG) tLuaDispatch::ProvideClassInfo2::Release(void)
 {
   return pUnk->Release();
 }
@@ -149,14 +153,14 @@ tLuaDispatch::QueryInterface(REFIID riid, void FAR* FAR* ppv)
 }
 
 
-STDMETHODIMP_(unsigned long)
+STDMETHODIMP_(ULONG)
 tLuaDispatch::AddRef()
 {
     return ++m_refs;
 }
 
 
-STDMETHODIMP_(unsigned long)
+STDMETHODIMP_(ULONG)
 tLuaDispatch::Release()
 {
   assert(m_refs > 0);
