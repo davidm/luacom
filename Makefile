@@ -99,7 +99,7 @@ DEFAULT_LIBS = kernel32.lib user32.lib gdi32.lib shell32.lib advapi32.lib ole32.
 #				/NODEFAULTLIB:"libcmtd.lib" \
 
 
-LFLAGS = /nologo /subsystem:console /incremental:no /machine:I386 \
+LFLAGS = /nologo /subsystem:console /incremental:no /machine:I386 /debug \
 				$(DEFAULT_LIBS) 
 
 !IFDEF DEBUG
@@ -150,6 +150,7 @@ clean:
 	if exist $(BIN_DIR)\*.exe del $(BIN_DIR)\*.exe
 	if exist $(BIN_DIR)\*.dll del $(BIN_DIR)\*.dll
 	if exist $(BIN_DIR)\*.manifest del $(BIN_DIR)\*.manifest
+	if exist $(BIN_DIR)\*.pdb del $(BIN_DIR)\*.pdb
 	if exist $(BIN_DIR)\luacom.lua del $(BIN_DIR)\luacom.lua
 	if exist $(BIN_DIR) rmdir $(BIN_DIR)
 
