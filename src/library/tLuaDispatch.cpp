@@ -5,7 +5,7 @@
  */
 
 // RCS Info
-static char *rcsid = "$Id: tLuaDispatch.cpp,v 1.6 2007/12/21 19:53:19 ignacio Exp $";
+static char *rcsid = "$Id: tLuaDispatch.cpp,v 1.7 2007/12/29 23:34:38 dmanura Exp $";
 static char *rcsname = "$Name:  $";
 
 
@@ -470,7 +470,8 @@ tLuaDispatch::tLuaDispatch(lua_State* p_L, ITypeInfo * pTypeinfo, int ref)
 
       BSTR names[1];
       unsigned int dumb; 
-      typeinfo->GetNames(funcdesc->memid, names, 1, &dumb); 
+      hr = typeinfo->GetNames(funcdesc->memid, names, 1, &dumb); 
+      CHECK(SUCCEEDED(hr), INTERNAL_ERROR);
 
       const int str_size = SysStringLen(names[0]);
 
