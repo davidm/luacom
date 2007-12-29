@@ -125,15 +125,15 @@ static lua_State* luacom_DoRegistryFile(const char* luaclsid) {
 		lua_strlibopen(L_inproc);
 #else
 		L_inproc = lua_open();
+		#if defined(LUA_VERSION_NUM) && LUA_VERSION_NUM >= 501
+ 		luaL_openlibs(L_inproc);
+ 		#else
 		luaopen_base(L_inproc);
 		luaopen_math(L_inproc);
 		luaopen_io(L_inproc);
 		luaopen_string(L_inproc);
 		luaopen_table(L_inproc);
-		#if defined(LUA_VERSION_NUM) && LUA_VERSION_NUM >= 501
- 		luaopen_package(L_inproc);
- 		#else
-		luaopen_loadlib(L_inproc);
+		luaopen_loadlib(L_inproc); // luaopen_package(L_inproc);
  		#endif
 		#ifdef IUP
 			/* iuplua initialization */
