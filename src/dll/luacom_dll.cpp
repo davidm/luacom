@@ -195,7 +195,7 @@ static tLuaCOMClassFactory* luacom_GetInprocFactory(REFCLSID rclsid) {
 			}
 		}
 		return pFactory;
- 	} catch(class tLuaCOMException& e) {
+ 	} catch(class tLuaCOMException&) {
       return NULL;
 	}
 }
