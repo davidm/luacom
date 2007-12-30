@@ -1,9 +1,11 @@
 $debug
 -- plasma.lua
 
+require "luacom"
+
 do 
 
-local in = {
+local in1 = {
    pack = function (data)
       local i = 1
       local sum = 0
@@ -51,8 +53,8 @@ function Plasma:write(cmd1,cmd2,data)
    tinsert(data,1,"60")
    tinsert(data,1,"80")
    tinsert(data,1,cmd1)
-   local msg = %in.pack(data)
-   print(%in.byte2str(msg))
+   local msg = in1.pack(data)
+   print(in1.byte2str(msg))
    print(strlen(msg))
    if self.obj and self.obj.PortOpen ~= 0 then
       print("Writing")
@@ -79,7 +81,7 @@ end
 
 function Plasma:open(port)
    local obj
-   obj = luacom_CreateObject("MSCOMMLib.MSComm.1")
+   obj = luacom.CreateObject("MSCOMMLib.MSComm.1")
    obj.CommPort = (port or 1)
    obj.Settings = "9600,O,8,1"
    obj.InputLen = 0
@@ -94,18 +96,18 @@ end
 
 function Plasma:on()
    self:write("9f","4e")
-   print(%in.byte2str(self:read(6,15)))
+   print(in1.byte2str(self:read(6,15)))
 end
 
 function Plasma:off()
    self:write("9f","4f")
-   print(%in.byte2str(self:read(6,15)))
+   print(in1.byte2str(self:read(6,15)))
 end
 
 function acox()
-   local msg = %in.pack({98,121,101}) -- bye
+   local msg = in1.pack({98,121,101}) -- bye
    print(msg)
-   print(%in.byte2str(msg))
+   print(in1.byte2str(msg))
    if Plasma.obj and Plasma.obj.PortOpen ~= 0 then
       print("Writing")
       Plasma.obj.Output = msg
