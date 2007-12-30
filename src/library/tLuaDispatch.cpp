@@ -5,7 +5,7 @@
  */
 
 // RCS Info
-static char *rcsid = "$Id: tLuaDispatch.cpp,v 1.7 2007/12/29 23:34:38 dmanura Exp $";
+static char *rcsid = "$Id: tLuaDispatch.cpp,v 1.8 2007/12/30 04:50:56 dmanura Exp $";
 static char *rcsname = "$Name:  $";
 
 
@@ -260,6 +260,7 @@ tLuaDispatch::Invoke(
   stkIndex member         = -1;
   int current_arg         = 0;
   HRESULT retval          = NOERROR;
+  const stkIndex baseidx = lua_gettop(L); // stack index on entry
   stkIndex return_value_pos = 0;
 
   if(wFlags & ~(DISPATCH_METHOD | DISPATCH_PROPERTYGET | DISPATCH_PROPERTYPUT |
@@ -322,6 +323,7 @@ tLuaDispatch::Invoke(
 
         if(ret != S_OK)
         {
+          lua_settop(L, implementation_table); // reset before next call
           retval = propertyget(
             funcinfo[index].name,
             funcinfo[index].funcdesc,
@@ -371,9 +373,6 @@ tLuaDispatch::Invoke(
     FillExceptionInfo(pexcepinfo, e.getMessage());
   }
 
-  // removes implementation table
-  lua_remove(L, implementation_table);
-
   if(retval == DISP_E_MEMBERNOTFOUND)
   {
     tUtil::log_verbose("tLuaDispatch", "Member '%s' not found (0x%.8x)",
@@ -385,6 +384,7 @@ tLuaDispatch::Invoke(
       funcinfo[index].name, dispidMember);
   }
 
+  lua_settop(L, baseidx); // reset on exit
   return retval;
 }
 
@@ -539,7 +539,7 @@ void tLuaDispatch::FillExceptionInfo(EXCEPINFO *pexcepinfo, const char *text)
 }
 
 
-
+// note: does not restore Lua stack
 HRESULT tLuaDispatch::propertyget(const char* name,
                                   FUNCDESC* funcdesc,
                                   DISPPARAMS *pdispparams,
@@ -555,7 +555,6 @@ HRESULT tLuaDispatch::propertyget(const char* name,
 
   if(lua_isnil(L, member))
   {
-    lua_remove(L, member);
     return DISP_E_MEMBERNOTFOUND;
   }
 
@@ -605,7 +604,7 @@ HRESULT tLuaDispatch::propertyget(const char* name,
   return S_OK;
 }
 
-
+// note: does not restore Lua stack
 HRESULT tLuaDispatch::propertyput(const char* name,
                                   DISPPARAMS *pdispparams,
                                   VARIANT *pvarResult,
@@ -687,6 +686,7 @@ HRESULT tLuaDispatch::propertyput(const char* name,
 }
 
 
+// note: does not restore Lua stack
 HRESULT tLuaDispatch::method(const char* name,
                              FUNCDESC* funcdesc,
                              DISPPARAMS *pdispparams,
@@ -694,75 +694,61 @@ HRESULT tLuaDispatch::method(const char* name,
                              EXCEPINFO *pexcepinfo,
                              unsigned int *puArgErr)
 {
-  // gets lua function from implementation table
+  // push Lua function (member) from implementation table
   lua_pushstring(L, name);
   lua_gettable(L, -2);
-
-  // stores position of the member function
-  stkIndex member = lua_gettop(L);
+  const stkIndex memberidx = lua_gettop(L);  // and stack index
       
-  // tests whether it's really a function
-
-  if(!lua_isfunction(L, member))
+  // test whether it's really a function
+  if(!lua_isfunction(L, memberidx))
   {
-    lua_remove(L, member);
     return DISP_E_MEMBERNOTFOUND;
   }
 
   /* converte parametros e empilha */
 
-  // parametro self
+  // push self argument
   lua_getref(L, table_ref);
   
-  // Parametros passados via COM
+  // push COM arguments
   typehandler->pushLuaArgs(
     L,
     pdispparams,
     funcdesc->lprgelemdescParam);
 
-  // chama funcao lua
+  // chama funcao Lua
   const char* errmsg = NULL;
   int result = 0;
-  
-  // compute the number of values to be popped at the end
-  int numValuesToRemove = lua_gettop(L) - member + 1;
 
-  result = luaCompat_call(L, lua_gettop(L) - member, LUA_MULTRET, &errmsg);
-
+  // call function
+  result = luaCompat_call(L, lua_gettop(L) - memberidx, LUA_MULTRET, &errmsg);
   if(result)
   {
     FillExceptionInfo(pexcepinfo, LuaAux::makeLuaErrorMessage(result, errmsg));
-	// pops results from the stack
-    lua_pop(L, numValuesToRemove);
-
     return DISP_E_EXCEPTION;
   }
+  // note: only return values are left above baseidx
+  stkIndex returnidx = memberidx; // start index of return values
 
-  // return values will be put in the place of the function
-  // and beyond
-  stkIndex return_value_pos = member;
-
-  if(lua_type(L, return_value_pos) != LUA_TNONE)
+  // set COM return value
+  if(lua_type(L, returnidx) != LUA_TNONE)
   {
     if(pvarResult != NULL && funcdesc->elemdescFunc.tdesc.vt != VT_VOID)
     {
       VARIANTARG result;
       VariantInit(&result);
 
-	  typehandler->lua2com(L, return_value_pos, result, funcdesc->elemdescFunc.tdesc.vt);
+	  typehandler->lua2com(L, returnidx, result, funcdesc->elemdescFunc.tdesc.vt);
 
       *pvarResult = result;
 
-      return_value_pos++;
+      returnidx++; // consume
     }
   }
 
-  // sets out values
-  if(lua_type(L, return_value_pos) != LUA_TNONE)
-    typehandler->setOutValues(L, funcdesc, pdispparams, return_value_pos);
-	
-  // pops results from the stack
-  lua_pop(L, numValuesToRemove);
+  // set COM out arguments
+  if(lua_type(L, returnidx) != LUA_TNONE)
+    typehandler->setOutValues(L, funcdesc, pdispparams, returnidx);
 
   return S_OK;
 }
