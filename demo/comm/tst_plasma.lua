@@ -1,4 +1,3 @@
-$debug
 -- plasma.lua
 
 do 
