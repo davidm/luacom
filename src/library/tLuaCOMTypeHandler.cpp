@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 // RCS Info
-static char *rcsid = "$Id: tLuaCOMTypeHandler.cpp,v 1.3 2007/12/20 06:51:15 dmanura Exp $";
+static char *rcsid = "$Id: tLuaCOMTypeHandler.cpp,v 1.4 2008/01/04 15:50:17 ignacio Exp $";
 static char *rcsname = "$Name:  $";
 
 
@@ -520,32 +520,35 @@ void tLuaCOMTypeHandler::lua2com(lua_State* L, stkIndex luaval, VARIANTARG& varg
 			luaCompat_pushPointer(L, idxDispatch);
 			lua_rawget(L, luaval);
 			if(!lua_isnil(L, -1)) {
-			varg.pdispVal = (IDispatch*)luaCompat_getPointer(L, -1);
-			varg.pdispVal->AddRef();
-			varg.vt = VT_DISPATCH;
-			} else if(luaCompat_checkTagToCom(L, luaval)) {
-			lua_remove(L, -2);
-			tLuaCOM* lcom;
-			switch(lua_type(L, -1)) {
-				case LUA_TTABLE:
-				lcom = convert_table(L, luaval);
-				break;
-				case LUA_TFUNCTION:
-		   		lua_pushvalue(L, luaval);
-				lua_pushnumber(L, type);
-				lua_call(L, 2, 1);
-				lcom = from_lua(L, lua_gettop(L));
-				lua_pop(L, 1);
-				break;
-				default:
-				lua_pop(L,1);
-				TYPECONV_ERROR("Invalid conversion function.");
+				varg.pdispVal = (IDispatch*)luaCompat_getPointer(L, -1);
+				varg.pdispVal->AddRef();
+				varg.vt = VT_DISPATCH;
 			}
-			if(!lcom) TYPECONV_ERROR("Conversion function failed.");
-			varg.pdispVal = lcom->GetIDispatch();
-			varg.pdispVal->AddRef();
-			varg.vt = VT_DISPATCH;
-			} else {
+			else if(luaCompat_checkTagToCom(L, luaval))
+			{
+				lua_remove(L, -2);
+				tLuaCOM* lcom;
+				switch(lua_type(L, -1)) {
+					case LUA_TTABLE:
+						lcom = convert_table(L, luaval);
+					break;
+					case LUA_TFUNCTION:
+		   				lua_pushvalue(L, luaval);
+						lua_pushnumber(L, type);
+						lua_call(L, 2, 1);
+						lcom = from_lua(L, lua_gettop(L));
+						lua_pop(L, 1);
+					break;
+					default:
+						lua_pop(L,1);
+						TYPECONV_ERROR("Invalid conversion function.");
+				}
+				if(!lcom) TYPECONV_ERROR("Conversion function failed.");
+				varg.pdispVal = lcom->GetIDispatch();
+				varg.pdispVal->AddRef();
+				varg.vt = VT_DISPATCH;
+			}
+			else {
 				lua_pushstring(L, "Type");
 				lua_gettable(L, luaval);
 				if(!lua_isnil(L, -1)) { // Table describes a variant
@@ -606,7 +609,7 @@ void tLuaCOMTypeHandler::lua2com(lua_State* L, stkIndex luaval, VARIANTARG& varg
 				        varg.scode = (SCODE)lua_tonumber(L, -1);
 					} else if(strcmp(vtype, "bool") == 0) {
 						varg.vt = VT_BOOL;
-						varg.boolVal = luaCompat_toCBool(L, -1) ? (short)0xFFFF : (short)0;
+						varg.boolVal = luaCompat_toCBool(L, -1) ? VARIANT_TRUE : VARIANT_FALSE;
 					} else {
 						varg.vt = VT_EMPTY;
 					}
@@ -1238,10 +1241,9 @@ SAFEARRAYBOUND* tLuaCOMTypeHandler::getRightOrderedBounds(
 {
   SAFEARRAYBOUND* new_bounds = new SAFEARRAYBOUND[num_dimensions];
 
-  unsigned long i = 0;
-
-  for(i = 0; i < num_dimensions; i++)
+  for(unsigned long i = 0; i < num_dimensions; i++) {
     new_bounds[i] = bounds[num_dimensions - i - 1];
+  }
 
   return new_bounds;
 }
@@ -1391,26 +1393,28 @@ stkIndex tLuaCOMTypeHandler::get_from_array(lua_State* L,
 
 
 
-void tLuaCOMTypeHandler::inc_indices(long *indices, 
+bool tLuaCOMTypeHandler::inc_indices(long *indices, 
                         SAFEARRAYBOUND *bounds,
                         unsigned long dimensions
                         )
 {
-  unsigned long j = 0;
+	long j = dimensions - 1;
 
-  indices[0]++;
-  j = 0;
+	indices[j]++;
 
-  while(
-    (indices[j] >= (long) bounds[j].cElements + bounds[j].lLbound) &&
-    (j < (dimensions - 1))
+	while(
+		(indices[j] >= (long) bounds[j].cElements + bounds[j].lLbound) &&
+		(j >= 0)
     )
-  {
-    indices[j] = bounds[j].lLbound;
-    indices[j+1]++;
-
-    j++;
-  }
+	{
+		indices[j] = bounds[j].lLbound;
+		indices[j - 1]++;
+		j--;
+		if(j == 0 && indices[j] >= (long) bounds[j].cElements + bounds[j].lLbound) {
+			return false;
+		}
+	}
+	return true;
 }
 
 
@@ -1472,9 +1476,8 @@ void tLuaCOMTypeHandler::safearray_lua2com(lua_State* L,
   // inicializa dimensoes
   for(i = 0; i < dimensions; i++)
   {
-    bounds[i].lLbound = 1;
-    bounds[i].cElements =
-      luavector.get_Nth_Dimension(dimensions - i);
+    bounds[dimensions - i - 1].lLbound = 1;
+    bounds[dimensions - i - 1].cElements = luavector.get_Nth_Dimension(dimensions - i);
   }
 
 
@@ -1493,9 +1496,9 @@ void tLuaCOMTypeHandler::safearray_lua2com(lua_State* L,
     for(i = 0; i < dimensions; i++)
       indices[i] = bounds[i].lLbound;
 
-    // copia elementos um por um
-    while(indices[dimensions - 1] < 
-      (long) bounds[dimensions - 1].cElements + bounds[dimensions - 1].lLbound)
+	unsigned long dimension = indices[0] - 1;
+	// copia elementos um por um
+    do
     {
       // obtem valor
       luaval = luavector.getindex(indices, dimensions, bounds);
@@ -1508,10 +1511,8 @@ void tLuaCOMTypeHandler::safearray_lua2com(lua_State* L,
 
       // libera
       VariantClear(&var_value);
-
-      // incrementa indices
-      inc_indices(indices, bounds, dimensions);
-    }
+	}
+	while(inc_indices(indices, bounds, dimensions));	// incrementa indices
   }
   catch(class tLuaCOMException&)
   {
@@ -1598,17 +1599,15 @@ void tLuaCOMTypeHandler::safearray2string(lua_State* L, VARIANTARG & varg)
 }
 
 
-long * tLuaCOMTypeHandler::dimensionsFromBounds(SAFEARRAYBOUND* bounds,
+long* tLuaCOMTypeHandler::dimensionsFromBounds(SAFEARRAYBOUND* bounds,
                                                 long num_bounds
                                                 )
 {
-  int i = 0;
-  long *dimensions = new long[num_bounds];
+  long* dimensions = new long[num_bounds];
 
-  for(i = 0; i < num_bounds; i++)
+  for(int i = 0; i < num_bounds; i++)
   {
-    dimensions[i] =
-      bounds[num_bounds - i - 1].cElements; 
+    dimensions[i] = bounds[i].cElements;
   }
 
   return dimensions;
@@ -1663,8 +1662,7 @@ void tLuaCOMTypeHandler::safearray_com2lua(lua_State* L, VARIANTARG & varg)
     // initializes indices
     indices = new long[num_dimensions];
 
-    int i = 0;
-    for(i = 0; i < num_dimensions; i++)
+    for(int i = 0; i < num_dimensions; i++)
       indices[i] = bounds[i].lLbound;
 
     // gets array data type
@@ -1680,22 +1678,15 @@ void tLuaCOMTypeHandler::safearray_com2lua(lua_State* L, VARIANTARG & varg)
     luaCompat_needStack(L, luavector.size()*2);
 
     // copia elementos um por um
-    while(indices[num_dimensions-1] < 
-      (long) 
-       (bounds[num_dimensions-1].cElements
-        + bounds[num_dimensions-1].lLbound
-       )
-    )
+    do
     {
       // pega do array
       luaval = get_from_array(L, safearray, indices, vt);
 
       // seta no luavector
       luavector.setindex(L, luaval, indices, num_dimensions, bounds);
-
-      // incrementa indices
-      inc_indices(indices, bounds, num_dimensions);
     }
+	while(inc_indices(indices, bounds, num_dimensions));	// incrementa indices
 
     // tries to create lua table on the top of stack
     succeeded = luavector.CreateTable(L);

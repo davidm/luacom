@@ -72,7 +72,7 @@ protected:
                     long* indices,
                     VARTYPE vt);
 
-  void inc_indices(long *indices,
+  bool inc_indices(long *indices,
                    SAFEARRAYBOUND *bounds,
                    unsigned long dimensions);
 
