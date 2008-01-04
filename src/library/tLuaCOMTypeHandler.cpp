@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 // RCS Info
-static char *rcsid = "$Id: tLuaCOMTypeHandler.cpp,v 1.4 2008/01/04 15:50:17 ignacio Exp $";
+static char *rcsid = "$Id: tLuaCOMTypeHandler.cpp,v 1.5 2008/01/04 20:29:29 ignacio Exp $";
 static char *rcsname = "$Name:  $";
 
 
@@ -1408,11 +1408,11 @@ bool tLuaCOMTypeHandler::inc_indices(long *indices,
     )
 	{
 		indices[j] = bounds[j].lLbound;
-		indices[j - 1]++;
 		j--;
-		if(j == 0 && indices[j] >= (long) bounds[j].cElements + bounds[j].lLbound) {
+		if(j < 0 && indices[0] == (long)bounds[0].lLbound) {
 			return false;
 		}
+		indices[j]++;
 	}
 	return true;
 }
@@ -1462,6 +1462,16 @@ void tLuaCOMTypeHandler::safearray_lua2com(lua_State* L,
   }
 
   long stack_top = lua_gettop(L);
+
+  if(luavector.getLength() == 0) {
+	// returns an empty vector
+	varg.vt = vt | VT_ARRAY;
+	varg.parray = SafeArrayCreateVector(vt, 0, 0);
+	varg.parray = NULL;
+
+	LUASTACK_CLEAN(L, 0);
+	return;
+  }
 
   // Cria variaveis
   unsigned long i = 0;
@@ -1629,6 +1639,13 @@ void tLuaCOMTypeHandler::safearray_com2lua(lua_State* L, VARIANTARG & varg)
   try
   {
     SAFEARRAY* safearray = varg.parray;
+
+	// check for NULL or empty array (is this enough?)
+	if(safearray == NULL || safearray->rgsabound[0].cElements == 0) {
+		// return an empty table in both cases, for consistency (also eases client code)
+		lua_newtable(L);
+		return;
+	}
 
     // pega dimensoes
     const int num_dimensions = SafeArrayGetDim(safearray);
