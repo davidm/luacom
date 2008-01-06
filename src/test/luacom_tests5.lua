@@ -1012,6 +1012,25 @@ function test_safearrays()
 
   obj:TestSafeArrayIDispatch(array)
 
+  -- test: multidimensional row/column order (fixed in 1.4)
+  local excel = luacom.CreateObject 'Excel.Application'
+  if excel then
+    local wb = excel.Workbooks:Add()
+    local ws = wb.ActiveSheet
+    local r = ws:Range("A2", "B5")
+    r.Value2 = {{2,3},{4,5},{6,7},{8,9}}
+    local v = r.Value2
+    assert(table2string(v) == '{{2, 3}, {4, 5}, {6, 7}, {8, 9}}',
+           table2string(v))
+    assert(ws.Cells(2,2).Value2 == 3)
+    assert(ws.Cells(3,1).Value2 == 4)
+    wb.Saved = true
+    wb:Close()
+    excel = nil
+  else
+    print 'WARNING: test disabled (Excel not detected)'
+  end
+
   collectgarbage()
 
 end
