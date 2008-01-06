@@ -5,7 +5,7 @@
  */
 
 // RCS Info
-static char *rcsid = "$Id: tLuaDispatch.cpp,v 1.8 2007/12/30 04:50:56 dmanura Exp $";
+static char *rcsid = "$Id: tLuaDispatch.cpp,v 1.9 2008/01/06 04:57:48 dmanura Exp $";
 static char *rcsname = "$Name:  $";
 
 
@@ -389,12 +389,6 @@ tLuaDispatch::Invoke(
 }
 
 STDMETHODIMP tLuaDispatch::PushIfSameState(lua_State *p_L) {
-#ifdef LUA4
-  if(L == p_L) {
-    lua_getref(L, table_ref);
-    return S_OK;
-  } else return E_FAIL;
-#else
   lua_getref(p_L, table_ref);
   if(lua_isnil(p_L, -1)) {
 	lua_pop(p_L,1);
@@ -411,7 +405,6 @@ STDMETHODIMP tLuaDispatch::PushIfSameState(lua_State *p_L) {
     lua_pop(p_L, 1);
 	return E_FAIL;
   }
-#endif
 }
 
 tLuaDispatch::tLuaDispatch(lua_State* p_L, ITypeInfo * pTypeinfo, int ref)

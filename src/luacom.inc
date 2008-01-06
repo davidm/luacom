@@ -60,11 +60,7 @@ DEFINES += VERBOSE
 endif
 
 
-ifeq "$(LUA_VERSION_NUMBER)" "5"
 USE_LUA5=YES
-else
-USE_LUA4=YES
-endif
 
 LDIR = $(LIBDIR)\\$(TEC_UNAME)
 

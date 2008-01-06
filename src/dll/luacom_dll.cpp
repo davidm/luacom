@@ -117,13 +117,6 @@ static lua_State* luacom_DoRegistryFile(const char* luaclsid) {
 	strcat(key,"\\ScriptFile");
 
 	if(tCOMUtil::GetRegKeyValue(key,&fileName)) {
-#if defined(LUA4)
-		L_inproc = lua_open(0);
-		lua_baselibopen(L_inproc);
-		lua_mathlibopen(L_inproc);
-		lua_iolibopen(L_inproc);
-		lua_strlibopen(L_inproc);
-#else
 		L_inproc = lua_open();
 		#if defined(LUA_VERSION_NUM) && LUA_VERSION_NUM >= 501
  		luaL_openlibs(L_inproc);
@@ -152,7 +145,7 @@ static lua_State* luacom_DoRegistryFile(const char* luaclsid) {
 			#endif
 			iupluaim_open(L_inproc);
 		#endif
-#endif	
+
 		luacom_open(L_inproc);
 		lua_getregistry(L_inproc);
 		lua_pushstring(L_inproc,"inproc");

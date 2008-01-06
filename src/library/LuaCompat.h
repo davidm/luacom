@@ -71,23 +71,5 @@ extern "C"
     (*(void **)(lua_newuserdata(L, sizeof(void *))) = (u)) 
 #endif
 
-// defined just to avoid compiler erros
-#ifdef LUA4
-#define LUA_TBOOLEAN 0xabcdef
-#define lua_toboolean(x,y) lua_tonumber((x),(y))
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-#include <luadebug.h>
-#ifdef __cplusplus
-}
-#endif
-#endif
-
-
-
-
 #endif /* __LUACOMPAT_H */
 
