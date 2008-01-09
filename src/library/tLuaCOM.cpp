@@ -8,7 +8,7 @@
  */
 
 // RCS Info
-static char *rcsid = "$Id: tLuaCOM.cpp,v 1.2 2007/12/20 06:51:15 dmanura Exp $";
+static char *rcsid = "$Id: tLuaCOM.cpp,v 1.3 2008/01/09 14:12:24 ignacio Exp $";
 static char *rcsname = "$Name:  $";
 
 #include "tLuaCOM.h"
@@ -366,7 +366,7 @@ int tLuaCOM::call(lua_State* L,
 
        // pushes out values
        if(invkind & INVOKE_FUNC)
-         num_retvals += typehandler->pushOutValues(L, dispparams);
+         num_retvals += typehandler->pushOutValues(L, dispparams, pfuncdesc);
      }
      catch(class tLuaCOMException& e)
      {

@@ -47,7 +47,7 @@ public:
 
   void pushTableVarNumber(lua_State *L, VARTYPE vt, double val);
 
-  int pushOutValues(lua_State* L, const DISPPARAMS& dispparams);
+  int pushOutValues(lua_State* L, const DISPPARAMS& dispparams, const FUNCDESC* pfuncdesc);
 
   bool setRetval(
     lua_State* L,
