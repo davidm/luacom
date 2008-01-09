@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 // RCS Info
-static char *rcsid = "$Id: tUtil.cpp,v 1.2 2007/12/20 06:51:15 dmanura Exp $";
+static char *rcsid = "$Id: tUtil.cpp,v 1.3 2008/01/09 17:17:13 ignacio Exp $";
 static char *rcsname = "$Name:  $";
 
 
@@ -125,6 +125,79 @@ const char * tUtil::bstr2string(BSTR bstr)
   }
 
   tUtil::string_buffer.copyToBuffer(str);
+
+  delete[] str;
+
+  return tUtil::string_buffer.getBuffer();
+}
+
+const char * tUtil::bstr2string(BSTR bstr, size_t& computedSize)
+{
+  char* str = NULL;
+  long size = 0;
+  int result = 0;
+
+  computedSize = 0;
+
+  try
+  {
+    if(bstr != NULL)
+    {
+	  computedSize = SysStringLen(bstr);
+	  if(!computedSize) {
+		  return "";
+	  }
+
+      // gets the size of the buffer
+      size = WideCharToMultiByte(
+        CP_UTF8,            // code page
+        0,            // performance and mapping flags
+        bstr,    // wide-character string
+		computedSize,	// number of chars in string
+        str,     // buffer for new string
+        0,          // size of buffer
+        NULL,     // default for unmappable chars
+        NULL  // set when default char used
+      );
+
+      if(!size)
+        LUACOM_ERROR(tUtil::GetErrorMessage(GetLastError()));
+
+      str = new char[size];
+
+      result = WideCharToMultiByte(
+        CP_UTF8,            // code page
+        0,            // performance and mapping flags
+        bstr,    // wide-character string
+        computedSize,	// number of chars in string
+        str,     // buffer for new string
+        size,          // size of buffer
+        NULL,     // default for unmappable chars
+        NULL  // set when default char used
+      );
+
+      if(!result)
+        LUACOM_ERROR(tUtil::GetErrorMessage(GetLastError()));
+
+    }
+    else
+    {
+      str = new char[1];
+      str[0] = '\0';
+    }
+  }
+  catch(class tLuaCOMException& e)
+  {
+    UNUSED(e);
+
+    if(str)
+      delete[] str;
+
+    str = new char[1];
+    str[0] = '\0';
+  }
+
+  tUtil::string_buffer.copyToBuffer(str, computedSize);
 
   delete[] str;
 

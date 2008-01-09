@@ -24,6 +24,7 @@ public:
 	static bool OpenLogFile(const char *name);
 	static BSTR string2bstr(const char *string);
 	static const char * bstr2string(BSTR bstr);
+	static const char * bstr2string(BSTR bstr, size_t& computedSize);
 	static const char *GetErrorMessage(DWORD errorcode);
 	static bool IsValidString(LPCTSTR string);
 
