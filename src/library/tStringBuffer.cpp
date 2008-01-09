@@ -38,6 +38,20 @@ void tStringBuffer::copyToBuffer(char * source)
   strncpy(buffer, source, new_size);
 }
 
+void tStringBuffer::copyToBuffer(char *source, size_t length)
+{
+  if(length > size)
+  {
+    if(buffer != NULL)
+      delete[] buffer;
+
+    size = length;
+    buffer = new char[size];
+  }
+
+  memcpy(buffer, source, length);
+}
+
 const char * tStringBuffer::getBuffer()
 {
   return buffer;
