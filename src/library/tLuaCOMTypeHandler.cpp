@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 // RCS Info
-static char *rcsid = "$Id: tLuaCOMTypeHandler.cpp,v 1.6 2008/01/09 14:12:24 ignacio Exp $";
+static char *rcsid = "$Id: tLuaCOMTypeHandler.cpp,v 1.7 2008/01/09 17:18:55 ignacio Exp $";
 static char *rcsname = "$Name:  $";
 
 
@@ -267,17 +267,19 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
 
       case VT_BSTR:
         {
-          const char* str = tUtil::bstr2string(varg.bstrVal);
+		  size_t computedSize;
+          const char* str = tUtil::bstr2string(varg.bstrVal, computedSize);
   		  if(is_variant && table_variants) {
   			lua_newtable(L);
 			lua_pushstring(L, "Type");
-			lua_pushstring(L, "bool");
-			lua_settable(L, -3);
 			lua_pushstring(L, "string");
-            lua_pushstring(L, (char *) str);
 			lua_settable(L, -3);
-		  } else
-          lua_pushstring(L, (char *) str);
+			lua_pushstring(L, "Value");
+			lua_pushlstring(L, str, computedSize);
+			lua_settable(L, -3);
+		  } else {
+			  lua_pushlstring(L, str, computedSize);
+		  }
         
           break;
         }
