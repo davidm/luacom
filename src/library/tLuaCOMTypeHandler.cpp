@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 // RCS Info
-static char *rcsid = "$Id: tLuaCOMTypeHandler.cpp,v 1.7 2008/01/09 17:18:55 ignacio Exp $";
+static char *rcsid = "$Id: tLuaCOMTypeHandler.cpp,v 1.8 2008/01/10 17:48:31 ignacio Exp $";
 static char *rcsname = "$Name:  $";
 
 
@@ -488,17 +488,9 @@ void tLuaCOMTypeHandler::lua2com(lua_State* L, stkIndex luaval, VARIANTARG& varg
   case LUA_TSTRING:
     {
       const char* str = lua_tostring(L, luaval);
-      size_t c_len = strlen(str);
       size_t l_len = lua_strlen(L, luaval);
-      if (c_len == l_len)
-      {
-         varg.vt = VT_BSTR;
-         varg.bstrVal = tUtil::string2bstr(str);
-      }
-      else
-      {
-        string2safearray(str, l_len, varg);
-      }
+      varg.vt = VT_BSTR;
+      varg.bstrVal = tUtil::string2bstr(str, l_len);
     }
 
     break;
@@ -740,7 +732,7 @@ int tLuaCOMTypeHandler::pushOutValues(lua_State* L, const DISPPARAMS& dispparams
   {
     VARIANTARG& varg = dispparams.rgvarg[dispparams.cArgs - i - 1];
     bool isout = pfuncdesc
-      ? (pfuncdesc->lprgelemdescParam[dispparams.cArgs-i-1].
+      ? (pfuncdesc->lprgelemdescParam[i].
          paramdesc.wParamFlags & PARAMFLAG_FOUT) != 0
       : (varg.vt & VT_BYREF) != 0;
     if (isout)
@@ -870,7 +862,7 @@ void tLuaCOMTypeHandler::fillDispParams(lua_State* L,
   bool hasdefault     = false;
   bool byref          = false;
   bool array          = false;
-  bool optout         = false;  // param is known to be an optional out.
+  bool optin		  = false;  // param is known to be an optional in.
   VARTYPE array_type  = VT_EMPTY;
   VARTYPE type        = VT_EMPTY;
 
@@ -889,7 +881,7 @@ void tLuaCOMTypeHandler::fillDispParams(lua_State* L,
       byref      = true;
       hasdefault = false;
       array      = false;
-	  optout     = false;
+	  optin      = false;
       type       = VT_VARIANT;
 
       VariantInit(&r_rgvarg[r_cArgs]);
@@ -927,7 +919,7 @@ void tLuaCOMTypeHandler::fillDispParams(lua_State* L,
               (SAFEARRAY**) CoTaskMemAlloc(sizeof(SAFEARRAY*));
             *r_rgvarg[r_cArgs].pparray = NULL;
 		  } else {
-	        initByRefParam(&r_rgvarg[r_cArgs], type, false);
+			initByRefParam(&r_rgvarg[r_cArgs], type);
 		  }
 
           r_cArgs++;
@@ -944,9 +936,9 @@ void tLuaCOMTypeHandler::fillDispParams(lua_State* L,
           byref = false;
 
 		// detects if optional output parameter
-        optout = (paramdesc.wParamFlags & PARAMFLAG_FOPT) != 0 &&
-                 (paramdesc.wParamFlags & PARAMFLAG_FOUT) != 0;
-        assert(!optout || byref); // optout => byref
+        optin = (paramdesc.wParamFlags & PARAMFLAG_FOPT) != 0 &&
+                (paramdesc.wParamFlags & PARAMFLAG_FIN) != 0;
+        assert(!optin || byref); // optin => byref
 
         // deals with default values (if any)
         if(paramdesc.wParamFlags & PARAMFLAG_FHASDEFAULT)
@@ -976,7 +968,7 @@ void tLuaCOMTypeHandler::fillDispParams(lua_State* L,
         VariantCopy(&var, &defaultValue);
         VariantClear(&defaultValue);
       }
-	  else if(!optout)
+	  else if(optin)
       {
         // assumes that a parameter is expected but has not been found
 
