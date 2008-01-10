@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 // RCS Info
-static char *rcsid = "$Id: tUtil.cpp,v 1.3 2008/01/09 17:17:13 ignacio Exp $";
+static char *rcsid = "$Id: tUtil.cpp,v 1.4 2008/01/10 17:44:55 ignacio Exp $";
 static char *rcsname = "$Name:  $";
 
 
@@ -204,36 +204,33 @@ const char * tUtil::bstr2string(BSTR bstr, size_t& computedSize)
   return tUtil::string_buffer.getBuffer();
 }
 
-BSTR tUtil::string2bstr(const char * string)
+BSTR tUtil::string2bstr(const char * string, size_t len)
 {
   if(!string)
     return NULL;
 
   BSTR bstr;
-
-  long length = 
-    MultiByteToWideChar(CP_UTF8, 0, string, -1, NULL, 0);
-
-  try
+  if(len == 0)
   {
-    if(length == 0)
-      LUACOM_ERROR(tUtil::GetErrorMessage(GetLastError()));
+    bstr = SysAllocStringLen(NULL, 0);
   }
-  catch(class tLuaCOMException& e)
+  else
   {
-    UNUSED(e);
-
-    return NULL;
+	long wclength = 
+      MultiByteToWideChar(CP_UTF8, 0, string, len, NULL, 0);
+	try
+    {
+      if(wclength == 0)
+        LUACOM_ERROR(tUtil::GetErrorMessage(GetLastError()));
+    }
+    catch(class tLuaCOMException& e)
+    {
+      UNUSED(e);
+      return NULL;
+    }
+    bstr = SysAllocStringLen(NULL, wclength);
+    MultiByteToWideChar(CP_UTF8, 0, string, len, bstr, wclength);
   }
-
-  wchar_t *widestr = new wchar_t[length];
-
-  MultiByteToWideChar(CP_UTF8, 0, string, -1, widestr, length);
-
-  bstr = SysAllocString(widestr);
-
-  delete[] widestr;
-  widestr = NULL;
 
   return bstr;
 }
