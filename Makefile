@@ -114,7 +114,7 @@ LUA_LIBSDLL = $(LUA_LIBDLL)/lua$(LUA_SUFFIX).lib
 # Target options
 # ---------------------------------------------------------------------------
 LC_LIB = $(LIB_DIR)\luacom-lua$(LUA_SUFFIX)-$(LUACOM_VERSION).lib
-LC_DLL = $(BIN_DIR)\luacom-lua$(LUA_SUFFIX)-$(LUACOM_VERSION).dll
+LC_DLL = $(BIN_DIR)\luacom.dll
 LC_IMPLIB = $(LIB_DIR)\luacomdll-lua$(LUA_SUFFIX)-$(LUACOM_VERSION).lib
 
 LC_CONSOLE_LIB = $(BIN_DIR)\luacom-lua$(LUA_SUFFIX)-$(LUACOM_VERSION).exe
@@ -181,7 +181,7 @@ BIN_OBJS = $(OBJ_DIR)/luacom_console.obj
 DLL_OBJS = $(OBJ_DIR)/luacom_dll.obj
 
 {$(SRC_LIB_DIR)}.cpp{$(OBJ_DIR)}.obj:
-	$(CC) /c /DLUACOM_DLL=\"luacom-lua$(LUA_SUFFIX)-$(LUACOM_VERSION).dll\" $(CPPFLAGS) $(COMPAT) /Fo$@ $<
+	$(CC) /c /DLUACOM_DLL=\"luacom.dll\" $(CPPFLAGS) $(COMPAT) /Fo$@ $<
 
 {$(SRC_LIB_DIR)}.c{$(OBJ_DIR)}.obj:
 	$(CC) /c /Za $(CFLAGS) $(COMPAT) /Fo$@ $<
@@ -195,7 +195,7 @@ DLL_OBJS = $(OBJ_DIR)/luacom_dll.obj
 include ./mak/dependences.mak
 
 $(BIN_DIR)/luacom.lua: $(SRC_LIB_DIR)/t_luacom.lua
-	$(LUA) -e"str=io.read('*a');str=string.gsub(str,'LUACOM_DLL','luacom-lua$(LUA_SUFFIX)-$(LUACOM_VERSION).dll');io.write(str);" < $(SRC_LIB_DIR)/t_luacom.lua > $@
+	$(LUA) -e"str=io.read('*a');str=string.gsub(str,'LUACOM_DLL','luacom.dll');io.write(str);" < $(SRC_LIB_DIR)/t_luacom.lua > $@
 
 $(LC_LIB): $(LIB_OBJS)
 	lib /NOLOGO /OUT:$@ $(LIB_OBJS)
