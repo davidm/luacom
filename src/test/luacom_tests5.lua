@@ -1,60 +1,74 @@
 -- LuaCOM test suite.
 
 require "luacom"
+assert(luacom)
+local luacom = luacom
 
 local skipped = false  -- whether tests were skipped
 
-teste_progid = "LuaCOM.Test"
+local teste_progid = "LuaCOM.Test"
 
-luacom.StartLog("y:\\luacom.log")
+luacom.StartLog("luacom.log")
 luacom.abort_on_API_error = true
 
-Unk = luacom.GetIUnknown
+--UNUSED: Unk = luacom.GetIUnknown
+
+local Events
+local Cookie
+local _obj
 
 -- Objeto COM de teste
-
-Test = {}
-
+local Test = {}
 Test.prop1 = 1
 Test.prop2_value = 0
-
 function Test:ShowDialog()
   print("ShowDialog called")
 end
+function Test:prop2(p1, p2, value)
+  Events:evt1(value)
+  Events:evt2()
+  if value then
+    Test.prop2_value = p1*p2*value
+  else
+    return Test.prop2_value/(p1*p2)
+  end
+end
 
-
+--[[
+BEGIN-UNUSED
 DataConvTest = {}
+do
+  function DataConvTest:TestDATE(a, b)
+    print(a)
+    print(b)
+    return b, a, a
+  end
 
+  function DataConvTest:TestArrayByVal(a)
+    return {"j","k","l"}
+  end
+
+  function DataConvTest:TestArrayByRef(a)
+    return {1,2}
+  end
+
+  function DataConvTest:TestBSTR(p1, p2)
+    return p2, p1, p1..p2
+  end
+
+  function DataConvTest:TestVARIANT(p1, p2)
+    return p1, p2, p2
+  end
+end
 function Test:DataConvTest()
-  return luacom.ImplInterface(DataConvTest, "LUACOM.Test", "IDataConversionTest")
+  return luacom.ImplInterface(DataConvTest, "LUACOM.Test",
+                              "IDataConversionTest")
 end
-
-function DataConvTest:TestDATE(a, b)
-  print(a)
-  print(b)
-  return b, a, a
-end
-
-function DataConvTest:TestArrayByVal(a)
-  return {"j","k","l"}
-end
-
-function DataConvTest:TestArrayByRef(a)
-  return {1,2}
-end
-
-function DataConvTest:TestBSTR(p1, p2)
-  return p2, p1, p1..p2
-end
-
-function DataConvTest:TestVARIANT(p1, p2)
-  return p1, p2, p2
-end
-
+END-UNUSED
+]]
 
 -- Criação e registro do objeto COM de teste
-
-function init()
+local function init()
   local reginfo = {}  
   reginfo.VersionIndependentProgID = "LUACOM.Test"
   reginfo.ProgID = reginfo.VersionIndependentProgID..".1"
@@ -67,8 +81,8 @@ function init()
   assert(res)
   
   -- creates and exposes COM proxy application object
+  local COMtestobj
   COMtestobj, Events = luacom.NewObject(Test, "LUACOM.Test")
-  
   assert(COMtestobj)
   assert(Events)
    
@@ -76,28 +90,18 @@ function init()
   assert(Cookie)
   
   _obj = luacom.CreateObject("LUACOM.Test")
-  
 end
 
-function finish()
+local function finish()
   luacom.RevokeObject(Cookie)
 end
 
 
-function Test:prop2(p1, p2, value)
-  Events:evt1(value)
-  Events:evt2()
-  if value then
-    Test.prop2_value = p1*p2*value
-  else
-    return Test.prop2_value/(p1*p2)
-  end
-end
-
 
 -- Funcoes auxiliares
 
-function table2string(table)
+-- Converts table to string.  Supports nested tables.
+local function table2string(table)
   if type(table) ~= "table" then
     return tostring(table)
   end
@@ -119,12 +123,10 @@ function table2string(table)
   return s
 end
 
-
-
-function number_test(start)
-  if number_test_n == nil then
-    number_test_n = 0
-  end
+-- Begin new test.
+local number_test_n
+local function number_test(start)
+  number_test_n = number_test_n or 0
 
   if type(start) == "number" then
     number_test_n = start
@@ -132,57 +134,54 @@ function number_test(start)
     number_test_n = number_test_n + 1
   end
 
-  if type(start) == "string" then
-    print("Teste "..number_test_n..": "..start);
-  else
-    print("Teste "..number_test_n);
-  end
+  print("Test " .. number_test_n ..
+        (type(start) == "string" and ": "..start or ""))
 end
+local nt = number_test
 
-nt = number_test
 
+----------------------------------------------------------------------
+----------------------------------------------------------------------
 
 
 -- Testa tratamento de entradas incorretas
-
-function test_wrong_parameters()
+local function test_wrong_parameters()
   print("\n=======> test_wrong_parameters")
 
   nt(1)
-  res = pcall(luacom.CreateObject,{table = "aa"})
+  local res = pcall(luacom.CreateObject,{table = "aa"})
   assert(res == false)
 
   nt()
-  res = pcall(luacom.CreateObject)
+  local res = pcall(luacom.CreateObject)
   assert(res == false)
 
   nt()
-  res = pcall(luacom.ImplInterface)
+  local res = pcall(luacom.ImplInterface)
   assert(res == false)
 
   nt()
-  d, obj = pcall(luacom.ImplInterface,{}, "blablabla", "blablabla")
+  local d, obj = pcall(luacom.ImplInterface,{}, "blablabla", "blablabla")
   assert(obj == nil)
 
   nt()
-  d, obj = pcall(luacom.ImplInterface, {}, "InetCtls.Inet", "blablabla")
+  local d, obj = pcall(luacom.ImplInterface, {}, "InetCtls.Inet", "blablabla")
   assert(obj == nil)
 
   -- ProgID's inexistentes
   nt()
-  obj = luacom.CreateObject("blablabla")
+  local obj = luacom.CreateObject("blablabla")
   assert(obj == nil)
 
   nt()
-  obj = luacom.CreateObject(1)
+  local obj = luacom.CreateObject(1)
   assert(obj == nil)
 
 end
 
 
 -- Teste simples
-
-function test_simple()
+local function test_simple()
   print("\n=======> test_simple")
 
   nt(1)
@@ -201,7 +200,7 @@ function test_simple()
     assert(table2string(array) == table2string({"1","2"}))
   end
 
-  obj = luacom.ImplInterface(table, "LUACOM.Test", "IDataConversionTest" )
+  local obj = luacom.ImplInterface(table, "LUACOM.Test", "IDataConversionTest" )
   assert(obj)
 
   obj:TestArray1({1,2})
@@ -209,19 +208,20 @@ end
 
 
 -- Teste de Implementacao de Interface via tabelas
-
-function test_iface_implementation()
+local function test_iface_implementation()
   print("\n=======> test_iface_implementation")
   
   nt(1)
 
-  iface_ok = 0
-  iface = {}
+  local iface_ok = 0
+  local iface = {}
   iface.evt1 = function(self)
     iface_ok = iface_ok + 1
   end
 
-  iface.TestManyParams = function(self,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15)
+  iface.TestManyParams = function(
+    self,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15
+  )
     assert(p1 == 1)
     assert(p2 == 2)
     assert(p3 == 3)
@@ -239,7 +239,7 @@ function test_iface_implementation()
     assert(p15 == 15)
   end
 
-  obj = luacom.ImplInterface(iface, teste_progid, "ITestEvents")
+  local obj = luacom.ImplInterface(iface, teste_progid, "ITestEvents")
   assert(obj)
 
   nt()
@@ -256,20 +256,22 @@ end
 
 
 -- Teste de stress
-function test_stress()
+local function test_stress()
   print("\n=======> test_stress")
 
   nt(1)
 
-  iface = {}
+  local iface = {}
+  local iface_ok
   iface.BeforeNavigate = function (self)
     iface_ok = iface_ok + 1
   end
 
-  obj = luacom.ImplInterface(iface, "InternetExplorer.Application", "DWebBrowserEvents")
+  local obj = luacom.ImplInterface(
+      iface, "InternetExplorer.Application", "DWebBrowserEvents")
   assert(obj)
 
-  i = 1
+  local i = 1
   iface_ok = 1
   while i < 100000 do
     obj:BeforeNavigate()
@@ -284,20 +286,19 @@ end
 
 
 -- Teste de Connection Points
-
-function test_connection_points()
+local function test_connection_points()
   print("\n=======> test_connection_points")
 
   nt(1)
 
   nt()
-  events = {}
-  events_ok = nil
+  local events = {}
+  local events_ok = nil
   events.evt2 = function(self)
     events_ok = 1
   end
 
-  evt = luacom.ImplInterface(events, "LUACOM.Test", "ITestEvents")
+  local evt = luacom.ImplInterface(events, "LUACOM.Test", "ITestEvents")
   assert(evt)
 
   nt()
@@ -316,8 +317,6 @@ function test_connection_points()
 
   nt()
   _obj.setprop2(2,2,3)
-
-
   assert(events_ok)
 
   nt()
@@ -329,11 +328,10 @@ end
 
 
 -- Teste de propget
-function test_propget()
+local function test_propget()
   print("\n=======> test_propget")
 
   nt(1)
-
   local iface = {}
   iface.Value = 1
   local evt = luacom.ImplInterface(iface, "MsComCtlLib.Slider", "ISlider")
@@ -345,13 +343,13 @@ function test_propget()
   end
 
   --nt()
-  --obj = luacom.CreateObject("COMCTL.TabStrip.1")
+  --local obj = luacom.CreateObject("COMCTL.TabStrip.1")
   --t = obj.Tabs
 end
 
 
 -- Teste de propput
-function test_propput()
+local function test_propput()
   print("\n=======> test_propput")
 
   nt(1) -- propput simples
@@ -371,7 +369,7 @@ end
 
 
 
-function test_index_fb()
+local function test_index_fb()
   print("\n=======> test_index_fb")
 
   nt(1)
@@ -379,19 +377,19 @@ function test_index_fb()
   assert(tm)
 
   nt()
-  res = pcall(tm, nil,nil)
+  local res = pcall(tm, nil,nil)
   assert(res == false)
 
   nt()
-  res = pcall(tm, {}, nil)
+  local res = pcall(tm, {}, nil)
   assert(res == false)
 
   nt()
-  res = pcall(tm, {}, "test")
+  local res = pcall(tm, {}, "test")
   assert(res == false)
 
   nt()
-  d, res = pcall(tm, _obj, nil)
+  local d, res = pcall(tm, _obj, nil)
   assert(res == nil)
 
   nt()
@@ -405,7 +403,7 @@ end
 
 
 
-function test_method_call_without_self()
+local function test_method_call_without_self()
   print("\n=======> test_method_call_without_self")
 
   nt(1)
@@ -428,11 +426,10 @@ end
 
 
 
-function test_in_params()
+local function test_in_params()
   print("\n=======> test_in_params")
 
-  obj = luacom.CreateObject(teste_progid)
-
+  local obj = luacom.CreateObject(teste_progid)
   assert(obj)
 
   -- Testa ordem dos parametros
@@ -442,22 +439,23 @@ function test_in_params()
   local res = obj:TestParam1(1,2,3)
   assert(res == 1)
 
-  res = obj:TestParam2(1,2,3)
+  local res = obj:TestParam2(1,2,3)
   assert(res == 2)
 
-  res = obj:TestParam3(1,2,3)
+  local res = obj:TestParam3(1,2,3)
   assert(res == 3)
 end
 
 
 
-function test_inout_params()
+local function test_inout_params()
   print("\n=======> test_inout_params")
 
-  iupobj = iupolecontrol{progid = "TESTECTL.TesteCtrl.1"}
+--[[DISABLED:
+  local iupobj = iupolecontrol{progid = "TESTECTL.TesteCtrl.1"}
   assert(iupobj)
 
-  obj = iupobj.LUACOM
+  local obj = iupobj.LUACOM
 
   nt(1)
   local res = pcall(obj.TestInOutshort, obj, 10)
@@ -473,22 +471,19 @@ function test_inout_params()
   local res = pcall(obj.TestInOutlong, obj,100000)
   assert(res ~= nil)
   assert(res[1] == 200000)
+--]]
 end
 
 
 
-----------------------------------------------------------------------
-
-----------------------------------------------------------------------
-
-
-function test_out_params()
+local function test_out_params()
   print("\n=======> test_out_params")
 
-  iupobj = iupolecontrol{progid = "TESTECTL.TesteCtrl.1"}
+--[[DISABLED:
+  local iupobj = iupolecontrol{progid = "TESTECTL.TesteCtrl.1"}
   assert(iupobj)
 
-  obj = iupobj.LUACOM
+  local obj = iupobj.LUACOM
 
   nt(1)
   local res = pcall(obj.TestOutParam, obj)
@@ -505,25 +500,20 @@ function test_out_params()
   assert(res[1] == 6)
   assert(res[2] == 2)
   assert(res[3] == 3)
+--]]
 end
 
 
 
-----------------------------------------------------------------------
-
-----------------------------------------------------------------------
-
 -- teste de safe array
-
-----------------------------------------------------------------------
-function test_safearrays()
+local function test_safearrays()
   print("\n=======> test_safearrays")
 
-  teste = {}
+  local teste = {}
 
   nt(1)
 
-  obj = luacom.ImplInterfaceFromTypelib(teste, "test.tlb", "ITest2" )
+  local obj = luacom.ImplInterfaceFromTypelib(teste, "test.tlb", "ITest2" )
   assert(obj)
 
   array = {}
@@ -535,7 +525,7 @@ function test_safearrays()
       array[i] = {}
     end
 
-    j = 1
+    local j = 1
     while j <= 3 do
       if array[i][j] == nil then
         array[i][j] = {}
@@ -556,7 +546,6 @@ function test_safearrays()
   end
 
   local i = 0
-
   while i < 10 do
     obj:TestSafeArray(array)
     i = i + 1
@@ -603,7 +592,7 @@ function test_safearrays()
   assert(res == false)
 
   -- steals a userdata...
-  userdata = obj["_USERDATA_REF_"]
+  local userdata = obj["_USERDATA_REF_"]
 
   local res = pcall(obj.TestSafeArrayVariant,{obj,{userdata, userdata}})
   assert(res)
@@ -623,7 +612,7 @@ function test_safearrays()
     assert(a[i] == i)
   end
 
-  array_test = {{1},{"1"},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1}}
+  local array_test = {{1},{"1"},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1},{1}}
   a = obj:TestSafeArrayVariant(array_test)
   assert(table2string(a) == table2string(array_test))
 
@@ -637,7 +626,7 @@ function test_safearrays()
     end
   end
 
-  obj = luacom.ImplInterfaceFromTypelib(teste, "test.tlb", "ITest2" )
+  local obj = luacom.ImplInterfaceFromTypelib(teste, "test.tlb", "ITest2" )
   assert(obj)
 
   array = {}
@@ -674,10 +663,8 @@ function test_safearrays()
 end
 
 
---
 -- Teste de luacom.NewObject
---
-function test_NewObject()
+local function test_NewObject()
   print("\n=======> test_NewObject")
 
   nt(1)
@@ -693,13 +680,13 @@ function test_NewObject()
       rawset(table, index, value)
     end
 
-  impl = {}
-  testtag = {}
+  local impl = {}
+  local testtag = {}
   setmetatable(impl, testtag)
   testtag["__index"] =  tm_gettable
   testtag["__newindex"] = tm_settable
 
-  obj = luacom.NewObject(impl, "LUACOM.Test")
+  local obj = luacom.NewObject(impl, "LUACOM.Test")
   assert(obj)
 
   obj.prop1 = 1
@@ -710,15 +697,15 @@ end
 --
 -- Teste da conversao de dados
 --
-function test_DataTypes()
+local function test_DataTypes()
   print("\n=======> test_DataTypes")
 
-  teste = {}
+  local teste = {}
   teste.Test = function(self, in_param, in_out_param, out_param)
     return in_out_param, in_param, in_param
   end
 
-  obj = luacom.ImplInterface(teste, "LUACOM.Test", "IDataConversionTest")
+  local obj = luacom.ImplInterface(teste, "LUACOM.Test", "IDataConversionTest")
   assert(obj)
 
   nt(1)  -- Datas
@@ -726,110 +713,110 @@ function test_DataTypes()
   teste.TestDATE = teste.Test
 
   -- this one should work  
-  date = "29/2/1996 10:00:00"
-  date2 = "1/1/2001 01:00:00"
-  date_res1, date_res2, date_res3 = obj:TestDATE(date, date2)
+  local date = "29/2/1996 10:00:00"
+  local date2 = "1/1/2001 01:00:00"
+  local date_res1, date_res2, date_res3 = obj:TestDATE(date, date2)
   assert(date_res1:find '01')
   assert(date_res2:find '96')
 --print(date_res3, date_res2)
 --FIX  assert(date_res3 == date_res2)
 
   -- this ones should fail
-  date = "29/2/1997 10:00:00"
-  res = pcall(obj.TestDATE,obj, date, date)
+  local date = "29/2/1997 10:00:00"
+  local res = pcall(obj.TestDATE,obj, date, date)
   assert(res == false)
 
-  date = "1/1/2001 24:00:00"
-  res = pcall(obj.TestDATE,obj, date, date)
+  local date = "1/1/2001 24:00:00"
+  local res = pcall(obj.TestDATE,obj, date, date)
   assert(res == false)
 
   nt("Currency") -- teste de currency
 
   teste.TestCURRENCY = teste.Test
-  cy = "R$ 1.000.001,15"
+  local cy = "R$ 1.000.001,15"
   -- cy = "$ 1,000,001.15" -- or this
-  cy2 = 988670.12
+  local cy2 = 988670.12
   print 'FIX - remove regional settings dependency in test'; skipped=true
   -- cy_res2, cy_res, cy_res3 = obj:TestCURRENCY(cy, cy2)
   -- assert(cy_res == 1000001.15)
   -- assert(cy_res2 == cy2)
   -- assert(cy_res3 == 1000001.15)
-  cy = 12345.56
-  cy_res = obj:TestCURRENCY(cy, cy)
+  local cy = 12345.56
+  local cy_res = obj:TestCURRENCY(cy, cy)
   assert(cy_res == cy)
 
   -- Este deve falhar
 
-  cy = "R$ 1,000,001.15"
-  res = pcall(obj.TestCURRENCY,obj, cy)
+  local cy = "R$ 1,000,001.15"
+  local res = pcall(obj.TestCURRENCY,obj, cy)
   assert(res == false)
 
-  cy = {}
-  res = pcall(obj.TestCURRENCY,obj, cy)
+  local cy = {}
+  local res = pcall(obj.TestCURRENCY,obj, cy)
   assert(res == false)
 
   nt() -- teste de booleanos
 
   teste.TestBool = teste.Test
 
-  b = true
-  b2 = false
-  b_res2, b_res, b_res3 = obj:TestBool(b, b2)
+  local b = true
+  local b2 = false
+  local b_res2, b_res, b_res3 = obj:TestBool(b, b2)
   assert(b == b_res)
   assert(b2 == b_res2)
   assert(b_res3 == b)
 
-  b = false
-  b_res = obj:TestBool(b, b)
+  local b = false
+  local b_res = obj:TestBool(b, b)
   assert(b == b_res)
 
   nt() -- teste de unsigned char
 
   teste.TestChar = teste.Test
 
-  uc = 100
-  uc2 = 150
-  uc_res2, uc_res, uc_res3 = obj:TestChar(uc, uc2)
+  local uc = 100
+  local uc2 = 150
+  local uc_res2, uc_res, uc_res3 = obj:TestChar(uc, uc2)
   assert(uc_res == uc)
   assert(uc_res2 == uc2)
   assert(uc_res3 == uc)
 
   -- este deve falhar
-  uc = 1000
-  res = pcall(obj.TestChar, obj, uc, uc)
+  local uc = 1000
+  local res = pcall(obj.TestChar, obj, uc, uc)
   assert(res == false)
 
   -- teste de VARIANT
   teste.TestVARIANT = teste.Test
 
   nt("VARIANT - number")
-  v = 100
-  v2 = 150
-  v_res2, v_res, v_res3 = obj:TestVARIANT(v, v2)
+  local v = 100
+  local v2 = 150
+  local v_res2, v_res, v_res3 = obj:TestVARIANT(v, v2)
   assert(v_res == v)
   assert(v_res2 == v2)
   assert(v_res3 == v)
 
   nt("VARIANT - String")
-  v = "abcdef"
-  v2 = "ghijog"
-  v_res2, v_res, v_res3 = obj:TestVARIANT(v, v2)
+  local v = "abcdef"
+  local v2 = "ghijog"
+  local v_res2, v_res, v_res3 = obj:TestVARIANT(v, v2)
   assert(v_res == v)
   assert(v_res2 == v2)
   assert(v_res3 == v)
 
   nt("VARIANT - mixed")
-  v = "abcdef"
-  v2 = 123
-  v_res2, v_res, v_res3 = obj:TestVARIANT(v, v2)
+  local v = "abcdef"
+  local v2 = 123
+  local v_res2, v_res, v_res3 = obj:TestVARIANT(v, v2)
   assert(v_res == v)
   assert(v_res2 == v2)
   assert(v_res3 == v)
 
   nt("VARIANT - IDispatch")
-  v = obj
-  v2 = obj
-  v_res2, v_res, v_res3 = obj:TestVARIANT(v, v2)
+  local v = obj
+  local v2 = obj
+  local v_res2, v_res, v_res3 = obj:TestVARIANT(v, v2)
 print 'FIX: GetIUnknown test disabled'; skipped=true
 --  assert(luacom.GetIUnknown(v_res)== luacom.GetIUnknown(v))
 --  assert(luacom.GetIUnknown(v_res2)== luacom.GetIUnknown(v2))
@@ -837,8 +824,8 @@ print 'FIX: GetIUnknown test disabled'; skipped=true
 
   nt("VARIANT - IUnknown")
 --[[FIX  v = luacom.GetIUnknown(obj)
-  v2 = v
-  v_res2, v_res, v_res3 = obj:TestVARIANT(v, v2)
+  local v2 = v
+  local v_res2, v_res, v_res3 = obj:TestVARIANT(v, v2)
   assert(luacom.GetIUnknown(v_res) == v)
   assert(luacom.GetIUnknown(v_res2) == v2)
   assert(luacom.GetIUnknown(v_res3) == v)
@@ -846,83 +833,83 @@ print 'FIX: GetIUnknown test disabled'; skipped=true
 
   nt("Enum") -- Teste de Enum
   teste.TestENUM = teste.Test
-  e = 3
-  e2 = 4
-  e_res2, e_res, e_res3 = obj:TestENUM(e, e2)
+  local e = 3
+  local e2 = 4
+  local e_res2, e_res, e_res3 = obj:TestENUM(e, e2)
   assert(e_res == e)
   assert(e_res2 == e2)
   assert(e_res3 == e)
 
   nt("BSTR") -- Teste de BSTR
   teste.TestBSTR = teste.Test
-  s = "abdja"
-  s2 = "fsjakfhdksjfhkdsa"
-  s_res2, s_res, s_res3 = obj:TestBSTR(s, s2)
+  local s = "abdja"
+  local s2 = "fsjakfhdksjfhkdsa"
+  local s_res2, s_res, s_res3 = obj:TestBSTR(s, s2)
   assert(s_res == s)
   assert(s_res2 == s2)
   assert(s_res3 == s)
 
   -- embedded nulls
   --   bug#428 - "Improper handling of BSTRs with embedded zeros"
-  s = "asdf\0asdf"; s2 = s
-  s_res2, s_res, s_res3 = obj:TestBSTR(s, s2)
+  local s = "asdf\0asdf"; s2 = s
+  local s_res2, s_res, s_res3 = obj:TestBSTR(s, s2)
   assert(s_res == s and s_res2 == s and s_res3 == s)
 
   -- empty string
-  s = ""; s2 = s
-  s_res2, s_res, s_res3 = obj:TestBSTR(s, s2)
+  local s = ""; s2 = s
+  local s_res2, s_res, s_res3 = obj:TestBSTR(s, s2)
   assert(s_res == s and s_res2 == s and s_res3 == s)
 
   nt("Short")
   teste.TestShort = teste.Test
-  p1 = 10
-  p2 = 100
-  res2, res1, res3 = obj:TestShort(p1, p2)
+  local p1 = 10
+  local p2 = 100
+  local res2, res1, res3 = obj:TestShort(p1, p2)
   assert(p1 == res1)
   assert(p2 == res2)
   assert(p1 == res3)
 
   nt("Long")
   teste.TestLong = teste.Test
-  p1 = 1234567
-  p2 = 9876543
-  res2, res1, res3 = obj:TestLong(p1, p2)
+  local p1 = 1234567
+  local p2 = 9876543
+  local res2, res1, res3 = obj:TestLong(p1, p2)
   assert(p1 == res1)
   assert(p2 == res2)
   assert(p1 == res3)
 
   nt("Float")
   teste.TestFloat = teste.Test
-  p1 = 10.111
-  p2 = 123.8212
-  res2, res1, res3 = obj:TestFloat(p1, p2)
+  local p1 = 10.111
+  local p2 = 123.8212
+  local res2, res1, res3 = obj:TestFloat(p1, p2)
   assert(math.abs(p1-res1) < 0.00001)
   assert(math.abs(p2-res2) < 0.00001)
   assert(math.abs(p1-res3) < 0.00001)
 
   nt("Double")
   teste.TestDouble = teste.Test
-  p1 = 9876.78273823
-  p2 = 728787.889978
-  res2, res1, res3 = obj:TestDouble(p1, p2)
+  local p1 = 9876.78273823
+  local p2 = 728787.889978
+  local res2, res1, res3 = obj:TestDouble(p1, p2)
   assert(p1 == res1)
   assert(p2 == res2)
   assert(p1 == res3)
 
   nt("Int")
   teste.TestInt = teste.Test
-  p1 = 1000
-  p2 = 1001
-  res2, res1, res3 = obj:TestInt(p1, p2)
+  local p1 = 1000
+  local p2 = 1001
+  local res2, res1, res3 = obj:TestInt(p1, p2)
   assert(p1 == res1)
   assert(p2 == res2)
   assert(p1 == res3)
 
   nt("IDispatch")
   teste.TestIDispatch = teste.Test
-  p1 = obj
-  p2 = obj
-  res2, res1, res3 = obj:TestIDispatch(p1, p2)
+  local p1 = obj
+  local p2 = obj
+  local res2, res1, res3 = obj:TestIDispatch(p1, p2)
 --[[FIX
   assert(luacom.GetIUnknown(res1) == luacom.GetIUnknown(obj))
   assert(luacom.GetIUnknown(res2) == luacom.GetIUnknown(obj))
@@ -931,9 +918,9 @@ print 'FIX: GetIUnknown test disabled'; skipped=true
 
   nt("IUnknown")
   teste.TestIUnknown = teste.Test
-  p1 = luacom.GetIUnknown(obj)
-  p2 = luacom.GetIUnknown(obj)
-  res2, res1, res3 = obj:TestIUnknown(p1, p2)
+  local p1 = luacom.GetIUnknown(obj)
+  local p2 = luacom.GetIUnknown(obj)
+  local res2, res1, res3 = obj:TestIUnknown(p1, p2)
 --[[FIX
   assert(p1 == luacom.GetIUnknown(res1))
   assert(p2 == luacom.GetIUnknown(res2))
@@ -942,76 +929,77 @@ print 'FIX: GetIUnknown test disabled'; skipped=true
 end
 
 
-function test_USERDEF_PTR()
+local function test_USERDEF_PTR()
   print("\n=======> test_USERDEF_PTR")
 
-  teste_table = {}
+  local teste_table = {}
   -- por default simplesmente retorna
   teste_table.teste = function(self, value)
     return value
   end
 
-  myindex = function(table, index)
+  local myindex = function(table, index)
     return rawget(table, "teste")
   end
 
-  t = {}
+  local t = {}
   setmetatable(teste_table, t)
   t["__index"] = myindex
 
-  teste = luacom.ImplInterface(teste_table, "LUACOM.Test", "ITest1")
-  teste2 = luacom.ImplInterface(teste_table, "LUACOM.Test", "IStruct1")
+  local teste = luacom.ImplInterface(teste_table, "LUACOM.Test", "ITest1")
+  local teste2 = luacom.ImplInterface(teste_table, "LUACOM.Test", "IStruct1")
   assert(teste)
 
   -- outra opcao
-  teste_disp = function(self, value)
+  local o2
+  local teste_disp = function(self, value)
     local t = {}
     o2 = luacom.ImplInterface(t, "LUACOM.Test", "ITest1")
     return o2
   end
 
   nt(1)
-  n = teste:up_userdef_enum(3)
+  local n = teste:up_userdef_enum(3)
   assert(n == nil)
 
   nt()
-  n = teste:up_ptr_userdef_enum(4)
+  local n = teste:up_ptr_userdef_enum(4)
 --FIX  assert(n == 4)
 
   nt()
   teste_table.up_ptr_disp = teste_disp
 
-  n = teste:up_ptr_disp(teste2)
+  local n = teste:up_ptr_disp(teste2)
 print 'FIX: GetIUnknown test disabled'; skipped=true
 --  assert(luacom.GetIUnknown(n) == luacom.GetIUnknown(o2))
 
   nt()
-  n = teste:up_ptr_userdef_disp(teste2)
+  local n = teste:up_ptr_userdef_disp(teste2)
   assert(n == nil)
 
   nt()
   teste_table.up_ptr_ptr_userdef_disp = teste_disp
-  n = teste:up_ptr_ptr_userdef_disp(teste2)
+  local n = teste:up_ptr_ptr_userdef_disp(teste2)
 print 'FIX: GetIUnknown test disabled'; skipped=true
 --  assert(luacom.GetIUnknown(n) == luacom.GetIUnknown(o2))
 
   nt()
-  n = teste:up_userdef_alias(1)
+  local n = teste:up_userdef_alias(1)
   assert(n == nil)
 
   nt()
-  n = teste:up_ptr_userdef_alias(1)
+  local n = teste:up_ptr_userdef_alias(1)
 --FIX  assert(n == 1)
-  n = teste:up_userdef_alias_userdef_alias(1)
+  local n = teste:up_userdef_alias_userdef_alias(1)
   assert(n == nil)
 
   nt()
-  n = teste:up_userdef_disp(teste2)
+  local n = teste:up_userdef_disp(teste2)
   assert(n == nil)
 
   nt()
   teste_table.up_udef_alias_ptr_udef_alias_ptr_disp = teste_disp
-  n = teste:up_udef_alias_ptr_udef_alias_ptr_disp(teste2)
+  local n = teste:up_udef_alias_ptr_udef_alias_ptr_disp(teste2)
 print 'FIX: GetIUnknown test disabled\n'; skipped=true
 --  assert(luacom.GetIUnknown(n) == luacom.GetIUnknown(o2))
 
@@ -1024,7 +1012,7 @@ print 'FIX: GetIUnknown test disabled\n'; skipped=true
 
   nt("Unknown & Userdef")
 
-  teste_unk = function(self, value)
+  local teste_unk = function(self, value)
     local t = {}
     o2 = luacom.ImplInterface(t, "LUACOM.Test", "ITest1")
     o2 = luacom.GetIUnknown(o2)
@@ -1033,7 +1021,7 @@ print 'FIX: GetIUnknown test disabled\n'; skipped=true
 
   teste_table.up_udef_alias_ptr_udef_alias_ptr_unk = teste_unk
 
-  n = teste:up_udef_alias_ptr_udef_alias_ptr_unk(luacom.GetIUnknown(teste2))
+  local n = teste:up_udef_alias_ptr_udef_alias_ptr_unk(luacom.GetIUnknown(teste2))
   --assert(luacom.GetIUnknown(n) == o2)
 
   nt("Unknown & Userdef")
@@ -1046,7 +1034,7 @@ print 'FIX: GetIUnknown test disabled\n'; skipped=true
 end
 
 
-function test_field_redefinition()
+local function test_field_redefinition()
   print("\n=======> test_field_redefinition")  
 
   nt(1)
@@ -1086,11 +1074,11 @@ function test_field_redefinition()
 end
 
 
-function test_indexing()
+local function test_indexing()
   print("\n=======> test_indexing: NOT IMPLEMENTED!!!")  
 end
 
-function test_API()
+local function test_API()
   nt(1)
   
   nt("CreateLuaCOM")
@@ -1100,25 +1088,27 @@ function test_API()
   
   local obj 
  
-  obj = luacom.CreateLuaCOM(1)
+  local obj = luacom.CreateLuaCOM(1)
   assert(obj == nil)
   
-  obj = luacom.CreateLuaCOM(punk)
+  local obj = luacom.CreateLuaCOM(punk)
   assert(type(obj.prop1) == "number")
   
   nt("ImportIUnknown & .IUnknown")
   
-  local ptr
-  ptr = _obj.IUnknown
+  local ptr = _obj.IUnknown
   assert(type(ptr) == "userdata")
   
-  obj = luacom.ImportIUnknown(ptr)
+  local obj = luacom.ImportIUnknown(ptr)
   assert(obj)
   
-  obj = luacom.CreateLuaCOM(obj)
+  local obj = luacom.CreateLuaCOM(obj)
   assert(type(obj.prop1) == "number")
 end
 
+
+----------------------------------------------------------------------
+----------------------------------------------------------------------
 
 
 -- Que testes vao ser realizados
@@ -1133,6 +1123,7 @@ test_propput()
 test_index_fb()
 test_method_call_without_self()
 end
+
 
 if false then
 test_in_params()
