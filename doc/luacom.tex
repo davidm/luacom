@@ -2090,9 +2090,11 @@ This way the client may call methods of the COM object using the
 \item Building with MSVC++2005.  Both Makefile and Visual Studio
 .sln/.vcproj files available.
 
+\item Fixed handling of empty SafeArrays and SafeArrays of one dimension.
+
 \item Fixed reversed order of indices in multidimensional SafeArray's
 
-\item Fixed handling of empty SafeArrays and SafeArrays of one dimension.
+\item Fixed handling BSTR's with embedded zeros. Bug#428.
 
 \item Renamed luacom-lua5-1.3.dll to luacom.dll.
 
