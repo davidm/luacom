@@ -109,14 +109,13 @@ local function table2string(table)
   local i, v = next(table, nil)
   local s = "{"
   local first = 1
-  while i ~= nil do
+  for i,v in pairs(table) do
     if first ~= 1 then
       s = s..", "            
     else
       first = 0
     end
     s = s..table2string(v)
-    i,v = next(table, i)    
   end
   s = s.."}"
 
@@ -271,11 +270,9 @@ local function test_stress()
       iface, "InternetExplorer.Application", "DWebBrowserEvents")
   assert(obj)
 
-  local i = 1
   iface_ok = 1
-  while i < 100000 do
+  for i=1,100000 do
     obj:BeforeNavigate()
-    i = i + 1
   end
 
   nt()
@@ -517,38 +514,26 @@ local function test_safearrays()
   assert(obj)
 
   array = {}
-  local i=1
-  local j=1
-  local k=1
-  while i <= 3 do
+  for i=1,3 do
     if array[i] == nil then
       array[i] = {}
     end
-
-    local j = 1
-    while j <= 3 do
+    for j=1,3 do
       if array[i][j] == nil then
         array[i][j] = {}
       end
-      k = 1
-      while k <= 3 do
+      for k=1,3 do
         array[i][j][k] = i*9+j*3+k
-        k = k + 1
       end
-      j = j + 1
     end
-
-    i = i + 1
   end
 
   teste.TestSafeArray = function(self, array_param)
     assert(table2string(array_param) == table2string(array))
   end
 
-  local i = 0
-  while i < 10 do
+  for i=1,10 do
     obj:TestSafeArray(array)
-    i = i + 1
   end
 
   nt()
@@ -619,10 +604,8 @@ local function test_safearrays()
   nt()
 
   teste.TestSafeArrayIDispatch = function(self, array)
-    local i = 1
-    while i < 10 do
+    for i=1,9 do
       print(tostring(i).." => "..tostring(array[i].Teste))
-      i = i + 1
     end
   end
 
@@ -630,12 +613,10 @@ local function test_safearrays()
   assert(obj)
 
   array = {}
-  local i = 1
   teste.Teste = 10
 
-  while i < 10 do
+  for i=1,9 do
     array[i] = luacom.ImplInterfaceFromTypelib(teste, "test.tlb", "ITest2" )
-    i = i + 1
   end
 
   obj:TestSafeArrayIDispatch(array)
@@ -932,23 +913,21 @@ end
 local function test_USERDEF_PTR()
   print("\n=======> test_USERDEF_PTR")
 
-  local teste_table = {}
+  local t = {}
+  function t.__index(table, index)
+    return rawget(table, "teste")
+  end
+
+  local teste_table = setmetatable({}, t)
   -- por default simplesmente retorna
   teste_table.teste = function(self, value)
     return value
   end
 
-  local myindex = function(table, index)
-    return rawget(table, "teste")
-  end
-
-  local t = {}
-  setmetatable(teste_table, t)
-  t["__index"] = myindex
-
-  local teste = luacom.ImplInterface(teste_table, "LUACOM.Test", "ITest1")
+  local teste  = luacom.ImplInterface(teste_table, "LUACOM.Test", "ITest1")
   local teste2 = luacom.ImplInterface(teste_table, "LUACOM.Test", "IStruct1")
   assert(teste)
+  assert(teste2)
 
   -- outra opcao
   local o2
@@ -1021,7 +1000,8 @@ print 'FIX: GetIUnknown test disabled\n'; skipped=true
 
   teste_table.up_udef_alias_ptr_udef_alias_ptr_unk = teste_unk
 
-  local n = teste:up_udef_alias_ptr_udef_alias_ptr_unk(luacom.GetIUnknown(teste2))
+  local n
+    = teste:up_udef_alias_ptr_udef_alias_ptr_unk(luacom.GetIUnknown(teste2))
   --assert(luacom.GetIUnknown(n) == o2)
 
   nt("Unknown & Userdef")
@@ -1114,7 +1094,6 @@ end
 -- Que testes vao ser realizados
 init()
 
-if true then
 test_simple()
 test_API()
 test_wrong_parameters()
@@ -1122,8 +1101,6 @@ test_propget()
 test_propput()
 test_index_fb()
 test_method_call_without_self()
-end
-
 
 if false then
 test_in_params()
@@ -1131,29 +1108,21 @@ test_out_params()
 test_inout_params()
 end
 
-if true then
 test_iface_implementation()
 test_connection_points()
-end
 
-if true then
 test_safearrays()
-end
 
 if false then
 test_stress()
 end
 
-if true then
 test_NewObject()
 test_DataTypes()
 test_USERDEF_PTR()
-end
 
-if true then
 test_field_redefinition()
 test_indexing()
-end
 
 if skipped then
   print 'WARNING: some tests were disabled.\n'
