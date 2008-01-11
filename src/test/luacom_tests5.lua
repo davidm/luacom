@@ -96,9 +96,41 @@ local function finish()
   luacom.RevokeObject(Cookie)
 end
 
-
+-- immutable tuple type
+-- Useful for comparing lists in test cases.  --djm
+local tuple = {}
+setmetatable(tuple, {__call = function(class, ...)
+  return setmetatable({n=select('#',...), ...}, tuple)
+end})
+function tuple.__eq(a,b)
+  if getmetatable(a) ~= tuple or getmetatable(b) ~= tuple then
+    return false
+  end
+  if a.n ~= b.n then
+    return false
+  end
+  for i=1,a.n do
+    if a[i] ~= b[i] then
+      return false
+    end
+  end
+  return true
+end
+function tuple.__tostring(a)
+  local ts = {}
+  for i=1,a.n do
+    ts[i] = tostring(a[i])
+  end
+  return 'tuple(' .. table.concat(ts, ',') .. ')'
+end
 
 -- Funcoes auxiliares
+
+local function asserteq(a, b)
+  if a ~= b then
+    error('FAIL: ' .. tostring(a) .. ' = ' .. tostring(b), 2)
+  end
+end
 
 -- Converts table to string.  Supports nested tables.
 local function table2string(table)
@@ -194,12 +226,12 @@ local function test_simple()
   assert(_obj.prop1 == 2)
 
   nt()
-  table = {}
-  table.TestArray1 = function(self, array)
+  local t = {}
+  t.TestArray1 = function(self, array)
     assert(table2string(array) == table2string({"1","2"}))
   end
 
-  local obj = luacom.ImplInterface(table, "LUACOM.Test", "IDataConversionTest" )
+  local obj = luacom.ImplInterface(t, "LUACOM.Test", "IDataConversionTest" )
   assert(obj)
 
   obj:TestArray1({1,2})
@@ -421,17 +453,56 @@ local function test_method_call_without_self()
   assert(res == false)
 end
 
+local function test_optional_params()
+  nt(1)
+
+  local teste = {}
+  local obj = luacom.ImplInterfaceFromTypelib(teste, "test.tlb", "ITest1" )
+  assert(obj)
+
+  nt('[in, optional]')
+  -- short test_optional(
+  --   short p1, [optional] VARIANT p2, [optional] VARIANT p3)
+  teste.test_optional = function(self, ...)
+    --FIX: asserteq(tuple(...), tuple(3,4,5))
+    return 6,7,8,9
+  end
+  -- print(tuple(obj:test_optional(3,4,5)))
+  asserteq(tuple(obj:test_optional(3,4,5)), tuple(6))
+
+  nt('[out, optional]')
+  teste.test_out_optional = function(self, ...)
+    asserteq(tuple(...), tuple(3))
+    return 5,6,7,8
+  end
+  --print(tuple(obj:test_out_optional(3,4,5)))
+  asserteq(tuple(obj:test_out_optional(3,4,5)), tuple(5,6,7))
+
+  nt('[in, out, optional]')
+  -- short test_in_out_optional(
+  --   short p1, [in, out, optional] VARIANT* p2,
+  --             [in, out, optional] VARIANT* p3)
+  local par
+  teste.test_in_out_optional = function(self, ...)
+    asserteq(tuple(...), par)
+    return 6,7,8,9
+  end
+  par = tuple(3,4,5)
+  asserteq(tuple(obj:test_in_out_optional(3,4,5)), tuple(6,7,8))
+  par = tuple(3,nil,nil)
+  asserteq(tuple(obj:test_in_out_optional(3)), tuple(6,7,8))
+
+end
 
 
 local function test_in_params()
   print("\n=======> test_in_params")
 
+--[[FIX?
   local obj = luacom.CreateObject(teste_progid)
   assert(obj)
 
   -- Testa ordem dos parametros
-
-  nt(1)
 
   local res = obj:TestParam1(1,2,3)
   assert(res == 1)
@@ -441,6 +512,7 @@ local function test_in_params()
 
   local res = obj:TestParam3(1,2,3)
   assert(res == 3)
+--]]
 end
 
 
@@ -1102,11 +1174,10 @@ test_propput()
 test_index_fb()
 test_method_call_without_self()
 
-if false then
 test_in_params()
 test_out_params()
 test_inout_params()
-end
+test_optional_params()
 
 test_iface_implementation()
 test_connection_points()

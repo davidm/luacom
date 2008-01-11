@@ -291,6 +291,16 @@ library Test
                             short p1, 
                             [defaultvalue(1)] VARIANT p2, 
                             [optional] VARIANT p3);
+            [id(0x00000019)]
+            short test_out_optional(
+                            short p1,
+                            [out, optional] VARIANT* p2,
+                            [out, optional] VARIANT* p3);
+            [id(0x00000020)]
+            short test_in_out_optional(
+                            short p1,
+                            [in, out, optional] VARIANT* p2,
+                            [in, out, optional] VARIANT* p3);
             [id(0x00000016), propget]
             short getput();
             [id(0x00000016), propput]
