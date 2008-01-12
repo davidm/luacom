@@ -36,7 +36,7 @@
 
 
 \title{\luacom \ User Manual \\
-{\small (Version 1.3)}}
+{\small (Version 1.4beta)}}
 
 \author{Vinicius Almendra \and Renato Cerqueira \and Fabio Mascarenhas}
 
@@ -86,7 +86,7 @@
     \item use of \com\ connection point mechanism for bidirectional
     communication and event handling;
 
-    \item fully compatible with Lua 5 and with Lua 4;
+    \item fully compatible with Lua 5.1;
 
     \item log mechanism to ease the debugging of applications.
 
@@ -105,8 +105,8 @@ manual, where more detailed information is provided.
 \paragraph{Newbies} For those who are newcomers, we provide a tutorial
 section (chapter \ref{cap:tutorial}) with a step-by-step guide to
 start using \luacom. More help and samples can be found in \luacom's
-home page. Notice that VBScript code can be easily converted to \lua\
-with \luacom.
+home page and in the demos folder. Notice that VBScript code can be
+easily converted to \lua\ with \luacom.
 
 This manual does not provide information for developers who need
 deeper technical information about \luacom\ or who are willing to
@@ -119,12 +119,9 @@ technologies work or how they can be used to solve particular
 problems. This information can be found easily in the web or in good
 books.
 
-\section*{Some information about samples}
-The sample codes shown in this documentation are all for Lua 5,
-although most of them should also run in Lua 4. Anyway, Lua 4 specific
-samples can be found in the documentation for the previous version of
-\luacom.
-
+\section*{Some information about samples} The sample codes shown in
+this documentation are all for Lua 5.1. Samples for previous Lua versions
+can be found in the documentation for the previous versions of \luacom.
 
 \chapter{Tutorial}
 \label{cap:tutorial}
@@ -134,9 +131,8 @@ samples can be found in the documentation for the previous version of
   \luacom\ is an add-on to the Lua language. To be used, either the binary
   library of \luacom\ must be linked with the host program, just like
   the Lua library and other add-ons, or you should load a \luacom\ dynamic
-  library through Lua 5's require/loadlib mechanism. To use dynamic
-  loading in Lua 4 you should implement a similar mechanism. There
-  are different versions of the \luacom\ binary for the different
+  library through Lua 5's module require mechanism.
+  There are different versions of the \luacom\ binary for the different
   versions of the Lua library, so pay attention to link the right one.
 
   If you are linking \luacom\ to your program, the next step is to modify
@@ -144,9 +140,10 @@ samples can be found in the documentation for the previous version of
   call \luacom's \emph{and} COM initialization and termination
   functions, which are part of the C/C++ API. To do so, include the
   \luacom 's header --- \verb+luacom.h+ --- and call these functions
-  in the proper order: \luacom\ must be initialize after COM and after
-  Lua; it must be terminated before Lua; COM must be terminated AFTER
-  Lua\footnote{Notice that COM must be initialized in each thread that
+  in the proper order: \luacom\ must be initialized after both COM and Lua;
+  \luacom\ must be terminated before Lua, and Lua must be terminated
+  before COM
+  \footnote{Notice that COM must be initialized in each thread that
   will use it. To use \luacom\ in this situation, it's not safe to
   share a single Lua state among several threads; one should create a
   new Lua state for each thread and then initialize \luacom\ with this
@@ -161,16 +158,15 @@ samples can be found in the documentation for the previous version of
    #include <stdio.h>
    #include <ole2.h> // needed for CoInitialize and CoUninitialize
    #include <lua.h>
-
-   #include "luacom.h"
+   #include <luacom.h>
 
    int main (int argc, char *argv[]) {
      /* COM initialization */
      CoInitialize(NULL);
      /* library initialization */
-     lua_State *L = lua_open();
+     lua_State *L = luaL_newstate();
      luacom_open(L);
-     if(lua_dofile("luacom_sample.lua") != 0) {
+     if(luaL_dofile("luacom_sample.lua") != 0) {
        puts("Error running sample!");
        exit(1);
      }
@@ -182,14 +178,19 @@ samples can be found in the documentation for the previous version of
 \end{verbatim}}
 \noindent
 Notice that it's necessary to initialize \com\ before
-\verb+lua_open+ and to terminate it only after the last
+\verb+luacom_open+ and to terminate it only after the last
 \verb+lua_close+, otherwise fatal errors may occur.
 
- Using Lua 5 to dynamically load \luacom\ is simpler. Just call \verb+require("luacom")+
- in your Lua script, and make sure the file \verb+luacom.lua+ is in your \verb+LUA_PATH+
- environment variable, and the Lua and \luacom\ DLLs (\verb+lua-5.0.dll+, \verb+lualib-5.0.dll+ and
- \verb+luacom-lua5-1.3.dll+, respectively) are in your \verb+PATH+.
- Then run your script with the Lua standalone interpreter.
+Using Lua to dynamically load \luacom\ is simpler. Just call
+\verb+require "luacom"+ in your Lua script, and make sure the file
+\verb+luacom.dll+ is in your \verb+LUA_CPATH+ environment variable and
+that Lua's DLLs (e.g. \verb+lua5.1.dll+) are in your \verb+PATH+.
+
+%OLD 1.3: \verb+luacom.lua+ is in your \verb+LUA_PATH+ environment
+% variable, and the Lua and \luacom\ DLLs (\verb+lua-5.0.dll+,
+% \verb+lualib-5.0.dll+ and
+% \verb+luacom-lua5-1.3.dll+, respectively) are in your \verb+PATH+.
+% Then run your script with the Lua standalone interpreter.
 
 \section{Locating \com\ Objects}
 
@@ -197,7 +198,7 @@ The first step to use a COM object is to find it. COM objects are
 registered in the system registry and are associated with an unique
 Class Identifier, known as CLSID. A CLSID may also be associated with
 a string known as Programmatic Identifier or ProgID. This last one is
-the easiest way to reference a COM object. E.g., the ProgID for
+the easiest way to reference a COM object. For example, the ProgID for
 Microsoft\registered\ Word is ``\ident{Word.Application}''.
 
 If one does not know in advance what is the CLSID or the ProgID of the
@@ -326,7 +327,7 @@ exit.
 
     \item \luacom\ API, a set of functions used to do a variety of
     tasks (library initialization, object creation, implementation of
-    Automation interfaces in Lua, manipulation of connection points
+    Automation interfaces in Lua, manipulation of connection points,
     etc.);
 
     \item Automation binding, which translates accesses on \luacom\
@@ -339,7 +340,7 @@ exit.
     \item \luacom\ parameter passing rules, which describe how \luacom\
     translate a \lua\ parameter list to a \com\ one and vice versa;
 
-    \item other objects, like typelib, typeinfo, enumerator etc.
+    \item other objects, like typelib, typeinfo, enumerator, etc.
 
   \end{itemize}
 
@@ -356,7 +357,7 @@ exit.
   using \luacom. This distinction has been made due to the possible
   unbounded growth of features, which could end up cluttering the
   library and making it bigger and bigger and more and more difficult
-  to use. For now, the extended API is entirely implemented in Lua 5
+  to use. For now, the extended API is entirely implemented in Lua
   and can be easily removed without trouble.
 
   The standard API is further divided in two classes: the Lua API and
@@ -365,7 +366,7 @@ exit.
   is declared in the header file \ident{luacom.h}. The Lua API
   permits Lua programs to access all the functionality of \luacom. It
   is implemented as a set of functions inside a global table named
-  \verb+luacom+; hereafter these functions will be called LuaCOM
+  \verb+luacom+; hereafter, these functions will be called LuaCOM
   \emph{methods}. This table is created and populated when the C/C++ API function
   \ident{luacom\_open} is called. Below there is summary of
   the \luacom\ API. Detailed information on these methods is available
@@ -586,12 +587,12 @@ happens:
 \begin{itemize}
 \item when calling \luacom\ API functions that return COM objects
 (\ident{CreateObject}, \ident{GetObject}, \ident{NewObject},
-\ident{Connect} etc.) and
+\ident{Connect}, etc.) and
 \item when receiving return values from COM, where some of the values
 are \idispatch\ pointers.
 \end{itemize}
 
-Follows a sample of these situations:
+Here follows a sample of these situations:
 
 \begin{verbatim}
 -- First, we get a luacom object using LuaCOM API
@@ -636,7 +637,7 @@ mechanism, so there isn't any explicit API method to destroy them.
 
 \paragraph{Caution} \luacom\ only tracks references to COM objects. It
 does not work with the concepts of ``application'', ``component'',
-``process'' etc. It does not know even which objects are part of the
+``process'', etc. It does not know even which objects are part of the
 same component or application. This has some consequences on the
 object disposal:
 
@@ -680,7 +681,7 @@ the component.
 
 The \ident{C++} objects of this class can be used in any place where
 an \idispatch\ or \ident{IUnknown} interface is expected. \luacom\
-takes care of these conversion. Follows a sample implementation of a
+takes care of these conversion. Here follows a sample implementation of a
 \dispinterface\ in Lua.
 
 \begin{verbatim}
@@ -743,7 +744,7 @@ hello_obj:Hello()
 
   One can also use the \verb+NewObject+ method, which is best suited
   to the situation where one needs to create a complete component in
-  \lua\ and wants to export it, so that it can be accessed through COM
+  \lua\ and wants to export it so that it can be accessed through COM
   by any running application.
 
 
@@ -770,7 +771,7 @@ obj:Teste2(a+1)
 
 It's important to notice the need of using the colon -- ``:'' -- for
 method calls. Although \luacom\ does not use the \ident{self}
-parameter that \lua\ passes in this case, its presence is assumed,
+parameter that \lua\ passes in this case, its presence is assumed ---
 that is, \luacom\ always skips the first parameter in the case of
 method calls; forgetting it may cause nasty bugs. Notice that this
 rule doesn't apply when using the default method of a \luacom\ object
@@ -793,7 +794,7 @@ obj.TestData = a + 1
 
 
 Properties may also be accessed as methods. This is mandatory when
-dealing with parameterized properties, that it, ones that accept (or
+dealing with parameterized properties --- that is, ones that accept (or
 demand) parameters. A common example of this situation is the ``Item''
 property of collections.
 
@@ -847,7 +848,7 @@ WMI objects (Windows Management Instrumentation).
 
 \subsubsection{Default methods}
 \label{sec:default-methods}
-A \dispinterface\ can have a default method or property, that is, one
+A \dispinterface\ can have a default method or property --- that is, one
 that is called when the client does not specify the method
 name. \luacom\ calls the default method when the object itself is used
 as a function.
@@ -862,7 +863,6 @@ as a function.
   sheet = excel.Sheets(1)
   print(sheet.Name)
   -- Here we also call the default method
-  -- We must supply the self parameter
   sheets = excel.Sheets
   sheet2 = sheets(2)
   print(sheet2.Name)
@@ -903,8 +903,8 @@ obj_untyp:setValue(b + 1)
 \subsubsection{Property Access in \lua}
 
 When implementing a \com\
-interface in \lua, \luacom\ also supports the concept of property and
-of indexed properties. \luacom\ translate property reads and writes to
+interface in \lua, \luacom\ also supports the concepts of properties and
+indexed properties. \luacom\ translate property reads and writes to
 table field accesses:
 
 \begin{verbatim}
@@ -916,7 +916,7 @@ obj = luacom.ImplInterface(interface, "TEST.Test", "ITest")
 print(obj.Test)
 -- must print nil (if there is no member named Test2)
 print(obj.Test2)
--- this writes the filed Test
+-- this writes the field Test
 obj.Test = 1
 -- Indexed property read. Must return 3 (remember that
 -- indexed tables start at 1 in Lua)
@@ -1027,7 +1027,7 @@ To receive events, it is necessary to have a message loop in the thread
 that owns the object that is receiving the events. All events are dispatched
 through a Windows message queue created
 during \com\ initialization. Without a message loop, the event objects
-implemented by \luacom\ , will never
+implemented by \luacom\ will never
 receive method calls from the \com\ objects they are registered with. Out-of-process
 \com\ servers implemented with \luacom\ also need a message loop to be able to service
 method calls (one is provided by calling \verb+luacom.DetectAutomation+).
@@ -1130,7 +1130,7 @@ describing a method of a \com\ object:
 -- Here we set p1 = 1, p3 = 2 and leave p2 uninitialized
 -- When the method returns, r1 = retval and r2 = p2 and r3 = p3
 r1, r2, r3 = com:TestShort(1,2)
--- WRONG! The are only two in/in-out parameters! Out parameters
+-- Below is WRONG! The are only two in/in-out parameters! Out parameters
 -- are ignored in the lua2com parameter translation
 r1, r2, r3 = com:TestShort(1,2,3) -- WRONG!
 -- Here p1 = 1, p2 is uninitialized and p3 is omitted.
@@ -1284,45 +1284,15 @@ of the conversion results and to avoid errors.
 \subsection{Boolean values}
 \label{subsect:boolean}
 
-\paragraph{Lua 5}
-\luacom\ uses the boolean values \verb+true+ and \verb+false+, but
-does not works with the older convention (\verb+nil+ and
-non-\verb+nil+; see paragraph below).
-
-\paragraph{Lua 4}
-This version of Lua uses the \ident{nil} value as false and
-non-\ident{nil} values as true. As \luacom\ gives a special meaning
-for \ident{nil} values in the parameter list, it can't use \lua\
-convention for true and false values; instead, \luacom\ uses the
-\ident{C} convention: the true value is a number different from zero
-and the false value is the number zero. Here follows a sample:
-
-\begin{verbatim}
--- This function alters the state of the of the window.
--- state is a Lua boolean value
--- window is a LuaCOM object
-function showWindow(window, state)
-  if state then
-    window.Visible = 1
-    -- this has the same result
-    windows.Visible = -10
-  else
-    window.Visible = 0
-  end
-end
--- Shows window
-showWindow(window, 1)
--- Hides window
-showWindow(window, nil)
-\end{verbatim}
-
-
+\luacom\ uses the boolean values \verb+true+ and \verb+false+ and
+does not work with the older Lua 4 convention (\verb+nil+ and
+non-\verb+nil+;).
 
 \subsection{Pointers to \idispatch\ and \luacom\ objects}
 
-A pointer to \idispatch\ is converted to a \luacom object whose
+A pointer to \idispatch\ is converted to a \luacom\ object whose
 implementation is provided by this pointer. If the object is implemented by local
-Lua table, then the pointer is converted to this table. A \luacom object is
+Lua table, then the pointer is converted to this table. A \luacom\ object is
 converted to \com\ simply passing its interface implementation to
 \com.
 
@@ -1335,15 +1305,15 @@ specific metatable.
 
 \subsection{Arrays and Tables}
 
-If the table does not have a \verb+tocom+ tag method (for Lua 4) or
-\verb+__tocom+ metamethod (for Lua 5), \luacom\ first checks if the
+If the table does not have a \verb+__tocom+ metamethod,
+\luacom\ first checks if the
 table can be describing a variant. A table is a variant if it has a
 \verb+Type+ field. This field must have a string that tells how the
 \verb+Value+ field of the table must be converted. Possible values
 for \verb+Type+ are \verb+string+, \verb+bool+, \verb+error+,
 \verb+null+, \verb+currency+, \verb+decimal+, \verb+double+,
 \verb+float+, \verb+int8+, \verb+uint8+, \verb+int4+, \verb+uint4+,
-\verb+int2+, \verb+uint2+, \verb+int1+, verb+uint1+, \verb+int+, and
+\verb+int2+, \verb+uint2+, \verb+int1+, \verb+uint1+, \verb+int+, and
 \verb+uint+. Each corresponds to a variant type.
 
 If the table is not describing a variant, then it may be describing
@@ -1387,11 +1357,11 @@ samples of how is this conversion done:
 \end{tabular}
 \end{center}
 
-If the table has the conversion tag/metamethod, \luacom\ uses it
-to guide the conversion. If the tag/metamethod is a method, \luacom\
+If the table has the conversion metamethod, \luacom\ uses it
+to guide the conversion. If the metamethod is a method, \luacom\
 calls it, passing the table and the COM type. The method should return a COM object
-that \luacom\ will pass on. If the tag/metamethod is a table, \luacom\ will
-look for a \verb+typelib+ field, an \verb+interface+field , and a \verb+coclass+ field,
+that \luacom\ will pass on. If the metamethod is a table, \luacom\ will
+look for a \verb+typelib+ field, an \verb+interface+ field, and a \verb+coclass+ field,
 and pass those as arguments to the \verb+ImplInterfaceFromTypelib+ API call. If the table
 does not have a \verb+typelib+ field, \luacom\ will look for a \verb+progid+ field and
 an \verb+interface+ field, and pass those to the \verb+ImplInterface+ API call. Either way,
@@ -1435,7 +1405,7 @@ compatibility with other scripts.
 
 \subsection{Error Handling}
 When \luacom\ cannot convert a value from or to \com\, it issues an
-exception, that may be translated to a \verb+lua_error+ or to a \com\
+exception, which may be translated to a \verb+lua_error+ or to a \com\
 exception, depending on who is the one being called.
 
 
@@ -1514,7 +1484,7 @@ composite of these parts:
 \begin{itemize}
 \item a server, which implements one or more COM objects;
 \item registry information, which associates a CLSID (Class ID) to
-a triple \emph{server -- type library -- default interface};
+a triple (\emph{server, type library, default interface)};
 \item a ProgID (Programmatic Identifier) which is a name associated to
 a CLSID;
 \item a type library containing a CoClass element.
@@ -1522,16 +1492,16 @@ a CLSID;
 
 The registry information maps a ProgID to a CLSID, which is, in
 turn, mapped to a server. The type information describes the
-component, that is, which interfaces it exposes and what is the
+component --- that is, which interfaces it exposes and what is the
 default interface.
 
-\luacom\ simplifies these tasks providing some helper functions to
+\luacom\ simplifies these tasks by providing some helper functions to
 deal with registration and instantiation of COM servers. \luacom\ suports
 both local (EXE) and in-process (DLL) servers.
 
 \luacom\ also provides helper functions to register and instantiate
 OLE controls (with their user interface embedded in the hosting
-application). This kind of object needs an in-process server, and a
+application). This kind of object needs an in-process server and a
 supported Lua GUI toolkit (IUP, for now).
 
 \section{Is it really useful?}
@@ -1546,7 +1516,7 @@ implemented allows one to do some neat things:
 \begin{itemize}
 \item to expose as a COM object any object that can be accessed via
 Lua through a table. These might be CORBA objects, C++ objects, C
-structures, Lua code etc. Using this feature, a legacy application or
+structures, Lua code, etc. Using this feature, a legacy application or
 library may be ``upgraded'' to COM world with little extra work;
 
 \item to use COM objects anywhere a Lua table is expected. For
@@ -1618,7 +1588,7 @@ CoClass entry, specifying some information about the component:
   supplied; thus the component object could be called an Application
   object for that component;
 
-  \item the source interface, that is, the interface the component
+  \item the source interface --- that is, the interface the component
   uses to send events to the client. This interface is not implemented
   by the component: it just \emph{uses} objects that implement this
   interface.
@@ -1685,7 +1655,7 @@ events.
 The most common way to build a type library is to write an IDL
 describing the type library and them use an IDL compiler, such as
 Microsoft's\registered\ MIDL. Notice that all the interfaces must be
-dispinterfaces, that is, must inherit from \idispatch, and must have
+dispinterfaces --- that is, must inherit from \idispatch and must have
 the flag \texttt{oleautomation}.
 
 
@@ -1739,7 +1709,7 @@ library. If not, they are invisible to COM.
 
 If you are implementing your own server, instead of using the builtin support, your server
 must call the COM initialization functions (\texttt{OleInitialize} or \texttt{CoInitialize}) before \luacom\ is
-started. Other initialization task is the implementation and
+started. Another initialization task is the implementation and
 exposition of the COM objects. This task can be greatly simplified
 using the C/C++ \luacom\ API function \verb+luacom_detectAutomation+.
 
@@ -1757,7 +1727,7 @@ exposed object. Then it must call the COM termination functions AFTER
 \section{Running the COM server}
 
 A COM server built following the preceding guidelines can be used
-as any other COM object, that is, using \verb+CoCreateInstance+,
+as any other COM object --- that is, using \verb+CoCreateInstance+,
 \verb+CreateObject+ or something like these.
 
 
@@ -1845,9 +1815,9 @@ return luacom.DetectAutomation(COM)
 
 Most of what is needed to build an OLE control was already covered
 in the last section. Controls are like ordinary \luacom\ objects,
-but they are created by the \verb+NewControl+ API function, instead
-of \verb+NewObject+. The registration info table must also have \
-verb+Control+ field set to \verb+true+.
+but they are created by the \verb+NewControl+ API function instead
+of \verb+NewObject+. The registration info table must also have
+\verb+Control+ field set to \verb+true+.
 
 The table that implements the control must also implement a few
 additional methods, part of the control protocol. These are:
@@ -1881,7 +1851,7 @@ an example of a control.
 Here is provided miscellaneous information specific to the current
 version of \luacom. Here are recorded the current limitations of
 \luacom, its known bugs, the history of modifications since the former
-version, technical details etc.
+version, technical details, etc.
 
 \section{Limitations}
 \label{sect:limitations}
@@ -1900,14 +1870,14 @@ parameters. This could be circumvented passing the optional parameters
 inside a table, but this hasn't been tested. This may be implemented
 under request;
 
-\item \luacom\ doesn't provide access to \com\ interfaces that doesn't
-inherit from \idispatch\ interface. That is, only Automation Objects
+\item \luacom\ doesn't provide access to \com\ interfaces that don't
+inherit from the \idispatch\ interface. That is, only Automation objects
 are supported. This restriction is due to the late-binding feature
 provided by \luacom. It's possible to provide access to these \com\
-interfaces via a "proxy" Automation Object, which translate calls made
+interfaces via a "proxy" Automation object, which translate calls made
 through automation to vtable (early-binding) calls. It's also possible
 to implement this "proxy" directly using \luacom\ C/C++ API, but this
-hasn't been tested nor tried;
+hasn't been tested nor tried.
 
 \end{itemize}
 
@@ -1961,7 +1931,7 @@ to these isses here.
 
 \subsection{Problems instantiating COM objects}
 Some COM objects can rest at in-process servers (implemented in DLL's)
-and at local servers (implemented as separeted processes). COM gives
+and at local servers (implemented as separate processes). COM gives
 preference to in-process servers, as they are faster. Nevertheless,
 some applications may not work with \luacom\ when working as
 in-process servers. One should instance the COM object supplying an
@@ -1982,7 +1952,7 @@ demand a more careful analysis:
 necessary to eliminate all references in Lua to the COM objects
 residing in this process and then force a garbage-collection cycle;
 \item sometimes a reference to a COM object may be stored by mistake
-to a global variable and then forgot there. This may prevent the
+to a global variable and then forgotten. This may prevent the
 server process to exit even when a method like ``Quit'' is called. To
 avoid this problem, one might group all to references to a COM object
 and its sub-objects in a single table to avoid ``lost'' references.
@@ -2085,18 +2055,22 @@ This way the client may call methods of the COM object using the
 
 \begin{itemize}
 
-\item Formally support Lua 5.1 (Lua 4.0/5.0 support will be dropped).
+\item Formally support Lua 5.1 (Lua 4.0/5.0 support dropped).
 
-\item Building with MSVC++2005.  Both Makefile and Visual Studio
-.sln/.vcproj files available.
+\item Makefile updated to MSVC++2005.  Visual Studio MSVC++2005 and VC6
+  project files included (.sln/.vcproj + .dsp).
 
-\item Fixed handling of empty SafeArrays and SafeArrays of one dimension.
+\item SafeArray Fixes:
+  Fixed handling of empty SafeArrays and SafeArrays of one dimension;
+  Fixed reversed order of indices in multidimensional SafeArray's;
+  Added new safearrays demo.
 
-\item Fixed reversed order of indices in multidimensional SafeArray's
-
-\item Fixed handling BSTR's with embedded zeros. Bug#428.
+\item Fixed handling BSTR's with embedded zeros. Bug428.
 
 \item Renamed luacom-lua5-1.3.dll to luacom.dll.
+
+\item Other bug fixes, such as with parameters, and code improvements
+  (See Tracker on LuaForge project page.)
 
 \end{itemize}
 
@@ -2210,7 +2184,7 @@ globally as \texttt{luacom\_<function>} in the Lua 4 version of the
 library;
 
 \item now it's possible to create instances of Microsoft\registered\
-Office\registered\ applications (Excel\registered, PowerPoint\registered\
+Office\registered\ applications (Excel\registered, PowerPoint\registered,
 etc.). It was only possible to use them via GetObject; now you can
 create a new instance of these applications using
 \texttt{luacom.CreateObject};
@@ -2311,7 +2285,7 @@ that.
 
 int main()
 {
-  lua_State *L = lua_open(0);
+  lua_State *L = luaL_newstate();
 
   OleInitialize(NULL);
 
@@ -2338,7 +2312,7 @@ int main()
 \subsubsection*{Description}
 This function is intended to clean up the data structures associated
 with \luacom\ in a specific \lua\ state (\ident{L}). Currently, it does nothing,
-but in future releases it will do. So, do not remove from your code!
+but in future releases it could. So, do not remove it from your code!
 It must be also called before the \com\ termination functions
 (\ident{OleUninitialize} and \ident{CoInitialize}) and before
 \ident{lua\_close}.
@@ -2350,7 +2324,7 @@ It must be also called before the \com\ termination functions
 
 int main()
 {
-  lua_State *L = lua_open(0);
+  lua_State *L = luaL_newstate();
 
   OleInitialize(NULL);
 
@@ -2412,6 +2386,7 @@ extern "C"
 {
 #include <lua.h>
 #include <lualib.h>
+#include <lauxlib.h>
 }
 #include <luacom.h>
 
@@ -2423,15 +2398,13 @@ int main (int argc, char *argv[])
 
   IupOpen();
 
-  lua_State *L = lua_open(0);
+  lua_State *L = luaL_newstate();
 
-  lua_baselibopen (L);
-  lua_strlibopen(L);
-  lua_iolibopen(L);
+  luaL_openlibs(L);
 
   luacom_open(L);
 
-  lua_dofile(L, "implementation.lua");
+  luaL_dofile(L, "implementation.lua");
 
   // Pushes the table containing the functions
   // responsible for the initialization of the
@@ -2483,6 +2456,7 @@ int main (int argc, char *argv[])
 --
 --   This is a sample implementation of a COM server in Lua
 --
+require "luacom"
 
 -- This is the implementation of the COM object
 TestObj = {}
@@ -3123,7 +3097,7 @@ cookie = luacom.addConnection(client, server)
 
 \subsubsection*{Description}
 This method connects two \luacom\ objects, setting the
-\ident{server} as an event sink for the \ident{client}, that is, the
+\ident{server} as an event sink for the \ident{client} --- that is, the
 client will call methods of the server to notify events (following the
 \com\ model). This will only work if the \ident{client} supports
 connection points of the \ident{server}'s type. If the method
@@ -3374,9 +3348,9 @@ result = luacom.StartLog(log_file_name)
 
 \subsubsection*{Description}
 This methods activates the log facility of \luacom, writing to the log
-file all errors that occurr. If the library was compiled with VERBOSE
+file all errors that occur. If the library was compiled with VERBOSE
 defined, it also logs other informative messages like creation and
-destruction of \luacom\ internal objects, method calls etc. This can
+destruction of \luacom\ internal objects, method calls, etc. This can
 help track down object leaks. The method returns \ttext{true} if the
 log file could be opened, \ttext{false} otherwise.
 
