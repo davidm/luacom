@@ -34,12 +34,12 @@ SRC_DLL_DIR = .\src\dll
 # WARNING: The version of Lua in these # directories MUST MATCH the one
 # specified in LUA_VERSION
 # ---------------------------------------------------------------------------
-LUA_INC = d:\clean\lua5.1\include
-LUA_LIB = d:\clean\lua5.1\lib\static
-LUA_LIBDLL = d:\clean\lua5.1\lib
-LUA = d:\clean\lua5.1\bin\lua$(LUA_SUFFIX).exe
-LUAC = d:\clean\lua5.1\bin\luac$(LUA_SUFFIX).exe
-BIN2C = d:\clean\lua5.1\bin\bin2c$(LUA_SUFFIX).exe
+LUA_INC = ..\lua5.1\include
+LUA_LIB = ..\lua5.1\lib\static
+LUA_LIBDLL = ..\lua5.1\lib
+LUA = ..\lua5.1\bin\lua$(LUA_SUFFIX).exe
+LUAC = ..\lua5.1\bin\luac$(LUA_SUFFIX).exe
+BIN2C = ..\lua5.1\bin\bin2c$(LUA_SUFFIX).exe
 
 # ---------------------------------------------------------------------------
 # Use the following lines to ste the IUP, CD, and IM include and library
@@ -93,7 +93,7 @@ CPPFLAGS = /EHsc $(CFLAGS)
 # ---------------------------------------------------------------------------
 # Linker options
 # ---------------------------------------------------------------------------
-DEFAULT_LIBS = kernel32.lib user32.lib gdi32.lib shell32.lib advapi32.lib ole32.lib winspool.lib uuid.lib oleaut32.lib shlwapi.lib
+DEFAULT_LIBS = kernel32.lib user32.lib gdi32.lib shell32.lib advapi32.lib ole32.lib winspool.lib uuid.lib oleaut32.lib shlwapi.lib htmlhelp.lib
 #				/NODEFAULTLIB:"libcd.lib" /NODEFAULTLIB:"msvcrt.lib" \
 #				/NODEFAULTLIB:"msvcrtd.lib" /NODEFAULTLIB:"libcmt.lib" \
 #				/NODEFAULTLIB:"libcmtd.lib" \
