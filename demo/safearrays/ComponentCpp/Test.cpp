@@ -194,7 +194,8 @@ STDMETHODIMP CTest::SetArray(SAFEARRAY** arr) {
 	sprintf(buffer, "Dimensions: Accessing through rgsabound\r\n");
 	printf("%s", buffer);
 	OutputDebugString(buffer);
-	for(int i = 0; i < SafeArrayGetDim(miArray); i++) {
+	int i;
+	for(i = 0; i < SafeArrayGetDim(miArray); i++) {
 		sprintf(buffer, "dim[%d] => [%d to %d]  -  %d\r\n", i + 1, rgsabounds[i].lLbound, (rgsabounds[i].cElements + rgsabounds[i].lLbound) - 1, rgsabounds[i].cElements);
 		printf("%s", buffer);
 		OutputDebugString(buffer);
