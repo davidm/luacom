@@ -70,7 +70,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="shlwapi.lib lua$(LUA_SUFFIX).lib"
+				AdditionalDependencies="htmlhelp.lib shlwapi.lib lua$(LUA_SUFFIX).lib"
 				OutputFile="$(OutDir)\$(ProjectName)"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="../../lua5.1/lib"
@@ -153,7 +153,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="shlwapi.lib lua$(LUA_SUFFIX).lib"
+				AdditionalDependencies="htmlhelp.lib shlwapi.lib lua$(LUA_SUFFIX).lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../../lua5.1/lib"
 				ModuleDefinitionFile="..\src\dll\luacom_dll.def"

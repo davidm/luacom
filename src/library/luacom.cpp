@@ -9,7 +9,7 @@
  */
 
 // RCS Info
-static char *rcsid = "$Id: luacom.cpp,v 1.2 2007/12/20 06:51:15 dmanura Exp $";
+static char *rcsid = "$Id: luacom.cpp,v 1.3 2008/01/12 20:25:06 dmanura Exp $";
 static char *rcsname = "$Name:  $";
 static char *g_version = "1.3";
 
@@ -18,6 +18,7 @@ static char *g_version = "1.3";
 
 #include <ole2.h>
 #include <ocidl.h>
+#include <htmlhelp.h> // HtmlHelp
 
 #include <assert.h>
 #include <stdio.h>
@@ -182,10 +183,21 @@ static int luacom_ShowHelp(lua_State *L)
 
   if(pHelpFile != NULL)
   {
-    if(context != 0)
-      WinHelp(NULL, pHelpFile, HELP_CONTEXT, context);
+    size_t len = strlen(pHelpFile);
+    if (len >= 4 && _stricmp(pHelpFile + len - 4, ".chm") == 0)
+    {
+      if(context != 0)
+        HtmlHelp(NULL, pHelpFile, HH_HELP_CONTEXT, context);
+      else
+        HtmlHelp(NULL, pHelpFile, HH_DISPLAY_TOC, 0);
+    }
     else
-      WinHelp(NULL, pHelpFile, HELP_FINDER, 0);
+    {
+      if(context != 0)
+        WinHelp(NULL, pHelpFile, HELP_CONTEXT, context);
+      else
+        WinHelp(NULL, pHelpFile, HELP_FINDER, 0);
+    }
   }
 
   return 0;
