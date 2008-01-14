@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 // RCS Info
-static char *rcsid = "$Id: tLuaCOMTypeHandler.cpp,v 1.8 2008/01/10 17:48:31 ignacio Exp $";
+static char *rcsid = "$Id: tLuaCOMTypeHandler.cpp,v 1.9 2008/01/14 18:57:37 ignacio Exp $";
 static char *rcsname = "$Name:  $";
 
 
@@ -938,7 +938,6 @@ void tLuaCOMTypeHandler::fillDispParams(lua_State* L,
 		// detects if optional output parameter
         optin = (paramdesc.wParamFlags & PARAMFLAG_FOPT) != 0 &&
                 (paramdesc.wParamFlags & PARAMFLAG_FIN) != 0;
-        assert(!optin || byref); // optin => byref
 
         // deals with default values (if any)
         if(paramdesc.wParamFlags & PARAMFLAG_FHASDEFAULT)
