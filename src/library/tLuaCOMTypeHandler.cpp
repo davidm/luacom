@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 // RCS Info
-static char *rcsid = "$Id: tLuaCOMTypeHandler.cpp,v 1.9 2008/01/14 18:57:37 ignacio Exp $";
+static char *rcsid = "$Id: tLuaCOMTypeHandler.cpp,v 1.10 2008/01/31 17:09:16 ignacio Exp $";
 static char *rcsname = "$Name:  $";
 
 
@@ -1648,14 +1648,19 @@ void tLuaCOMTypeHandler::safearray_com2lua(lua_State* L, VARIANTARG & varg)
     SAFEARRAY* safearray = varg.parray;
 
 	// check for NULL or empty array (is this enough?)
-	if(safearray == NULL || safearray->rgsabound[0].cElements == 0) {
-		// return an empty table in both cases, for consistency (also eases client code)
+	// returns an empty table in both cases, for consistency (also eases client code)
+	if(safearray == NULL) {		
 		lua_newtable(L);
 		return;
 	}
 
     // pega dimensoes
     const int num_dimensions = SafeArrayGetDim(safearray);
+	// checks for empty array, must be done in the 'first' dimension
+	if(safearray->rgsabound[num_dimensions - 1].cElements == 0) {
+		lua_newtable(L);
+		return;
+	}
 
     bounds = getRightOrderedBounds
       (
