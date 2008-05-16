@@ -1,5 +1,5 @@
 
-CURRENT_VERSION = 1.2
+CURRENT_VERSION = 1.3.1
 SINGLE_FILE_DIR = luacom-htmldoc
 BROWSEABLE_DIR = luacom-browseable
 
