@@ -8,7 +8,7 @@
  */
 
 // RCS Info
-static char *rcsid = "$Id: tLuaCOM.cpp,v 1.3 2008/01/09 14:12:24 ignacio Exp $";
+static char *rcsid = "$Id: tLuaCOM.cpp,v 1.4 2008/05/16 15:15:49 mascarenhas Exp $";
 static char *rcsname = "$Name:  $";
 
 #include "tLuaCOM.h"

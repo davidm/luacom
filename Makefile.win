@@ -12,7 +12,7 @@
 # variable. Currently only 4 and 5 are acceptable options
 # ---------------------------------------------------------------------------
 LUA_SUFFIX=5.1        # suffix for binaries (e.g. 5.1 => lua5.1.exe)
-LUACOM_VERSION=1.3
+LUACOM_VERSION=1.3.1
 
 # ---------------------------------------------------------------------------
 # Use the following lines to set your installation directories

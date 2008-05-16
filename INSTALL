@@ -1,7 +1,12 @@
-This is LuaCom 1.3
+This is LuaCom 1.3.1
 
 * Installation Steps
 --------------------
+
+  1. Install LuaRocks
+  2. Do "luarocks install luacom"
+
+  or (the hard way)...
 
   1. Make sure that Lua is installed in your system.
   2. Edit the Makefile file to suit your environment.
