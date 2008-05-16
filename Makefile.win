@@ -138,7 +138,7 @@ $(BIN_DIR)::
 	if not exist $(BIN_DIR) \
 	   mkdir $(BIN_DIR)
 
-install: lc_dll
+install: $(LC_DLL)
 	if not exist "$(LUA_LIBDIR)" mkdir -p "$(LUA_LIBDIR)"
 	copy $(BIN_DIR)\luacom.dll "$(LUA_LIBDIR)"
 
