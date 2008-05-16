@@ -122,7 +122,7 @@ LC_CONSOLE_DLL = $(BIN_DIR)\luacomdll-lua$(LUA_SUFFIX)-$(LUACOM_VERSION).exe
 
 all: lc_lib lc_dll lc_bin_lib lc_bin_dll
 lc_lib: $(LIB_DIR) $(OBJ_DIR) $(LC_LIB)
-lc_dll: $(BIN_DIR) $(OBJ_DIR) $(LC_DLL)
+lc_dll: lc_lib $(BIN_DIR) $(OBJ_DIR) $(LC_DLL)
 lc_bin_lib: $(OBJ_DIR) $(BIN_DIR) $(LC_CONSOLE_LIB)
 lc_bin_dll: $(OBJ_DIR) $(BIN_DIR) $(LC_CONSOLE_DLL) $(BIN_DIR)/luacom.lua
 
@@ -138,9 +138,9 @@ $(BIN_DIR)::
 	if not exist $(BIN_DIR) \
 	   mkdir $(BIN_DIR)
 
-install:
+install: lc_dll
 	if not exist "$(LUA_LIBDIR)" mkdir -p "$(LUA_LIBDIR)"
-	copy $(BINDIR)\luacom.dll "$(LUA_LIBDIR)"
+	copy $(BIN_DIR)\luacom.dll "$(LUA_LIBDIR)"
 
 clean-obj:
 	if exist $(OBJ_DIR)\*.obj del $(OBJ_DIR)\*.obj 
@@ -216,8 +216,7 @@ $(LC_DLL): $(LIB_OBJS) $(DLL_OBJS) $(DEF)
 .SUFFIXES: .lua
 
 {$(SRC_LIB_DIR)}.lua{$(SRC_LIB_DIR)}.loh:
-	$(LUAC) -o $*.lo $<
-	$(BIN2C) $< > $@	
-	del $*.lo
+	"$(LUAC)" -o "$*.lo" "$<"
+	"$(BIN2C)" "$*.lo" > "$@"	
 
 
