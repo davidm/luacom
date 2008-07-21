@@ -101,7 +101,7 @@ static void factoryCache_Release() {
 		pFactory->Release();
 		lua_pop(factoryCache,1);
     }
-	lua_pop(factoryCache,2);
+	lua_pop(factoryCache,1);
 	#ifdef IUP
 		IupClose();
 	#endif
