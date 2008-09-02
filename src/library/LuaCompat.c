@@ -14,12 +14,6 @@
 #include <lua.h>
 #include <lauxlib.h>
 
-#if !(defined(LUA_VERSION_NUM) && LUA_VERSION_NUM >= 501)
-#ifdef COMPAT51
-#include "compat-5.1.h"
-#endif
-#endif
-
 #include "LuaCompat.h"
 
 #define UNUSED(x) (void)(x)
