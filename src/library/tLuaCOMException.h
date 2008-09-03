@@ -14,8 +14,8 @@
 class tLuaCOMException  
 {
 public:
-	void getDebugMessage(void);
-	const char * getMessage(void);
+  void getDebugMessage(void);
+  const char * getMessage(void);
   enum Errors {INTERNAL_ERROR, PARAMETER_OUT_OF_RANGE,
     TYPECONV_ERROR, COM_ERROR, COM_EXCEPTION, UNSUPPORTED_FEATURE,
     WINDOWS_ERROR, LUACOM_ERROR, MALLOC_ERROR
@@ -23,8 +23,8 @@ public:
 
   static const char *GetErrorMessage(DWORD errorcode);
 
-	tLuaCOMException(Errors p_code, char *p_file, int p_line, const char *usermessage = NULL);
-	virtual ~tLuaCOMException();
+  tLuaCOMException(Errors p_code, char *p_file, int p_line, const char *usermessage = NULL);
+  virtual ~tLuaCOMException();
 
   Errors code;
   char *file;

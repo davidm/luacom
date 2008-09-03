@@ -243,7 +243,7 @@ int tLuaTLB::ExportEnumerations(tLuaObject* lua_obj, lua_State* L)
   tLuaTLB* lua_tlb = DYNAMIC_CAST<tLuaTLB*>(lua_obj);
   CHECKPRECOND(lua_tlb);
   if(lua_gettop(L) == 0)
-	  lua_newtable(L);
+    lua_newtable(L);
   else CHECKPARAM(lua_type(L, -1) == LUA_TTABLE);
 
   TYPEKIND tkind;
@@ -263,14 +263,14 @@ int tLuaTLB::ExportEnumerations(tLuaObject* lua_obj, lua_State* L)
     if(tkind == TKIND_ENUM)
     {
 
-	  hr = lua_tlb->typelib->GetTypeInfo(count, &ptypeinfo);
+      hr = lua_tlb->typelib->GetTypeInfo(count, &ptypeinfo);
       CHK_COM_CODE(hr);
 
-	  hr = lua_tlb->typelib->GetDocumentation(count, &name, NULL, NULL, NULL);	
+      hr = lua_tlb->typelib->GetDocumentation(count, &name, NULL, NULL, NULL);
       CHK_COM_CODE(hr);
       lua_pushstring(L, tUtil::bstr2string(name));
       SysFreeString(name);
-	  lua_newtable(L);
+      lua_newtable(L);
 
       typehandler = new tLuaCOMTypeHandler(ptypeinfo);
 
@@ -301,7 +301,7 @@ int tLuaTLB::ExportEnumerations(tLuaObject* lua_obj, lua_State* L)
         pvardesc = NULL;
       }
 
-	  lua_settable(L, -3);
+      lua_settable(L, -3);
 
       SAFEDELETE(typehandler);
       COM_RELEASE(ptypeinfo);
@@ -525,25 +525,25 @@ int tLuaTypeInfo::GetFuncDesc(tLuaObject* lua_obj, lua_State* L)
       lua_settable(L, -3);
     }
 
-	USHORT paramFlags = pfuncdesc->lprgelemdescParam[i].paramdesc.wParamFlags;
+    USHORT paramFlags = pfuncdesc->lprgelemdescParam[i].paramdesc.wParamFlags;
 
     lua_pushstring(L, "in");
-	luaCompat_pushBool(L,paramFlags & PARAMFLAG_FIN);
-	lua_settable(L, -3);
+    luaCompat_pushBool(L,paramFlags & PARAMFLAG_FIN);
+    lua_settable(L, -3);
 
     lua_pushstring(L, "out");
-	luaCompat_pushBool(L,paramFlags & PARAMFLAG_FOUT);
-	lua_settable(L, -3);
+    luaCompat_pushBool(L,paramFlags & PARAMFLAG_FOUT);
+    lua_settable(L, -3);
 
     lua_pushstring(L, "opt");
-	luaCompat_pushBool(L,paramFlags & PARAMFLAG_FOPT);
-	lua_settable(L, -3);
+    luaCompat_pushBool(L,paramFlags & PARAMFLAG_FOPT);
+    lua_settable(L, -3);
 
-	lua_pushstring(L, "default");
-	if(paramFlags & PARAMFLAG_FHASDEFAULT) {
-		lua_typeinfo->typehandler->com2lua(L,pfuncdesc->lprgelemdescParam[i].paramdesc.pparamdescex->varDefaultValue);
-	} else lua_pushnil(L);
-	lua_settable(L, -3);
+    lua_pushstring(L, "default");
+    if(paramFlags & PARAMFLAG_FHASDEFAULT) {
+      lua_typeinfo->typehandler->com2lua(L,pfuncdesc->lprgelemdescParam[i].paramdesc.pparamdescex->varDefaultValue);
+    } else lua_pushnil(L);
+    lua_settable(L, -3);
 
     // removes copy of the table
     lua_pop(L, 1);

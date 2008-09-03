@@ -39,15 +39,15 @@ struct FuncInfo
 class tLuaCOM
 {
 public:
-	bool hasTypeInfo(void);
-	int Lock(void);
+  bool hasTypeInfo(void);
+  int Lock(void);
   int Unlock(void);
-	ITypeInfo* GetTypeInfo(void);
-	CLSID GetCLSID(void);
-	void GetIID(IID *piid);
-	IDispatch * GetIDispatch(void);
-	void ReleaseFuncDesc(FUNCDESC *pfuncdesc);
-	ITypeInfo * GetDefaultEventsInterface(void);
+  ITypeInfo* GetTypeInfo(void);
+  CLSID GetCLSID(void);
+  void GetIID(IID *piid);
+  IDispatch * GetIDispatch(void);
+  void ReleaseFuncDesc(FUNCDESC *pfuncdesc);
+  ITypeInfo * GetDefaultEventsInterface(void);
   static tLuaCOM * CreateLuaCOM(
     lua_State* L,
     IDispatch * pdisp,
@@ -56,8 +56,8 @@ public:
     bool untyped = false
     );
 
-	void getHelpInfo(char **ppHelpFile, DWORD *pHelpContext);
-	bool isMember(const char *name);
+  void getHelpInfo(char **ppHelpFile, DWORD *pHelpContext);
+  bool isMember(const char *name);
 
    ~tLuaCOM();
 
@@ -79,9 +79,9 @@ public:
 
   static long NEXT_ID;
 protected:
-	ITypeComp* ptcomp;
+  ITypeComp* ptcomp;
   ITypeComp* plib_tcomp;
-	long lock_count;
+  long lock_count;
   CLSID clsid;
   IConnectionPoint *conn_point;
   DWORD conn_cookie;
@@ -93,7 +93,7 @@ protected:
     CLSID coclass
     );
 
-	tLuaCOMTypeHandler * typehandler;
+  tLuaCOMTypeHandler * typehandler;
 
 
   LPDISPATCH pdisp;
@@ -104,7 +104,7 @@ protected:
 
   FuncInfo pFuncInfo[MAX_FUNCINFOS];
 private:
-	long ID;
+  long ID;
 };
 
 #endif // __LUACOM_H

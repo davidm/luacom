@@ -143,17 +143,17 @@ const char * tUtil::bstr2string(BSTR bstr, size_t& computedSize)
   {
     if(bstr != NULL)
     {
-	  computedSize = SysStringLen(bstr);
-	  if(!computedSize) {
-		  return "";
-	  }
+      computedSize = SysStringLen(bstr);
+      if(!computedSize) {
+        return "";
+      }
 
       // gets the size of the buffer
       size = WideCharToMultiByte(
         CP_UTF8,            // code page
         0,            // performance and mapping flags
         bstr,    // wide-character string
-		computedSize,	// number of chars in string
+        computedSize,  // number of chars in string
         str,     // buffer for new string
         0,          // size of buffer
         NULL,     // default for unmappable chars
@@ -169,7 +169,7 @@ const char * tUtil::bstr2string(BSTR bstr, size_t& computedSize)
         CP_UTF8,            // code page
         0,            // performance and mapping flags
         bstr,    // wide-character string
-        computedSize,	// number of chars in string
+        computedSize,  // number of chars in string
         str,     // buffer for new string
         size,          // size of buffer
         NULL,     // default for unmappable chars
@@ -216,9 +216,9 @@ BSTR tUtil::string2bstr(const char * string, size_t len)
   }
   else
   {
-	long wclength = 
+    long wclength =
       MultiByteToWideChar(CP_UTF8, 0, string, len, NULL, 0);
-	try
+    try
     {
       if(wclength == 0)
         LUACOM_ERROR(tUtil::GetErrorMessage(GetLastError()));

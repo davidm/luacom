@@ -147,7 +147,7 @@ tLuaDispatch::QueryInterface(REFIID riid, void FAR* FAR* ppv)
       AddRef();
       return NOERROR;
     }
-	       
+
     *ppv = NULL;
     return ResultFromScode(E_NOINTERFACE);
 }
@@ -391,8 +391,8 @@ tLuaDispatch::Invoke(
 STDMETHODIMP tLuaDispatch::PushIfSameState(lua_State *p_L) {
   lua_getref(p_L, table_ref);
   if(lua_isnil(p_L, -1)) {
-	lua_pop(p_L,1);
-	return E_FAIL;
+    lua_pop(p_L,1);
+    return E_FAIL;
   }
   const void *p1 = lua_topointer(p_L, -1);
   lua_getref(L, table_ref);
@@ -403,7 +403,7 @@ STDMETHODIMP tLuaDispatch::PushIfSameState(lua_State *p_L) {
   } else {
     lua_pop(L, 1);
     lua_pop(p_L, 1);
-	return E_FAIL;
+    return E_FAIL;
   }
 }
 
@@ -470,7 +470,7 @@ tLuaDispatch::tLuaDispatch(lua_State* p_L, ITypeInfo * pTypeinfo, int ref)
 
       funcinfo[num_methods].name = new char[str_size + 1];
       wcstombs(funcinfo[num_methods].name, names[0], str_size+1);
-	  SysFreeString(names[0]);
+      SysFreeString(names[0]);
 
       num_methods++;
     }
@@ -731,7 +731,7 @@ HRESULT tLuaDispatch::method(const char* name,
       VARIANTARG result;
       VariantInit(&result);
 
-	  typehandler->lua2com(L, returnidx, result, funcdesc->elemdescFunc.tdesc.vt);
+      typehandler->lua2com(L, returnidx, result, funcdesc->elemdescFunc.tdesc.vt);
 
       *pvarResult = result;
 

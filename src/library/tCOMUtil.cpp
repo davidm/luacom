@@ -628,20 +628,20 @@ bool tCOMUtil::GetDefaultTypeLibVersion(const char* libid,
 }
 
 bool tCOMUtil::GetRegKeyValue(const char* key, char** pValue) {
-	LONG ec = 0;
-	// unused: HKEY hKey;
-	LONG cbValue;
+  LONG ec = 0;
+  // unused: HKEY hKey;
+  LONG cbValue;
 
-	ec = RegQueryValue(HKEY_CLASSES_ROOT,key,NULL,&cbValue);
+  ec = RegQueryValue(HKEY_CLASSES_ROOT,key,NULL,&cbValue);
 
-	if(ERROR_SUCCESS == ec) {
-		*pValue = new char[cbValue+1];
-		ec = RegQueryValue(HKEY_CLASSES_ROOT,key,*pValue,&cbValue);
-  		if(ERROR_SUCCESS == ec)
-			return true;
-	}
+  if(ERROR_SUCCESS == ec) {
+    *pValue = new char[cbValue+1];
+    ec = RegQueryValue(HKEY_CLASSES_ROOT,key,*pValue,&cbValue);
+      if(ERROR_SUCCESS == ec)
+      return true;
+  }
 
-	return false;
+  return false;
 }
 
 bool tCOMUtil::SetRegKeyValue(const char *key,
@@ -718,7 +718,7 @@ bool tCOMUtil::DelRegKey(const char *key,
 
   if (ERROR_SUCCESS == ec)
   {
-	  return true;
+    return true;
   }
 
   return false;
@@ -869,7 +869,7 @@ const char* tCOMUtil::getPrintableTypeDesc(const TYPEDESC& tdesc)
 
   case VT_HRESULT:
     strcat(buffer, "void");
-	break;
+    break;
   }
 
   if(tdesc.vt & VT_BYREF)

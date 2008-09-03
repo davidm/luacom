@@ -12,9 +12,9 @@
 #include "tLuaDispatch.h"
 
 class tLuaControl: public tLuaDispatch, public IOleObject,
-	public IOleControl,	public IOleInPlaceObject,
-	public IOleInPlaceActiveObject, public IViewObject2,
-	public IPersistStreamInit, public IPersistStorage, public IQuickActivate
+        public IOleControl,	public IOleInPlaceObject,
+        public IOleInPlaceActiveObject, public IViewObject2,
+        public IPersistStreamInit, public IPersistStorage, public IQuickActivate
 {
 public:
     tLuaControl(lua_State* L, ITypeInfo *pTypeinfo, int ref);
@@ -44,46 +44,46 @@ public:
     STDMETHOD(SaveCompleted)(IStorage  *pStgNew);
     STDMETHOD(HandsOffStorage)(void);
 
-	// IOleControl methods
+    // IOleControl methods
     //
     STDMETHOD(GetControlInfo)(LPCONTROLINFO pCI);
     STDMETHOD(OnMnemonic)(LPMSG pMsg);
     STDMETHOD(OnAmbientPropertyChange)(DISPID dispid);
     STDMETHOD(FreezeEvents)(BOOL bFreeze);
 
-	// IOleObject implementation (yikes)
-	STDMETHOD(SetClientSite)(IOleClientSite* pcs);
-	STDMETHOD(GetClientSite)(IOleClientSite** ppcs);
-	STDMETHOD(SetHostNames)(LPCOLESTR szContainerApp, LPCOLESTR szContainerObj);
-	STDMETHOD(Close)(DWORD dwSaveOption);
-	STDMETHOD(SetMoniker)(DWORD dwWitchMoniker, IMoniker* pmk);
-	STDMETHOD(GetMoniker)(DWORD dwAssign, DWORD dwWitchMoniker, IMoniker** ppMoniker);
-	STDMETHOD(InitFromData)(IDataObject* pDataObject, BOOL fCreation, DWORD dwReserved);
-	STDMETHOD(IsUpToDate)();
-	STDMETHOD(GetClipboardData)(DWORD dwReserved, IDataObject** ppDataObject);
-	STDMETHOD(DoVerb)(LONG iVerb, LPMSG lpmsg, IOleClientSite* pActiveSite,
-		LONG lIndex, HWND hwndParent, LPCRECT lprcPosRect);
-	STDMETHOD(EnumVerbs)(IEnumOLEVERB** ppEnumOleVerb);
-	STDMETHOD(Update)();
-	STDMETHOD(GetUserClassID)(CLSID* pClsid);
-	STDMETHOD(GetUserType)(DWORD dwFormOfType, LPOLESTR* pszUserType);
-	STDMETHOD(SetExtent)(DWORD dwAspect, SIZEL* pSizel);
-	STDMETHOD(GetExtent)(DWORD dwAspect, SIZEL* pSizel);
-	STDMETHOD(Advise)(IAdviseSink* pAdvSink, DWORD* pdwConnection);
-	STDMETHOD(Unadvise)(DWORD dwConnection);
-	STDMETHOD(EnumAdvise)(IEnumSTATDATA** ppEnumAdvise);
-	STDMETHOD(GetMiscStatus)(DWORD dwAspect, DWORD* pdwStatus);
-	STDMETHOD(SetColorScheme)(LOGPALETTE* pLogpal);
+    // IOleObject implementation (yikes)
+    STDMETHOD(SetClientSite)(IOleClientSite* pcs);
+    STDMETHOD(GetClientSite)(IOleClientSite** ppcs);
+    STDMETHOD(SetHostNames)(LPCOLESTR szContainerApp, LPCOLESTR szContainerObj);
+    STDMETHOD(Close)(DWORD dwSaveOption);
+    STDMETHOD(SetMoniker)(DWORD dwWitchMoniker, IMoniker* pmk);
+    STDMETHOD(GetMoniker)(DWORD dwAssign, DWORD dwWitchMoniker, IMoniker** ppMoniker);
+    STDMETHOD(InitFromData)(IDataObject* pDataObject, BOOL fCreation, DWORD dwReserved);
+    STDMETHOD(IsUpToDate)();
+    STDMETHOD(GetClipboardData)(DWORD dwReserved, IDataObject** ppDataObject);
+    STDMETHOD(DoVerb)(LONG iVerb, LPMSG lpmsg, IOleClientSite* pActiveSite,
+        LONG lIndex, HWND hwndParent, LPCRECT lprcPosRect);
+    STDMETHOD(EnumVerbs)(IEnumOLEVERB** ppEnumOleVerb);
+    STDMETHOD(Update)();
+    STDMETHOD(GetUserClassID)(CLSID* pClsid);
+    STDMETHOD(GetUserType)(DWORD dwFormOfType, LPOLESTR* pszUserType);
+    STDMETHOD(SetExtent)(DWORD dwAspect, SIZEL* pSizel);
+    STDMETHOD(GetExtent)(DWORD dwAspect, SIZEL* pSizel);
+    STDMETHOD(Advise)(IAdviseSink* pAdvSink, DWORD* pdwConnection);
+    STDMETHOD(Unadvise)(DWORD dwConnection);
+    STDMETHOD(EnumAdvise)(IEnumSTATDATA** ppEnumAdvise);
+    STDMETHOD(GetMiscStatus)(DWORD dwAspect, DWORD* pdwStatus);
+    STDMETHOD(SetColorScheme)(LOGPALETTE* pLogpal);
 
-	// IOleInPlaceObject implementation
-	STDMETHOD(GetWindow)(HWND* phwnd);
-	STDMETHOD(ContextSensitiveHelp)(BOOL fEnterMode);
-	STDMETHOD(InPlaceDeactivate)();
-	STDMETHOD(UIDeactivate)();
-	STDMETHOD(SetObjectRects)(LPCRECT lprcPosRect, LPCRECT lprcClipRect);
-	STDMETHOD(ReactivateAndUndo)();
+    // IOleInPlaceObject implementation
+    STDMETHOD(GetWindow)(HWND* phwnd);
+    STDMETHOD(ContextSensitiveHelp)(BOOL fEnterMode);
+    STDMETHOD(InPlaceDeactivate)();
+    STDMETHOD(UIDeactivate)();
+    STDMETHOD(SetObjectRects)(LPCRECT lprcPosRect, LPCRECT lprcClipRect);
+    STDMETHOD(ReactivateAndUndo)();
 
-	// IOleInPlaceActiveObject
+    // IOleInPlaceActiveObject
     STDMETHOD(TranslateAccelerator)(LPMSG lpmsg);
     STDMETHOD(OnFrameWindowActivate)(BOOL fActivate);
     STDMETHOD(OnDocWindowActivate)(BOOL fActivate);
@@ -92,8 +92,8 @@ public:
             BOOL fFrameWindow);
     STDMETHOD(EnableModeless)(BOOL fEnable);
 
-	// IViewObject2
-	STDMETHOD(Draw)(DWORD dwDrawAspect, LONG lindex, void  *pvAspect,
+    // IViewObject2
+    STDMETHOD(Draw)(DWORD dwDrawAspect, LONG lindex, void  *pvAspect,
                     DVTARGETDEVICE  *ptd, HDC hdcTargetDev, HDC hdcDraw,
                     LPCRECTL lprcBounds, LPCRECTL lprcWBounds,
                     BOOL ( __stdcall  *pfnContinue )(ULONG_PTR dwContinue),
@@ -114,12 +114,12 @@ public:
     STDMETHOD(SetContentExtent)(LPSIZEL);
     STDMETHOD(GetContentExtent)(LPSIZEL);
 
-	HRESULT InPlaceActivate(BOOL lVerb);
+    HRESULT InPlaceActivate(BOOL lVerb);
     void SetInPlaceVisible(BOOL fShow);
     HWND CreateInPlaceWindow(int x, int y, BOOL fNoRedraw);
-	void DestroyWindow();
+    void DestroyWindow();
 
-	static tLuaControl *CreateLuaControl(
+    static tLuaControl *CreateLuaControl(
       lua_State* L,
       ITypeInfo* typeinfo,
       int ref
@@ -128,7 +128,7 @@ private:
     IOleAdviseHolder *m_pOleAdviseHolder;          // IOleObject::Advise holder object
     IAdviseSink      *m_pViewAdviseSink;           // IViewAdvise sink for IViewObject2
 
-	IOleClientSite     *m_pClientSite;             // client site
+    IOleClientSite     *m_pClientSite;             // client site
     IOleControlSite    *m_pControlSite;            // IOleControlSite ptr on client site
     IOleInPlaceSite    *m_pInPlaceSite;            // IOleInPlaceSite for managing activation
     IOleInPlaceFrame   *m_pInPlaceFrame;           // IOleInPlaceFrame ptr on client site

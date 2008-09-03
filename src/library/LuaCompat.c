@@ -392,7 +392,7 @@ int luaCompat_checkTagToCom(lua_State *L, int luaval)
   lua_gettable(L, -2);
   if(lua_isnil(L,-1)) {
     lua_pop(L, 2);
-	return 0;
+    return 0;
   }
 
   lua_remove(L,-2);

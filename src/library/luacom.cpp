@@ -362,8 +362,8 @@ static int luacom_ImplInterfaceFromTypelib(lua_State *L)
 {
   tLuaCOM *lcom = luacom_ImplInterfaceFromTypelibHelper(L);
   if(lcom) {
-	LuaBeans::push(L, lcom); 
-	return 1;
+    LuaBeans::push(L, lcom);
+    return 1;
   } else return 0;
 }
 
@@ -441,8 +441,8 @@ static int luacom_ImplInterface(lua_State *L)
   tLuaCOM* lcom = luacom_ImplInterfaceHelper(L);
   
   if(lcom) {
-	LuaBeans::push(L, lcom); 
-	return 1;
+    LuaBeans::push(L, lcom);
+    return 1;
   } else return 0;
 }
 
@@ -637,16 +637,16 @@ static int luacom_GetObject(lua_State *L)
     }
     else  // tests whether the user passed in a DisplayName of a moniker
     {
-	  BSTR bstr = NULL;
+      BSTR bstr = NULL;
       ULONG chEaten = 0;
       
       hr = CreateBindCtx(0, &pbc);
       CHK_COM_CODE(hr);
 
-	  bstr = tUtil::string2bstr(progId);
+      bstr = tUtil::string2bstr(progId);
       hr = MkParseDisplayName(pbc, bstr, &chEaten, &pmk);
-	  SysFreeString(bstr);
-	  CHK_COM_CODE(hr);
+      SysFreeString(bstr);
+      CHK_COM_CODE(hr);
 
       hr = pmk->BindToObject(pbc, NULL, IID_IUnknown, (void **) &punk);
       CHK_COM_CODE(hr);
@@ -818,10 +818,10 @@ static int luacom_NewObjectOrControl(lua_State *L, int type)
 
 
     // Creates IDispatch implementation
-	if(type) // Control
+    if(type) // Control
       iluacom = 
         (tLuaDispatch*)tLuaControl::CreateLuaControl(L, interface_typeinfo, ref);
-	else // Object
+    else // Object
       iluacom = 
         tLuaDispatch::CreateLuaDispatch(L, interface_typeinfo, ref);
 
@@ -884,11 +884,11 @@ static int luacom_NewObjectOrControl(lua_State *L, int type)
 }
 
 static int luacom_NewObject(lua_State *L) {
-	return luacom_NewObjectOrControl(L, 0);
+  return luacom_NewObjectOrControl(L, 0);
 }
 
 static int luacom_NewControl(lua_State *L) {
-	return luacom_NewObjectOrControl(L, 1);
+  return luacom_NewObjectOrControl(L, 1);
 }
 
 
@@ -922,13 +922,13 @@ static int luacom_ExposeObject(lua_State *L)
     HRESULT hr = S_OK;
 
     if(luacom_runningInprocess(L)) {
-	  // Inprocess "registration": stores object in the Lua registry
-  	  lua_getregistry(L);
-	  lua_pushstring(L,"object");
-	  luaCompat_pushPointer(L,(void*)luacom->GetIDispatch());
-	  lua_settable(L,-3);
-	  lua_pop(L,1);
-	} else {
+      // Inprocess "registration": stores object in the Lua registry
+      lua_getregistry(L);
+      lua_pushstring(L,"object");
+      luaCompat_pushPointer(L,(void*)luacom->GetIDispatch());
+      lua_settable(L,-3);
+      lua_pop(L,1);
+    } else {
       luacom_cf = 
           new tLuaCOMClassFactory(luacom->GetIDispatch());
       luacom_cf->AddRef();
@@ -945,7 +945,7 @@ static int luacom_ExposeObject(lua_State *L)
         &cookie);
 
       CHK_COM_CODE(hr);
-	}
+    }
   }
   catch(class tLuaCOMException& e)
   {
@@ -1036,8 +1036,8 @@ static int luacom_RegisterObject(lua_State *L)
   {
 
     lua_pushstring(L, "Control");
-	lua_gettable(L, 1);
-	bool control = luaCompat_toCBool(L, -1) != 0;
+    lua_gettable(L, 1);
+    bool control = luaCompat_toCBool(L, -1) != 0;
 
     // gets the registration information from the registration table
     lua_pushstring(L, "VersionIndependentProgID");
@@ -1151,11 +1151,11 @@ static int luacom_RegisterObject(lua_State *L)
       ModulePath,
       sizeof(ModulePath));
 
-	if(scriptFile)
-	{
+    if(scriptFile)
+    {
       strcat(ModulePath, " ");
       strcat(ModulePath, scriptFile);
-	}
+    }
 
     if(arguments)
     {
@@ -1215,43 +1215,43 @@ static int luacom_RegisterObject(lua_State *L)
       "LocalServer32",
       ModulePath);
 
-	if(scriptFile) {
-		tCOMUtil::SetRegKeyValue(
-			CLSID,
-			"InprocServer32",
-			LUACOM_DLL);
-		tCOMUtil::SetRegKeyValue(
-			CLSID,
-			"ScriptFile",
-			scriptFile);
-	}
+    if(scriptFile) {
+      tCOMUtil::SetRegKeyValue(
+      CLSID,
+      "InprocServer32",
+      LUACOM_DLL);
+    tCOMUtil::SetRegKeyValue(
+      CLSID,
+      "ScriptFile",
+      scriptFile);
+    }
 
-	if(control) {
-	    tCOMUtil::SetRegKeyValue(
-		  CLSID,
-		  "Implemented Categories\\{0DE86A53-2BAA-11CF-A229-00AA003D7352}",
-		  NULL);
-	    tCOMUtil::SetRegKeyValue(
-		  CLSID,
-		  "Implemented Categories\\{0DE86A57-2BAA-11CF-A229-00AA003D7352}",
-		  NULL);
-	    tCOMUtil::SetRegKeyValue(
-		  CLSID,
-		  "Implemented Categories\\{40FC6ED4-2438-11CF-A3DB-080036F12502}",
-		  NULL);
-	    tCOMUtil::SetRegKeyValue(
-		  CLSID,
-		  "Implemented Categories\\{40FC6ED5-2438-11CF-A3DB-080036F12502}",
-		  NULL);
-	    tCOMUtil::SetRegKeyValue(
-		  CLSID,
-		  "Implemented Categories\\{7DD95801-9882-11CF-9FA9-00AA006C42C4}",
-		  NULL);
-	    tCOMUtil::SetRegKeyValue(
-		  CLSID,
-		  "Implemented Categories\\{7DD95802-9882-11CF-9FA9-00AA006C42C4}",
-		  NULL);
-	}
+    if(control) {
+      tCOMUtil::SetRegKeyValue(
+        CLSID,
+        "Implemented Categories\\{0DE86A53-2BAA-11CF-A229-00AA003D7352}",
+        NULL);
+      tCOMUtil::SetRegKeyValue(
+        CLSID,
+        "Implemented Categories\\{0DE86A57-2BAA-11CF-A229-00AA003D7352}",
+        NULL);
+      tCOMUtil::SetRegKeyValue(
+        CLSID,
+        "Implemented Categories\\{40FC6ED4-2438-11CF-A3DB-080036F12502}",
+        NULL);
+      tCOMUtil::SetRegKeyValue(
+        CLSID,
+        "Implemented Categories\\{40FC6ED5-2438-11CF-A3DB-080036F12502}",
+        NULL);
+      tCOMUtil::SetRegKeyValue(
+        CLSID,
+        "Implemented Categories\\{7DD95801-9882-11CF-9FA9-00AA006C42C4}",
+        NULL);
+      tCOMUtil::SetRegKeyValue(
+        CLSID,
+        "Implemented Categories\\{7DD95802-9882-11CF-9FA9-00AA006C42C4}",
+        NULL);
+    }
 
     tCOMUtil::SetRegKeyValue(
       CLSID,
@@ -1358,8 +1358,8 @@ static int luacom_UnRegisterObject(lua_State *L)
 
       typelib->GetLibAttr(&plibattr);
 
-	  UnRegisterTypeLib(plibattr->guid, plibattr->wMajorVerNum, plibattr->wMinorVerNum,
-		  plibattr->lcid, plibattr->syskind);
+      UnRegisterTypeLib(plibattr->guid, plibattr->wMajorVerNum, plibattr->wMinorVerNum,
+      plibattr->lcid, plibattr->syskind);
 
       typelib->ReleaseTLibAttr(plibattr);
     }
@@ -1669,27 +1669,27 @@ int luacom_CreateLuaCOM(lua_State* L)
 
 int luacom_StartMessageLoop(lua_State *L)
 {
-	MSG msg; 
-	if(lua_gettop(L) > 0) {
-		const char *err;
-		if(luaCompat_call(L, lua_gettop(L)-1, 0, &err)) {
+  MSG msg;
+  if(lua_gettop(L) > 0) {
+    const char *err;
+    if(luaCompat_call(L, lua_gettop(L)-1, 0, &err)) {
           luacom_APIerror(L, err);
-		  return 0;
-		}
-	}
-	while (GetMessage(&msg, NULL, 0, 0)) 
-	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-		if(lua_gettop(L) > 0) {
-			const char *err;
-			if(luaCompat_call(L, lua_gettop(L)-1, 0, &err)) {
+      return 0;
+    }
+  }
+  while (GetMessage(&msg, NULL, 0, 0))
+  {
+    TranslateMessage(&msg);
+    DispatchMessage(&msg);
+    if(lua_gettop(L) > 0) {
+      const char *err;
+      if(luaCompat_call(L, lua_gettop(L)-1, 0, &err)) {
               luacom_APIerror(L, err);
-			  return 0;
-			}
-		}
-	}
-	return 0;
+        return 0;
+      }
+    }
+  }
+  return 0;
 }
 
 /*
@@ -1699,67 +1699,67 @@ int luacom_StartMessageLoop(lua_State *L)
 
 int luacom_LuaDetectAutomation(lua_State* L)
 {
-	lua_getglobal(L,"arg");
-	if(lua_istable(L,-1))
-	{
-		// Running out-of-process	
-		lua_pushnumber(L,1);
-		lua_gettable(L,-2);
-		const char* cmdSwitch = lua_tostring(L,-1);
-		lua_pop(L,2);
-		if(cmdSwitch != NULL) {
-			const char* errMsg;
-			if(_stricmp("/Register",cmdSwitch) == 0) {
-				lua_pushstring(L,"Register");
-				lua_gettable(L,-2);
-				lua_pushvalue(L,-2);
-				if(luaCompat_call(L,1,0,&errMsg)) {
-					lua_pushnil(L);
-					lua_pushstring(L,errMsg);
-					return 2;
-				} else {
-					return 1;
-				}
-			} else if(_stricmp("/UnRegister",cmdSwitch) == 0) {
-				lua_pushstring(L,"UnRegister");
-				lua_gettable(L,-2);
-				lua_pushvalue(L,-2);
-				if(luaCompat_call(L,1,0,&errMsg)) {
-					lua_pushnil(L);
-					lua_pushstring(L,errMsg);
-					return 2;
-				} else {
-					return 1;
-				}
-			} else if(_stricmp("/Automation",cmdSwitch) == 0) {
-				lua_pushstring(L,"StartAutomation");
-				lua_gettable(L,-2);
-				lua_pushvalue(L,-2);
-				if(luaCompat_call(L,1,0,&errMsg)) {
-					lua_pushnil(L);
-					lua_pushstring(L,errMsg);
-					return 2;
-				} else {
-					lua_settop(L, 0);
-					luacom_StartMessageLoop(L);
-					return 0;
-				}
-			}
-			lua_pushnil(L);
-			lua_pushstring(L,"no valid command-line switch");
-			return 2;
-		} else {
-			lua_pushnil(L);
-			lua_pushstring(L,"no valid command-line switch");
-			return 2;
-		}
-	}
-	else
-	{
-		// Running in-process
-		lua_pop(L,1);
-		return 1;
-	}
+  lua_getglobal(L,"arg");
+  if(lua_istable(L,-1))
+  {
+    // Running out-of-process
+    lua_pushnumber(L,1);
+    lua_gettable(L,-2);
+    const char* cmdSwitch = lua_tostring(L,-1);
+    lua_pop(L,2);
+    if(cmdSwitch != NULL) {
+      const char* errMsg;
+      if(_stricmp("/Register",cmdSwitch) == 0) {
+        lua_pushstring(L,"Register");
+        lua_gettable(L,-2);
+        lua_pushvalue(L,-2);
+        if(luaCompat_call(L,1,0,&errMsg)) {
+          lua_pushnil(L);
+          lua_pushstring(L,errMsg);
+          return 2;
+        } else {
+          return 1;
+        }
+      } else if(_stricmp("/UnRegister",cmdSwitch) == 0) {
+        lua_pushstring(L,"UnRegister");
+        lua_gettable(L,-2);
+        lua_pushvalue(L,-2);
+        if(luaCompat_call(L,1,0,&errMsg)) {
+          lua_pushnil(L);
+          lua_pushstring(L,errMsg);
+          return 2;
+        } else {
+          return 1;
+        }
+      } else if(_stricmp("/Automation",cmdSwitch) == 0) {
+        lua_pushstring(L,"StartAutomation");
+        lua_gettable(L,-2);
+        lua_pushvalue(L,-2);
+        if(luaCompat_call(L,1,0,&errMsg)) {
+          lua_pushnil(L);
+          lua_pushstring(L,errMsg);
+          return 2;
+        } else {
+          lua_settop(L, 0);
+          luacom_StartMessageLoop(L);
+          return 0;
+        }
+      }
+      lua_pushnil(L);
+      lua_pushstring(L,"no valid command-line switch");
+      return 2;
+    } else {
+      lua_pushnil(L);
+      lua_pushstring(L,"no valid command-line switch");
+      return 2;
+    }
+  }
+  else
+  {
+    // Running in-process
+    lua_pop(L,1);
+    return 1;
+  }
 }
 
 /*
@@ -1801,16 +1801,16 @@ int luacom_ImportIUnknown(lua_State* L)
 // Returns current directory
 int luacom_GetCurrentDirectory(lua_State* L)
 {
-	static char buffer[1025];
-	
-	DWORD size = GetCurrentDirectory(1024, buffer);
-	
-	if(!size || size > 1023)
-		return 0;
-		
-	lua_pushstring(L, buffer);
-	
-	return 1;
+  static char buffer[1025];
+
+  DWORD size = GetCurrentDirectory(1024, buffer);
+
+  if(!size || size > 1023)
+    return 0;
+
+  lua_pushstring(L, buffer);
+
+  return 1;
 }
 
 
@@ -1872,7 +1872,7 @@ static int tagmeth_gc(lua_State *L)
   assert(lcom);
 
   if(lcom != NULL) {
-	  lcom->Unlock();
+    lcom->Unlock();
   }
 
   return 0;
@@ -2385,12 +2385,12 @@ static int tagmeth_index(lua_State *L)
 }
 
 static bool luacom_runningInprocess(lua_State* L) {
-	lua_getregistry(L);
-	lua_pushstring(L,"inproc");
-	lua_gettable(L,-2);
-	bool inproc = lua_toboolean(L,-1) != 0;
-	lua_pop(L,2);
-	return inproc;
+  lua_getregistry(L);
+  lua_pushstring(L,"inproc");
+  lua_gettable(L,-2);
+  bool inproc = lua_toboolean(L,-1) != 0;
+  lua_pop(L,2);
+  return inproc;
 }
 
 
@@ -2438,13 +2438,13 @@ static int call_event(lua_State *L)
 
 
 static int luacom_RoundTrip(lua_State *L) {
-	VARIANTARG v;
-	
-	tLuaCOMTypeHandler *handler = new tLuaCOMTypeHandler(NULL);
-	handler->lua2com(L, 1, v);
-	handler->com2lua(L, v);
-	delete handler;
-	return 1;
+  VARIANTARG v;
+
+  tLuaCOMTypeHandler *handler = new tLuaCOMTypeHandler(NULL);
+  handler->lua2com(L, 1, v);
+  handler->com2lua(L, v);
+  delete handler;
+  return 1;
 }
 
 /////////////////////////////////////////////

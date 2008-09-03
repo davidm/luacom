@@ -19,7 +19,7 @@ tStringBuffer::tStringBuffer()
 tStringBuffer::~tStringBuffer()
 {
   if(buffer!=NULL)
-	  delete[] buffer;
+    delete[] buffer;
 }
 
 void tStringBuffer::copyToBuffer(char * source)

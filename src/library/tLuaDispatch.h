@@ -26,7 +26,7 @@ extern "C"
 
 class ILuaDispatch : public IUnknown {
 public:
-	STDMETHOD(PushIfSameState)(lua_State *L)=0;
+  STDMETHOD(PushIfSameState)(lua_State *L)=0;
 };
 
 
@@ -39,11 +39,11 @@ static void *idxDispatch;
 class tLuaDispatch : public IDispatch, public ILuaDispatch
 {
 public:
-	tLuaCOMConnPointContainer* GetConnPointContainer(void);
-	void BeConnectable(void);
-	void SetCoClassinfo(ITypeInfo* coclassinfo);
-	void FillExceptionInfo(EXCEPINFO *pexcepinfo, const char* text);
-	static tLuaDispatch * CreateLuaDispatch(
+  tLuaCOMConnPointContainer* GetConnPointContainer(void);
+  void BeConnectable(void);
+  void SetCoClassinfo(ITypeInfo* coclassinfo);
+  void FillExceptionInfo(EXCEPINFO *pexcepinfo, const char* text);
+  static tLuaDispatch * CreateLuaDispatch(
     lua_State* L,
     ITypeInfo* typeinfo,
     int ref
@@ -87,8 +87,8 @@ public:
   ITypeInfo *typeinfo;
 
 protected:
-	tLuaCOMConnPointContainer* cpc;
-	HRESULT propertyget(
+  tLuaCOMConnPointContainer* cpc;
+  HRESULT propertyget(
     const char* name, 
     FUNCDESC* funcdesc,
     DISPPARAMS* pdispparams,
@@ -111,9 +111,9 @@ protected:
     EXCEPINFO *pexcepinfo,
     unsigned int *puArgErr);
 
-	lua_State* L;
-	IID interface_iid;
-	tLuaCOMTypeHandler * typehandler;
+  lua_State* L;
+  IID interface_iid;
+  tLuaCOMTypeHandler * typehandler;
   static int tag;
 
   unsigned long m_refs;
@@ -128,7 +128,7 @@ protected:
   {
   public:
     ProvideClassInfo2(ITypeInfo* p_coclassinfo, IUnknown* p_pUnk);
-	ProvideClassInfo2::~ProvideClassInfo2();
+    ProvideClassInfo2::~ProvideClassInfo2();
 
     STDMETHODIMP_(ULONG) AddRef(void);
     STDMETHODIMP_(ULONG) Release(void);

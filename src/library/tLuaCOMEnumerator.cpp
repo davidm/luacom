@@ -192,7 +192,7 @@ int tLuaCOMEnumerator::call_method(lua_State *L)
 
 int tLuaCOMEnumerator::callCOMmethod(lua_State* L, const char *name, int first_param, int num_params)
 {
-  HRESULT hr = S_OK;
+    HRESULT hr = S_OK;
 
   // Next method
   if(strcmp(name, "Next") == 0)
@@ -222,11 +222,11 @@ int tLuaCOMEnumerator::callCOMmethod(lua_State* L, const char *name, int first_p
     }
 
     for(counter = 0; counter <  num_elements; counter++)
-	  VariantClear(&pVar[counter]);
+      VariantClear(&pVar[counter]);
 
     delete[] pVar;
 
-	pVar = NULL;
+    pVar = NULL;
 
     return fetched;
   }

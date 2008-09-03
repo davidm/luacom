@@ -61,7 +61,7 @@ public:
   tLuaCOMTypeHandler(ITypeInfo *ptypeinfo);
   virtual ~tLuaCOMTypeHandler();
 
-	static TYPEDESC processTYPEDESC(
+  static TYPEDESC processTYPEDESC(
     ITypeInfo* typeinfo,
     TYPEDESC tdesc);
 
@@ -79,20 +79,20 @@ protected:
   SAFEARRAYBOUND* getRightOrderedBounds(SAFEARRAYBOUND *bounds, 
                                         unsigned long num_dimensions);
 
-	void Coerce(VARIANTARG& dest, VARIANTARG src, VARTYPE vt);
-	long VariantSize(VARTYPE vt);
-	static TYPEDESC processSAFEARRAY(ITypeInfo* typeinfo, TYPEDESC& tdesc);
-	void toByRefParam(VARIANT& var_source, VARIANTARG * pvarg_dest);
-	void initByRefParam(VARIANTARG* pvarg, VARTYPE vt, bool alloc_memory = true);
-	void pushIUnknown(lua_State* L, IUnknown *punk);
-	bool isIUnknown(lua_State* L, stkIndex value);
-	static TYPEDESC processAliases(
+  void Coerce(VARIANTARG& dest, VARIANTARG src, VARTYPE vt);
+  long VariantSize(VARTYPE vt);
+  static TYPEDESC processSAFEARRAY(ITypeInfo* typeinfo, TYPEDESC& tdesc);
+  void toByRefParam(VARIANT& var_source, VARIANTARG * pvarg_dest);
+  void initByRefParam(VARIANTARG* pvarg, VARTYPE vt, bool alloc_memory = true);
+  void pushIUnknown(lua_State* L, IUnknown *punk);
+  bool isIUnknown(lua_State* L, stkIndex value);
+  static TYPEDESC processAliases(
     ITypeInfo* typeinfo,
     const TYPEDESC& tdesc);
-	static TYPEDESC processUSERDEFINED(
+  static TYPEDESC processUSERDEFINED(
     ITypeInfo* typeinfo,
     const TYPEDESC& tdesc);
-	static TYPEDESC processPTR(
+  static TYPEDESC processPTR(
     ITypeInfo* typeinfo,
     const TYPEDESC& tdesc);
 

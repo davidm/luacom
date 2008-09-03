@@ -458,7 +458,7 @@ DWORD tLuaCOM::addConnection(tLuaCOM *server)
   }
 
   if(conn_point!=NULL)
-	  conn_point->Release();
+    conn_point->Release();
   conn_point = connection_point;
   conn_cookie = connection_point_cookie;
 
@@ -487,7 +487,7 @@ void tLuaCOM::releaseConnection(tLuaCOM* server, DWORD cookie)
 
   if(FAILED(hr))
   {
-	  LUACOM_ERROR("Object does not accept connections!");
+    LUACOM_ERROR("Object does not accept connections!");
   }
 
   {
@@ -512,54 +512,54 @@ void tLuaCOM::releaseConnection(tLuaCOM* server, DWORD cookie)
 }
 
 void tLuaCOM::releaseConnections() {
-	if(conn_point==NULL)
-		return;
-	
-	conn_point->Release();
-	IConnectionPointContainer *pcpc;
+  if(conn_point==NULL)
+    return;
 
-    HRESULT hr = pdisp->QueryInterface(IID_IConnectionPointContainer, (void **) &pcpc);
+  conn_point->Release();
+  IConnectionPointContainer *pcpc;
 
-    if(FAILED(hr))
-    {
-	    return;
+  HRESULT hr = pdisp->QueryInterface(IID_IConnectionPointContainer, (void **) &pcpc);
+
+  if(FAILED(hr))
+  {
+    return;
+  }
+
+  IEnumConnectionPoints *pecp;
+
+  hr = pcpc->EnumConnectionPoints(&pecp);
+  pcpc->Release();
+
+  if(FAILED(hr))
+  {
+    return;
+  }
+
+  pecp->Reset();
+
+  IConnectionPoint *pcp;
+  ULONG fetched = 0;
+
+  hr = pecp->Next(1, &pcp, &fetched);
+  while(SUCCEEDED(hr) && fetched) {
+    IEnumConnections *pec;
+    hr = pcp->EnumConnections(&pec);
+    if(SUCCEEDED(hr)) {
+      pec->Reset();
+      CONNECTDATA conn;
+      ULONG conn_fetched = 0;
+      hr = pec->Next(1, &conn, &conn_fetched);
+      while(SUCCEEDED(hr) && conn_fetched) {
+        pcp->Unadvise(conn.dwCookie);
+        hr = pec->Next(1, &conn, &conn_fetched);
+      }
+      pec->Release();
     }
+    pcp->Release();
+    pecp->Next(1, &pcp, &fetched);
+  }
 
-	IEnumConnectionPoints *pecp;
-
-	hr = pcpc->EnumConnectionPoints(&pecp);
-	pcpc->Release();
-
-    if(FAILED(hr))
-    {
-	    return;
-    }
-
-	pecp->Reset();
-
-	IConnectionPoint *pcp;
-	ULONG fetched = 0;
-
-	hr = pecp->Next(1, &pcp, &fetched);
-	while(SUCCEEDED(hr) && fetched) {
-		IEnumConnections *pec;
-		hr = pcp->EnumConnections(&pec);
-		if(SUCCEEDED(hr)) {
-			pec->Reset();
-			CONNECTDATA conn;
-			ULONG conn_fetched = 0;
-			hr = pec->Next(1, &conn, &conn_fetched);
-			while(SUCCEEDED(hr) && conn_fetched) {
-				pcp->Unadvise(conn.dwCookie);
-				hr = pec->Next(1, &conn, &conn_fetched);
-			}
-			pec->Release();
-		}
-        pcp->Release();
-  	    pecp->Next(1, &pcp, &fetched);
-	}
-	
-	pecp->Release();
+  pecp->Release();
 }
 
 //
