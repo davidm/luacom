@@ -178,7 +178,8 @@ const char * tUtil::bstr2string(BSTR bstr, size_t& computedSize)
 
       if(!result)
         LUACOM_ERROR(tUtil::GetErrorMessage(GetLastError()));
-
+      
+      computedSize = size;	// Now holds the actual length of the string
     }
     else
     {
