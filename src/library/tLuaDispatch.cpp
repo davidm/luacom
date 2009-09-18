@@ -21,7 +21,8 @@ extern "C"
 #include "LuaCompat.h"
 }
 
-#ifdef __MINGW32__ // hack for MinGW
+// hacks for certain compilers
+#if defined(__MINGW32__) || defined(__CYGWIN__)
 #define GUIDKIND_DEFAULT_SOURCE_DISP_IID 1
 #endif
 

@@ -8,7 +8,6 @@ static char *rcsname = "$Name:  $";
 
 
 #include <ole2.h>
-#include <comdef.h>
 
 extern "C"
 {
@@ -33,7 +32,6 @@ extern "C"
 #include "luabeans.h"
 
 #include "luacom_internal.h"
-
 
 #define LUA_NOOBJECT 0
 
@@ -295,7 +293,7 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
             break;
           }
 
-          IUnknownPtr pProxMgr;
+          IUnknown* pProxMgr;
           ILuaDispatch *pLuaDispatch;
           if((pdisp->QueryInterface(IID_IProxyManager, (void**)&pProxMgr)==E_NOINTERFACE) &&
               SUCCEEDED(pdisp->QueryInterface(IID_ILuaDispatch, (void**)&pLuaDispatch)) &&
@@ -330,7 +328,7 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
 
           if(SUCCEEDED(hr))
           {
-               IUnknownPtr pProxMgr;
+            IUnknown* pProxMgr;
             ILuaDispatch *pLuaDispatch;
             if((pdisp->QueryInterface(IID_IProxyManager, (void**)&pProxMgr)==E_NOINTERFACE) &&
                 SUCCEEDED(pdisp->QueryInterface(IID_ILuaDispatch, (void**)&pLuaDispatch)) &&

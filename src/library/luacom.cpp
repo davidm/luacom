@@ -18,7 +18,9 @@ static char *g_version = "1.4";
 
 #include <ole2.h>
 #include <ocidl.h>
+#ifndef NO_HTMLHELP
 #include <htmlhelp.h> // HtmlHelp
+#endif
 
 #include <assert.h>
 #include <stdio.h>
@@ -186,10 +188,15 @@ static int luacom_ShowHelp(lua_State *L)
     size_t len = strlen(pHelpFile);
     if (len >= 4 && _stricmp(pHelpFile + len - 4, ".chm") == 0)
     {
+#ifdef NO_HTMLHELP
+      ::MessageBox(NULL, "Error: HtmlHelp support not included",
+        "LuaCOM", MB_ICONEXCLAMATION);
+#else
       if(context != 0)
         HtmlHelp(NULL, pHelpFile, HH_HELP_CONTEXT, context);
       else
         HtmlHelp(NULL, pHelpFile, HH_DISPLAY_TOC, 0);
+#endif
     }
     else
     {
@@ -2686,3 +2693,13 @@ LUACOM_API int luacom_detectAutomation(lua_State *L, int argc, char *argv[])
 
   return automation_result;
 }
+
+
+// preprocessor warnings
+#ifdef NO_HTMLHTML
+#ifdef _MSC_VER
+#pragma message("htmlhelp.h disabled")
+#else
+#warning(htmlhtlp.h disabled)
+#endif
+#endif

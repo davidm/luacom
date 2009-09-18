@@ -349,7 +349,7 @@ void tUtil::ShowHelp(const char *filename, unsigned long context)
       sprintf(context_param, "-mapid %d", context);
     else
       context_param[0] = '\0';
-#if !defined(__WINE__) || defined(__MSVCRT__)
+#if !defined(__WINE__) && !defined(__CYGWIN__)
     _spawnlp(_P_NOWAIT, "hh.exe", "hh.exe", context_param, filename, NULL);
 #else
     MessageBox(NULL, "FIX - not implemented - _spawnlp", "LuaCOM", MB_ICONEXCLAMATION);

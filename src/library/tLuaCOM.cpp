@@ -20,6 +20,11 @@ static char *rcsname = "$Name:  $";
 
 #include "LuaCompat.h"
 
+#if defined(__CYGWIN__) || defined(__MINGW32__)
+#include <initguid.h>
+DEFINE_GUID(IID_IProxyManager, 0x00000008, 0x0000, 0x0000, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46);
+#endif
+
 long tLuaCOM::NEXT_ID = 0;
 
 tLuaCOM::tLuaCOM(lua_State* L,
