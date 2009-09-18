@@ -136,7 +136,7 @@ static void luacom_err(lua_State* L, const char* message, bool is_API_function)
 
   if(luaCompat_toCBool(L, -1))
   {
-    luaL_error(L, message);
+    luaL_error(L, "%s", message);
   }
 
   lua_pop(L, 1);
