@@ -26,8 +26,6 @@
 #define LUASTACK_CLEAN(L, n) assert((__LuaAux_luastack_top_index + n) == lua_gettop(L))
 #endif
 
-#define LUACOMPAT_ERRORMESSAGE "__luacompat_errormesage"
-
 
 /* Lua 5 version of the API */
 
@@ -45,12 +43,6 @@ void luaCompat_openlib(lua_State* L, const char* libname, const struct luaL_reg*
 #endif
 
   LUASTACK_CLEAN(L, 1);
-}
-
-void luaCompat_error(lua_State* L, const char* message)
-{ /* lua5 */
-  lua_pushstring(L, message);
-  lua_error(L);
 }
 
 int luaCompat_call(lua_State* L, int nargs, int nresults, const char** pErrMsg)
