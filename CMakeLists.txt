@@ -42,8 +42,18 @@ ADD_DEFINITIONS(-D_stricmp=${STRICMP})
 FIND_PACKAGE(Lua51 REQUIRED)
 INCLUDE_DIRECTORIES(${LUA_INCLUDE_DIR})
 
+#~ improve?
+FIND_PROGRAM(LUA NAMES lua lua.bat)
+
+# Compile luacom5.lua to luacom5.loh
+ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/luacom5.loh
+    DEPENDS src/library/luacom5.lua
+	COMMAND "${LUA}" "${CMAKE_CURRENT_SOURCE_DIR}/mak/luac.lua" "-o" "${CMAKE_CURRENT_BINARY_DIR}/luacom5.lo" "${CMAKE_CURRENT_SOURCE_DIR}/src/library/luacom5.lua"
+	COMMAND "${LUA}" "${CMAKE_CURRENT_SOURCE_DIR}/mak/bin2c.lua" "${CMAKE_CURRENT_BINARY_DIR}/luacom5.lo" ">${CMAKE_CURRENT_BINARY_DIR}/luacom5.loh")
+
+
 # Build
-INCLUDE_DIRECTORIES(include src/dll src/library)
+INCLUDE_DIRECTORIES(include ${CMAKE_CURRENT_BINARY_DIR} src/dll src/library)
 
 SET(SRC_LIB
 	src/library/LuaAux.cpp
@@ -66,6 +76,9 @@ SET(SRC_LIB
 	src/library/tStringBuffer.cpp
 	src/library/tUtil.cpp
 )
+
+SET_SOURCE_FILES_PROPERTIES(src/library/luacom.cpp PROPERTIES OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/luacom5.loh)
+
 
 SET(SRC_DLL src/dll/luacom_dll.cpp)
 ADD_DEFINITIONS(-DLUACOM_DLL="luacom.dll")
@@ -95,8 +108,6 @@ INSTALL (FILES doc/luacom.gif doc/luacom.pdf www/index.html DESTINATION ${INSTAL
 INSTALL (DIRECTORY demo DESTINATION ${INSTALL_EXAMPLE})
 
 #debugging only: INSTALL (FILES src/library/luacom5.lua DESTINATION ${INSTALL_LMOD})
-
-#~ TODO: build .loh file
 
 # ===============================================================================
 #
