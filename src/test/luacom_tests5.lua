@@ -6,6 +6,13 @@ local luacom = luacom
 
 local skipped = false  -- whether tests were skipped
 
+-- Set this to true if your running as a non-administrator user and the
+-- test.tlb hasn't been registered by an administrator.
+local SKIP_REGISTER = true
+if SKIP_REGISTER then
+  print "WARNING: skipping COM registration test (to permit tests to run on non-admin accounts)"
+end
+
 local teste_progid = "LuaCOM.Test"
 
 luacom.StartLog("luacom.log")
@@ -25,8 +32,12 @@ function Test:ShowDialog()
   print("ShowDialog called")
 end
 function Test:prop2(p1, p2, value)
-  Events:evt1(value)
-  Events:evt2()
+  if Events then
+    Events:evt1(value)
+    Events:evt2()
+  else
+    print "WARNING: Events test disabled"; skipped=true
+  end
   if value then
     Test.prop2_value = p1*p2*value
   else
@@ -61,11 +72,18 @@ do
   end
 end
 function Test:DataConvTest()
-  return luacom.ImplInterface(DataConvTest, "LUACOM.Test",
-                              "IDataConversionTest")
+  return impl_interface(DataConvTest, "IDataConversionTest")
 end
 END-UNUSED
 ]]
+
+local function impl_interface(t, ...)
+  if SKIP_REGISTER then
+    return luacom.ImplInterfaceFromTypelib(t, "test.tlb", ...)
+  else
+    return luacom.ImplInterface(t, "LUACOM.Test", ...)
+  end
+end
 
 -- Criação e registro do objeto COM de teste
 local function init()
@@ -79,21 +97,28 @@ local function init()
   
   local res = luacom.RegisterObject(reginfo)
   assert(res)
-  
-  -- creates and exposes COM proxy application object
-  local COMtestobj
-  COMtestobj, Events = luacom.NewObject(Test, "LUACOM.Test")
-  assert(COMtestobj)
-  assert(Events)
+
+  if SKIP_REGISTER then
+    _obj = impl_interface(Test, "ITest", "Test")
+    Events = nil
+  else
+    -- creates and exposes COM proxy application object
+    local COMtestobj
+    COMtestobj, Events = luacom.NewObject(Test, "LUACOM.Test")
+    assert(COMtestobj)
+    assert(Events)
    
-  Cookie = luacom.ExposeObject(COMtestobj)
-  assert(Cookie)
+    Cookie = luacom.ExposeObject(COMtestobj)
+    assert(Cookie)
   
-  _obj = luacom.CreateObject("LUACOM.Test")
+    _obj = luacom.CreateObject("LUACOM.Test")
+  end
 end
 
 local function finish()
-  luacom.RevokeObject(Cookie)
+  if not SKIP_REGISTER then
+    luacom.RevokeObject(Cookie)
+  end
 end
 
 -- immutable tuple type
@@ -231,7 +256,7 @@ local function test_simple()
     assert(table2string(array) == table2string({"1","2"}))
   end
 
-  local obj = luacom.ImplInterface(t, "LUACOM.Test", "IDataConversionTest" )
+  local obj = impl_interface(t, "IDataConversionTest")
   assert(obj)
 
   obj:TestArray1({1,2})
@@ -270,7 +295,7 @@ local function test_iface_implementation()
     assert(p15 == 15)
   end
 
-  local obj = luacom.ImplInterface(iface, teste_progid, "ITestEvents")
+  local obj = impl_interface(iface, "ITestEvents")
   assert(obj)
 
   nt()
@@ -318,6 +343,11 @@ end
 local function test_connection_points()
   print("\n=======> test_connection_points")
 
+  if not Events then
+    print "WARNING: Events tests disabled"; skipped = true
+    return
+  end
+
   nt(1)
 
   nt()
@@ -327,7 +357,7 @@ local function test_connection_points()
     events_ok = 1
   end
 
-  local evt = luacom.ImplInterface(events, "LUACOM.Test", "ITestEvents")
+  local evt = impl_interface(events, "ITestEvents")
   assert(evt)
 
   nt()
@@ -758,7 +788,7 @@ local function test_DataTypes()
     return in_out_param, in_param, in_param
   end
 
-  local obj = luacom.ImplInterface(teste, "LUACOM.Test", "IDataConversionTest")
+  local obj = impl_interface(teste, "IDataConversionTest")
   assert(obj)
 
   nt(1)  -- Datas
@@ -996,8 +1026,8 @@ local function test_USERDEF_PTR()
     return value
   end
 
-  local teste  = luacom.ImplInterface(teste_table, "LUACOM.Test", "ITest1")
-  local teste2 = luacom.ImplInterface(teste_table, "LUACOM.Test", "IStruct1")
+  local teste  = impl_interface(teste_table, "ITest1")
+  local teste2 = impl_interface(teste_table, "IStruct1")
   assert(teste)
   assert(teste2)
 
@@ -1005,7 +1035,7 @@ local function test_USERDEF_PTR()
   local o2
   local teste_disp = function(self, value)
     local t = {}
-    o2 = luacom.ImplInterface(t, "LUACOM.Test", "ITest1")
+    o2 = impl_interface(t, "ITest1")
     return o2
   end
 
@@ -1065,7 +1095,7 @@ print 'FIX: GetIUnknown test disabled\n'; skipped=true
 
   local teste_unk = function(self, value)
     local t = {}
-    o2 = luacom.ImplInterface(t, "LUACOM.Test", "ITest1")
+    o2 = impl_interface(t, "ITest1")
     o2 = luacom.GetIUnknown(o2)
     return o2
   end
@@ -1095,7 +1125,7 @@ local function test_field_redefinition()
   luaobj.get = 2
   luaobj.func = function() return 3 end
 
-  local obj = luacom.ImplInterface(luaobj, "LUACOM.Test", "ITest1")
+  local obj = impl_interface(luaobj, "ITest1")
   assert(obj)
   assert(obj.getput == 1)
   assert(obj.get == 2)
@@ -1188,7 +1218,7 @@ if false then
 test_stress()
 end
 
-test_NewObject()
+if not SKIP_REGISTER then test_NewObject() end
 test_DataTypes()
 test_USERDEF_PTR()
 
