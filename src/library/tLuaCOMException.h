@@ -23,16 +23,16 @@ public:
 
   static const char *GetErrorMessage(DWORD errorcode);
 
-  tLuaCOMException(Errors p_code, char *p_file, int p_line, const char *usermessage = NULL);
+  tLuaCOMException(Errors p_code, const char *p_file, int p_line, const char *usermessage = NULL);
   virtual ~tLuaCOMException();
 
   Errors code;
-  char *file;
+  const char *file;
   int line;
   const char *usermessage;
 
 protected:
-  static char *messages[];
+  static char const * const messages[];
 };
 
 #define LUACOM_EXCEPTION(x) throw tLuaCOMException(tLuaCOMException::x, \

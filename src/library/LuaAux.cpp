@@ -15,8 +15,8 @@ extern "C"
 
 
 // RCS Info
-static char *rcsid = "$Id: LuaAux.cpp,v 1.2 2007/12/20 06:51:15 dmanura Exp $";
-static char *rcsname = "$Name:  $";
+static char const * const rcsid = "$Id: LuaAux.cpp,v 1.2 2007/12/20 06:51:15 dmanura Exp $";
+static char const * const rcsname = "$Name:  $";
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

@@ -9,9 +9,9 @@
  */
 
 // RCS Info
-static char *rcsid = "$Id: luacom.cpp,v 1.5 2008/05/16 15:26:43 mascarenhas Exp $";
-static char *rcsname = "$Name:  $";
-static char *g_version = "1.4";
+static char const * const rcsid = "$Id: luacom.cpp,v 1.5 2008/05/16 15:26:43 mascarenhas Exp $";
+static char const * const rcsname = "$Name:  $";
+static char const * const g_version = "1.4";
 
 #include <string.h>
 #include <stdlib.h>

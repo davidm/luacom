@@ -49,7 +49,7 @@ const OLEVERB verbs[] = {
     }
 
 #define FAIL(szMsg)                                         \
-        { static char szMsgCode[] = szMsg;                    \
+        { static const char szMsgCode[] = szMsg;                    \
         DisplayAssert(szMsgCode, "FAIL", __FILE__, __LINE__); }
 
 // macro that checks a pointer for validity on input
@@ -79,7 +79,7 @@ static const char szTitle[]  = _SERVERNAME_ " Assertion  (Abort = UAE, Retry = I
 //=--------------------------------------------------------------------------=
 // Local functions
 //=--------------------------------------------------------------------------=
-int NEAR _IdMsgBox(LPSTR pszText, LPCSTR pszTitle, UINT mbFlags);
+int NEAR _IdMsgBox(LPCSTR pszText, LPCSTR pszTitle, UINT mbFlags);
 
 //=--------------------------------------------------------------------------=
 // DisplayAssert
@@ -91,16 +91,14 @@ int NEAR _IdMsgBox(LPSTR pszText, LPCSTR pszTitle, UINT mbFlags);
 //
 VOID DisplayAssert
 (
-    LPSTR  pszMsg,
-    LPSTR  pszAssert,
-    LPSTR  pszFile,
+    LPCSTR pszMsg,
+    LPCSTR pszAssert,
+    LPCSTR pszFile,
     UINT   line
 )
 {
     char   szMsg[250];
-    LPSTR  lpszText;
-
-    lpszText = pszMsg; // Assume no file & line # info
+    LPCSTR lpszText = pszMsg; // Assume no file & line # info
 
     // If C file assert, where you've got a file name and a line #
     //
@@ -136,7 +134,7 @@ VOID DisplayAssert
 //
 int NEAR _IdMsgBox
 (
-    LPSTR  pszText,
+    LPCSTR  pszText,
     LPCSTR pszTitle,
     UINT   mbFlags
 )

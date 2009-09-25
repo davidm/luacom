@@ -128,7 +128,7 @@ protected:
   {
   public:
     ProvideClassInfo2(ITypeInfo* p_coclassinfo, IUnknown* p_pUnk);
-    ProvideClassInfo2::~ProvideClassInfo2();
+    ~ProvideClassInfo2();
 
     STDMETHODIMP_(ULONG) AddRef(void);
     STDMETHODIMP_(ULONG) Release(void);
