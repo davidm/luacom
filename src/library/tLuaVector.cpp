@@ -23,9 +23,11 @@ extern "C"
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-tLuaVector::tLuaVector()
+tLuaVector::tLuaVector() :
+  initialized(false),
+  vectors(NULL),
+  luavals(NULL)
 {
-  initialized = false;
 }
 
 tLuaVector::~tLuaVector()
