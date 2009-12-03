@@ -35,6 +35,17 @@ extern "C"
 
 #define LUA_NOOBJECT 0
 
+static const VARTYPE com_types[] = {
+  VT_R8, VT_R4, VT_ARRAY, VT_R8, VT_R8, VT_I8, VT_UI8, VT_I4, VT_UI4,
+  VT_I2, VT_UI2, VT_I1, VT_UI1, VT_INT, VT_UINT, VT_BSTR, VT_NULL, VT_ERROR, VT_BOOL
+};
+
+static const char *const com_type_names[] = {
+  "double", "float", "array", "decimal", "currency", "int8", "uint8", "int4", "uint4",
+  "int2", "uint2", "int1", "uint1", "int", "uint", "string", "null", "error", "bool", NULL
+};
+
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -120,7 +131,7 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
   lua_gettable(L, -2);
   bool table_variants = luaCompat_toCBool(L, -1) != 0;
   lua_pop(L, 2);
-  
+
 
   // dereferences VARIANTARG (if necessary)
   hr = VariantCopyInd(&varg, &varg_orig);
@@ -131,7 +142,7 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
   // Gives a different treatment to SAFEARRAYs
   if(varg.vt & VT_ARRAY)
   {
-    // treats an array of VT_UI1 as an array of char and 
+    // treats an array of VT_UI1 as an array of char and
     // converts it to a string
     if(varg.vt == (VT_ARRAY | VT_UI1))
       safearray2string(L, varg);
@@ -239,7 +250,7 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
         }
 
 
-      case VT_ERROR: 
+      case VT_ERROR:
         // assumes that a parameter has been omitted
         if(is_variant && table_variants) {
             lua_newtable(L);
@@ -278,7 +289,7 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
           } else {
               lua_pushlstring(L, str, computedSize);
           }
-        
+
           break;
         }
 
@@ -299,7 +310,7 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
               SUCCEEDED(pdisp->QueryInterface(IID_ILuaDispatch, (void**)&pLuaDispatch)) &&
               SUCCEEDED(pLuaDispatch->PushIfSameState(L)))
             break;
-          
+
           tLuaCOM* lcom = NULL;
 
           try
@@ -366,7 +377,7 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
 
             try
             {
-              enumerator = 
+              enumerator =
                 new tLuaCOMEnumerator(pEV);
             }
             catch(class tLuaCOMException& e)
@@ -395,11 +406,11 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
       default:
         {
           static char msg[100];
-        
-          sprintf(msg, "COM->Lua - Type 0x%.2x not implemented.", varg.vt); 
-        
+
+          sprintf(msg, "COM->Lua - Type 0x%.2x not implemented.", varg.vt);
+
           TYPECONV_ERROR(msg);
-        
+
           break;
         }
       }
@@ -550,6 +561,18 @@ void tLuaCOMTypeHandler::lua2com(lua_State* L, stkIndex luaval, VARIANTARG& varg
           if(strcmp(vtype, "double") == 0) {
             varg.vt = VT_R8;
             varg.dblVal = lua_tonumber(L, -1);
+          } else if(strcmp(vtype, "array") == 0) {
+            safearray_lua2com(L, lua_gettop(L), varg, VT_VARIANT);
+          } else if(strncmp(vtype, "array of ", strlen("array of ")) == 0) {
+			VARTYPE vtarr = VT_EMPTY;
+			const char *varrtype = vtype + strlen("array of ");
+			for (int i=0; com_type_names[i]; i++) {
+				if (strcmp(com_type_names[i], varrtype) == 0) {
+					vtarr = com_types[i];
+					break;
+				}
+			}
+            safearray_lua2com(L, lua_gettop(L), varg, vtarr);
           } else if(strcmp(vtype, "float") == 0) {
             varg.vt = VT_R4;
             varg.fltVal = (float)lua_tonumber(L, -1);
@@ -593,12 +616,12 @@ void tLuaCOMTypeHandler::lua2com(lua_State* L, stkIndex luaval, VARIANTARG& varg
             varg.uintVal = (unsigned int)lua_tonumber(L, -1);
           } else if(strcmp(vtype, "string") == 0) {
             varg.vt = VT_BSTR;
-                varg.bstrVal = tUtil::string2bstr(lua_tostring(L, -1));
+            varg.bstrVal = tUtil::string2bstr(lua_tostring(L, -1));
           } else if(strcmp(vtype, "null") == 0) {
             varg.vt = VT_NULL;
           } else if(strcmp(vtype, "error") == 0) {
             varg.vt = VT_ERROR;
-                varg.scode = (SCODE)lua_tonumber(L, -1);
+            varg.scode = (SCODE)lua_tonumber(L, -1);
           } else if(strcmp(vtype, "bool") == 0) {
             varg.vt = VT_BOOL;
             varg.boolVal = luaCompat_toCBool(L, -1) ? VARIANT_TRUE : VARIANT_FALSE;
@@ -660,7 +683,7 @@ void tLuaCOMTypeHandler::lua2com(lua_State* L, stkIndex luaval, VARIANTARG& varg
     }
 
     break;
-  
+
   case LUA_TBOOLEAN:
     varg.vt = VT_BOOL;
     varg.boolVal = luaCompat_toCBool(L, luaval);
@@ -724,15 +747,14 @@ int tLuaCOMTypeHandler::pushOutValues(lua_State* L, const DISPPARAMS& dispparams
 
   unsigned int i = 0;
   int num_pushed_values = 0;
-   
+
   // Procura valor de retorno dos parametros de saida
   for(i = 0; i < dispparams.cArgs; i++)
   {
     VARIANTARG& varg = dispparams.rgvarg[dispparams.cArgs - i - 1];
-    bool isout = pfuncdesc
-      ? (pfuncdesc->lprgelemdescParam[i].
-         paramdesc.wParamFlags & PARAMFLAG_FOUT) != 0
-      : (varg.vt & VT_BYREF) != 0;
+    bool isout = (pfuncdesc &&
+      ((pfuncdesc->lprgelemdescParam[i].paramdesc.wParamFlags & PARAMFLAG_FOUT) != 0)) ||
+       ((varg.vt & VT_BYREF) != 0);
     if (isout)
     {
       com2lua(L, varg);
@@ -797,7 +819,7 @@ void tLuaCOMTypeHandler::fillDispParams(lua_State* L,
   stkIndex val              = -1;
 
   // references to simplify code
-  unsigned int& r_cArgs   = rDispParams.cArgs; 
+  unsigned int& r_cArgs   = rDispParams.cArgs;
   VARIANTARG* &r_rgvarg   = rDispParams.rgvarg;
 
   // propertyput particular case
@@ -854,7 +876,7 @@ void tLuaCOMTypeHandler::fillDispParams(lua_State* L,
     max_idl_params = max_params;
 
   // creates array of VARIANTs
-  r_rgvarg = new VARIANTARG[max_params]; 
+  r_rgvarg = new VARIANTARG[max_params];
 
 
   bool hasdefault     = false;
@@ -883,13 +905,13 @@ void tLuaCOMTypeHandler::fillDispParams(lua_State* L,
       type       = VT_VARIANT;
 
       VariantInit(&r_rgvarg[r_cArgs]);
-  
+
       // processing that makes sense when there is type info
       // available
       if(pfuncdesc && i < max_idl_params)
       {
         PARAMDESC paramdesc = pfuncdesc->lprgelemdescParam[i].paramdesc;
-        const TYPEDESC tdesc = 
+        const TYPEDESC tdesc =
           processTYPEDESC(m_typeinfo, pfuncdesc->lprgelemdescParam[i].tdesc);
 
         // stores type of the expected value
@@ -913,7 +935,7 @@ void tLuaCOMTypeHandler::fillDispParams(lua_State* L,
           if(array)
           {
             r_rgvarg[r_cArgs].vt = array_type | VT_ARRAY | VT_BYREF;
-            r_rgvarg[r_cArgs].pparray = 
+            r_rgvarg[r_cArgs].pparray =
               (SAFEARRAY**) CoTaskMemAlloc(sizeof(SAFEARRAY*));
             *r_rgvarg[r_cArgs].pparray = NULL;
     } else {
@@ -924,7 +946,7 @@ void tLuaCOMTypeHandler::fillDispParams(lua_State* L,
           continue;
         }
         else if(paramdesc.wParamFlags & PARAMFLAG_FOUT)
-        {         
+        {
           // assumes that it is an in/out parameter
           byref = true;
         }
@@ -953,7 +975,7 @@ void tLuaCOMTypeHandler::fillDispParams(lua_State* L,
       // Converts to VARIANT
       VariantInit(&var);
 
-      if(val != 0 && lua_type(L, val) != LUA_TNONE && !lua_isnil(L, val)) 
+      if(val != 0 && lua_type(L, val) != LUA_TNONE && !lua_isnil(L, val))
       {
         if(array)
           safearray_lua2com(L, val, var, array_type);
@@ -990,8 +1012,8 @@ void tLuaCOMTypeHandler::fillDispParams(lua_State* L,
       lua_args++;
     }
 
-    /* 
-    // deals with vararg functions following 
+    /*
+    // deals with vararg functions following
     // vararg documentation
     if(pfuncdesc && pfuncdesc->cParamsOpt == -1)
     {
@@ -1023,7 +1045,7 @@ void tLuaCOMTypeHandler::fillDispParams(lua_State* L,
     for(i = 0; i < r_cArgs/2; i++)
     {
       temp = r_rgvarg[i];
-      r_rgvarg[i] = r_rgvarg[r_cArgs - i - 1]; 
+      r_rgvarg[i] = r_rgvarg[r_cArgs - i - 1];
       r_rgvarg[r_cArgs - i - 1] = temp;
     }
   }
@@ -1045,7 +1067,7 @@ void tLuaCOMTypeHandler::pushLuaArgs(lua_State* L,
   HRESULT hr = S_OK;
   unsigned int ArgErr = 0;
 
-  const unsigned int first_named_param = 
+  const unsigned int first_named_param =
     pDispParams->cArgs - pDispParams->cNamedArgs;
 
   VariantInit(&var);
@@ -1066,7 +1088,7 @@ void tLuaCOMTypeHandler::pushLuaArgs(lua_State* L,
       int index = -1;
 
       if(arg < first_named_param) // still inside positional parameters
-        index = pDispParams->cArgs - arg - 1; 
+        index = pDispParams->cArgs - arg - 1;
       else // now we are dealing with named parameters
       {
         // tries to find a named param for the current position
@@ -1086,7 +1108,7 @@ void tLuaCOMTypeHandler::pushLuaArgs(lua_State* L,
         }
       }
 
-      VARIANTARG& varg = pDispParams->rgvarg[index];    
+      VARIANTARG& varg = pDispParams->rgvarg[index];
 
       // we assume that empty parameters with paramflags NONE
       // are out params
@@ -1149,7 +1171,7 @@ void tLuaCOMTypeHandler::setOutValues(lua_State* L,
       break;
 
     // alias
-    const TYPEDESC tdesc = 
+    const TYPEDESC tdesc =
       processTYPEDESC(m_typeinfo, pFuncDesc->lprgelemdescParam[arg].tdesc);
 
     // tests whether this parameters is an out parameter
@@ -1160,7 +1182,7 @@ void tLuaCOMTypeHandler::setOutValues(lua_State* L,
       unsigned int index = (unsigned int)-1;
 
       if(arg < first_named_param) // still inside positional parameters
-        index = pDispParams->cArgs - arg - 1; 
+        index = pDispParams->cArgs - arg - 1;
       else // now we are dealing with named parameters
       {
         // tries to find a named param for the current position
@@ -1173,7 +1195,7 @@ void tLuaCOMTypeHandler::setOutValues(lua_State* L,
           }
         }
 
-        if(index == -1) 
+        if(index == -1)
         {
           // no corresponding named param found, so we must skip
           // this one
@@ -1241,7 +1263,7 @@ void tLuaCOMTypeHandler::setOutValues(lua_State* L,
 
 
 SAFEARRAYBOUND* tLuaCOMTypeHandler::getRightOrderedBounds(
-    SAFEARRAYBOUND *bounds, 
+    SAFEARRAYBOUND *bounds,
     unsigned long num_dimensions)
 {
   SAFEARRAYBOUND* new_bounds = new SAFEARRAYBOUND[num_dimensions];
@@ -1282,7 +1304,7 @@ void tLuaCOMTypeHandler::put_in_array(SAFEARRAY* safearray,
   case VT_I4:
     hr = SafeArrayPutElement(safearray, indices, &var_value.lVal);
     break;
-    
+
   case VT_R4:
     hr = SafeArrayPutElement(safearray, indices, &var_value.fltVal);
     break;
@@ -1352,7 +1374,7 @@ void tLuaCOMTypeHandler::put_in_array(SAFEARRAY* safearray,
     TYPECONV_ERROR("Type not compatible with automation.");
     break;
   }
- 
+
   CHK_COM_CODE(hr);
 #endif
 }
@@ -1369,7 +1391,7 @@ stkIndex tLuaCOMTypeHandler::get_from_array(lua_State* L,
   VARIANTARG varg;
   void *pv = NULL;
 
- 
+
   HRESULT hr = S_OK;
 
   if(vt == VT_VARIANT)
@@ -1382,7 +1404,7 @@ stkIndex tLuaCOMTypeHandler::get_from_array(lua_State* L,
     varg.vt = vt;
 
     // e' uma union, tanto faz de quem pego o ponteiro
-    pv = (void *) &varg.dblVal; 
+    pv = (void *) &varg.dblVal;
   }
 
   hr = SafeArrayGetElement(safearray, indices, pv);
@@ -1398,7 +1420,7 @@ stkIndex tLuaCOMTypeHandler::get_from_array(lua_State* L,
 
 
 
-bool tLuaCOMTypeHandler::inc_indices(long *indices, 
+bool tLuaCOMTypeHandler::inc_indices(long *indices,
                         SAFEARRAYBOUND *bounds,
                         unsigned long dimensions
                         )
@@ -1441,7 +1463,7 @@ void tLuaCOMTypeHandler::safearray_lua2com(lua_State* L,
   HRESULT hr = S_OK;
 
   tLuaVector luavector;
-  
+
   long stack_bottom = lua_gettop(L);
 
   if(!from_stack)
@@ -1463,7 +1485,7 @@ void tLuaCOMTypeHandler::safearray_lua2com(lua_State* L,
   }
   else // trying to create an array from the stack
   {
-    luavector.InitVectorFromStack(L, luaval);    
+    luavector.InitVectorFromStack(L, luaval);
   }
 
   long stack_top = lua_gettop(L);
@@ -1498,9 +1520,9 @@ void tLuaCOMTypeHandler::safearray_lua2com(lua_State* L,
 
   // cria array
   safearray = SafeArrayCreate(vt, dimensions, bounds);
-  
+
   long *indices = NULL;
-  
+
   try
   {
     CHECK(safearray, INTERNAL_ERROR);
@@ -1543,7 +1565,7 @@ void tLuaCOMTypeHandler::safearray_lua2com(lua_State* L,
 
     throw;
   }
-  
+
 
   // preenche variantarg
   varg.vt = vt | VT_ARRAY;
@@ -1572,7 +1594,7 @@ void tLuaCOMTypeHandler::string2safearray(const char* str, size_t len, VARIANTAR
   MessageBox(NULL, "FIX - not implemented - VARIANT", "LuaCOM", MB_ICONEXCLAMATION);
 #else
   HRESULT hr = S_OK;
-  
+
   // cria array
   SAFEARRAY *safearray = SafeArrayCreateVector(VT_UI1, 0, (ULONG)len);
   CHECK(safearray, INTERNAL_ERROR);
@@ -1640,7 +1662,7 @@ void tLuaCOMTypeHandler::safearray_com2lua(lua_State* L, VARIANTARG & varg)
   bool succeeded          = false;
   long *indices           = NULL;
   SAFEARRAYBOUND* bounds  = NULL;
-  
+
   try
   {
     SAFEARRAY* safearray = varg.parray;
@@ -1665,8 +1687,8 @@ void tLuaCOMTypeHandler::safearray_com2lua(lua_State* L, VARIANTARG & varg)
       safearray->rgsabound,
       num_dimensions
       );
-  
-    
+
+
       // cria objeto LuaVector
     tLuaVector luavector;
 
@@ -1763,7 +1785,7 @@ TYPEDESC tLuaCOMTypeHandler::processPTR(ITypeInfo* typeinfo,
 
   // removes aliases
   pointed_at = processAliases(typeinfo, pointed_at);
-  
+
   // if the referenced type is userdefined, gets its
   // definition
   bool userdef = false;
@@ -1779,7 +1801,7 @@ TYPEDESC tLuaCOMTypeHandler::processPTR(ITypeInfo* typeinfo,
   {
     // does nothing, because it's a VT_USERDEFINED TYPEDESC that
     // describes an interface that inherits from IDispatch.
-    // Pointers (that is, single indirection) to IDispatch 
+    // Pointers (that is, single indirection) to IDispatch
     // are always VT_DISPATCH.
   }
   else if(pointed_at.vt == VT_PTR)
@@ -1793,16 +1815,16 @@ TYPEDESC tLuaCOMTypeHandler::processPTR(ITypeInfo* typeinfo,
     // interfaces are always refenced as pointers,
     // it looks like a single indirection
 
-    pointed_at.vt |= VT_BYREF; 
+    pointed_at.vt |= VT_BYREF;
   }
   else if(pointed_at.vt == VT_SAFEARRAY)
   {
     pointed_at = processSAFEARRAY(typeinfo, pointed_at);
-    pointed_at.vt |= VT_BYREF; 
+    pointed_at.vt |= VT_BYREF;
   }
   else // other types under a VT_PTR are just BYREF
   {
-    pointed_at.vt |= VT_BYREF; 
+    pointed_at.vt |= VT_BYREF;
   }
 
   return pointed_at;
@@ -1830,7 +1852,7 @@ TYPEDESC tLuaCOMTypeHandler::processUSERDEFINED(ITypeInfo* typeinfo,
     userdef->Release();
     TYPECONV_ERROR("Could not understand user-defined type");
   }
-  
+
   switch(typeattr->typekind)
   {
   case TKIND_ENUM:
@@ -2077,7 +2099,7 @@ void tLuaCOMTypeHandler::toByRefParam(VARIANT &var_source, VARIANTARG* pvarg_des
   // Tries to convert the value to the type expected in varg_dest
   if(!(vt_dest & VT_ARRAY))
   {
-    HRESULT hr = 
+    HRESULT hr =
       VariantChangeType(&var_source, &var_source, 0, vt_dest);
 
     CHK_COM_CODE(hr);
@@ -2127,7 +2149,7 @@ long tLuaCOMTypeHandler::VariantSize(VARTYPE vt)
 
   case VT_I4:
     return 4;
-    
+
   case VT_R4:
     return 4;
 
