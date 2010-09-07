@@ -107,7 +107,7 @@ VOID DisplayAssert
 
         // Then format the assert nicely
         //
-        wsprintf(szMsg, szFormat, (pszMsg&&*pszMsg) ? pszMsg : pszAssert, pszFile, line);
+        wsprintfA(szMsg, szFormat, (pszMsg&&*pszMsg) ? pszMsg : pszAssert, pszFile, line);
         lpszText = szMsg;
     }
 
@@ -115,7 +115,7 @@ VOID DisplayAssert
     //
     switch (_IdMsgBox(lpszText, szTitle, MB_ICONHAND|MB_ABORTRETRYIGNORE|MB_SYSTEMMODAL)) {
         case IDABORT:
-            FatalAppExit(0, lpszText);
+            FatalAppExitA(0, lpszText);
             return;
 
         case IDRETRY:
@@ -145,7 +145,7 @@ int NEAR _IdMsgBox
 
     hwndActive = GetActiveWindow();
 
-    id = MessageBox(hwndActive, pszText, pszTitle, mbFlags);
+    id = MessageBoxA(hwndActive, pszText, pszTitle, mbFlags);
 
     return id;
 }
@@ -177,7 +177,7 @@ void HimetricToPixel(const SIZEL* himetricSize, SIZEL* pixelSize) {
 //
 HWND GetParkingWindow(void)
 {
-    WNDCLASS wndclass;
+    WNDCLASSA wndclass;
 
     // crit sect this creation for apartment threading support.
     //
@@ -189,12 +189,12 @@ HWND GetParkingWindow(void)
     wndclass.hInstance   = g_hInstance;
     wndclass.lpszClassName = "CtlFrameWork_Parking";
 
-    if (!RegisterClass(&wndclass)) {
+    if (!RegisterClassA(&wndclass)) {
         FAIL("Couldn't Register Parking Window Class!");
         goto CleanUp;
     }
 
-    g_hwndParking = CreateWindow("CtlFrameWork_Parking", NULL, WS_POPUP, 0, 0, 0, 0, NULL, NULL, g_hInstance, NULL);
+    g_hwndParking = CreateWindowA("CtlFrameWork_Parking", NULL, WS_POPUP, 0, 0, 0, 0, NULL, NULL, g_hInstance, NULL);
 
     ASSERT(g_hwndParking, "Couldn't Create Global parking window!!");
 

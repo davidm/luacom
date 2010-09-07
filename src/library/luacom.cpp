@@ -193,17 +193,17 @@ static int luacom_ShowHelp(lua_State *L)
         "LuaCOM", MB_ICONEXCLAMATION);
 #else
       if(context != 0)
-        HtmlHelp(NULL, pHelpFile, HH_HELP_CONTEXT, context);
+        HtmlHelpA(NULL, pHelpFile, HH_HELP_CONTEXT, context);
       else
-        HtmlHelp(NULL, pHelpFile, HH_DISPLAY_TOC, 0);
+        HtmlHelpA(NULL, pHelpFile, HH_DISPLAY_TOC, 0);
 #endif
     }
     else
     {
       if(context != 0)
-        WinHelp(NULL, pHelpFile, HELP_CONTEXT, context);
+        WinHelpA(NULL, pHelpFile, HELP_CONTEXT, context);
       else
-        WinHelp(NULL, pHelpFile, HELP_FINDER, 0);
+        WinHelpA(NULL, pHelpFile, HELP_FINDER, 0);
     }
   }
 
@@ -1153,7 +1153,7 @@ static int luacom_RegisterObject(lua_State *L)
     CLSID[0] = 0;
     ModulePath[0] = 0;
 
-    GetModuleFileName(
+    GetModuleFileNameA(
       NULL,
       ModulePath,
       sizeof(ModulePath));
@@ -1810,7 +1810,7 @@ int luacom_GetCurrentDirectory(lua_State* L)
 {
   static char buffer[1025];
 
-  DWORD size = GetCurrentDirectory(1024, buffer);
+  DWORD size = GetCurrentDirectoryA(1024, buffer);
 
   if(!size || size > 1023)
     return 0;

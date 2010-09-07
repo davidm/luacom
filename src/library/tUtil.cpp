@@ -359,8 +359,8 @@ void tUtil::ShowHelp(const char *filename, unsigned long context)
   else if(_stricmp(extension, ".hlp") == 0)
   {
     if(context != 0)
-      WinHelp(NULL, filename, HELP_CONTEXT, context);
+      WinHelpA(NULL, filename, HELP_CONTEXT, context);
     else
-      WinHelp(NULL, filename, HELP_FINDER, 0);
+      WinHelpA(NULL, filename, HELP_FINDER, 0);
   }
 }

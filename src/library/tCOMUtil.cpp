@@ -434,32 +434,32 @@ ITypeLib* tCOMUtil::LoadTypeLibFromCLSID(CLSID clsid,
 
   try
   {
-    res = RegOpenKeyEx(HKEY_CLASSES_ROOT,"CLSID", 0, KEY_READ, &iid_key);
+    res = RegOpenKeyExA(HKEY_CLASSES_ROOT,"CLSID", 0, KEY_READ, &iid_key);
     WINCHECK(res == ERROR_SUCCESS);
 
-    res = RegOpenKeyEx(iid_key, pcClsid, 0, KEY_READ, &obj_key);
+    res = RegOpenKeyExA(iid_key, pcClsid, 0, KEY_READ, &obj_key);
     RegCloseKey(iid_key);
     free(pcClsid);
     pcClsid = NULL;
 
     WINCHECK(res == ERROR_SUCCESS);
 
-    res = RegOpenKeyEx(obj_key, "TypeLib",0, KEY_READ, &typelib_key);
+    res = RegOpenKeyExA(obj_key, "TypeLib",0, KEY_READ, &typelib_key);
     if(res != ERROR_SUCCESS)
     {
       RegCloseKey(obj_key);
       LUACOM_EXCEPTION(WINDOWS_ERROR);
     }
 
-    res = RegOpenKeyEx(obj_key, "version",0, KEY_READ, &version_key);
+    res = RegOpenKeyExA(obj_key, "version",0, KEY_READ, &version_key);
     RegCloseKey(obj_key);
     if(res != ERROR_SUCCESS)
       version_info_found = false;
 
-    RegQueryValueEx(typelib_key, NULL, NULL, NULL, bLibID, &size);
+    RegQueryValueExA(typelib_key, NULL, NULL, NULL, bLibID, &size);
     RegCloseKey(typelib_key);
         
-    RegQueryValueEx(version_key, NULL, NULL, NULL, bVersion, &size);
+    RegQueryValueExA(version_key, NULL, NULL, NULL, bVersion, &size);
     RegCloseKey(version_key);
   }
   catch(class tLuaCOMException& e)
@@ -599,13 +599,13 @@ bool tCOMUtil::GetDefaultTypeLibVersion(const char* libid,
   LONG res = 0;
   HKEY typelib_key, this_typelib_key;
 
-  res = RegOpenKeyEx(HKEY_CLASSES_ROOT,"TypeLib", 0, KEY_READ, &typelib_key);
+  res = RegOpenKeyExA(HKEY_CLASSES_ROOT,"TypeLib", 0, KEY_READ, &typelib_key);
   RegCloseKey(HKEY_CLASSES_ROOT);
 
   if(res != ERROR_SUCCESS)
     return false;
 
-  res = RegOpenKeyEx(typelib_key, libid, 0, KEY_READ, &this_typelib_key);
+  res = RegOpenKeyExA(typelib_key, libid, 0, KEY_READ, &this_typelib_key);
   RegCloseKey(typelib_key);
 
   if(res != ERROR_SUCCESS)
@@ -615,7 +615,7 @@ bool tCOMUtil::GetDefaultTypeLibVersion(const char* libid,
   char version_info[bufsize];
   DWORD size = bufsize;
 
-  res = RegEnumKeyEx(this_typelib_key, 0, version_info, &size,
+  res = RegEnumKeyExA(this_typelib_key, 0, version_info, &size,
     NULL, NULL, NULL, NULL); 
   RegCloseKey(this_typelib_key);
 
@@ -632,11 +632,11 @@ bool tCOMUtil::GetRegKeyValue(const char* key, char** pValue) {
   // unused: HKEY hKey;
   LONG cbValue;
 
-  ec = RegQueryValue(HKEY_CLASSES_ROOT,key,NULL,&cbValue);
+  ec = RegQueryValueA(HKEY_CLASSES_ROOT,key,NULL,&cbValue);
 
   if(ERROR_SUCCESS == ec) {
     *pValue = new char[cbValue+1];
-    ec = RegQueryValue(HKEY_CLASSES_ROOT,key,*pValue,&cbValue);
+    ec = RegQueryValueA(HKEY_CLASSES_ROOT,key,*pValue,&cbValue);
       if(ERROR_SUCCESS == ec)
       return true;
   }
@@ -664,7 +664,7 @@ bool tCOMUtil::SetRegKeyValue(const char *key,
     strcat(Key, subkey);
   }
 
-  ec = RegCreateKeyEx(
+  ec = RegCreateKeyExA(
          HKEY_CLASSES_ROOT,
          Key,
          0,
@@ -679,7 +679,7 @@ bool tCOMUtil::SetRegKeyValue(const char *key,
   {
     if (NULL != value)
     {
-      ec = RegSetValueEx(
+      ec = RegSetValueExA(
              hKey,
              NULL,
              0,
@@ -714,7 +714,7 @@ bool tCOMUtil::DelRegKey(const char *key,
     strcat(Key, subkey);
   }
 
-  ec = SHDeleteKey(HKEY_CLASSES_ROOT, Key);
+  ec = SHDeleteKeyA(HKEY_CLASSES_ROOT, Key);
 
   if (ERROR_SUCCESS == ec)
   {
