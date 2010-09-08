@@ -189,7 +189,7 @@ static int luacom_ShowHelp(lua_State *L)
     if (len >= 4 && _stricmp(pHelpFile + len - 4, ".chm") == 0)
     {
 #ifdef NO_HTMLHELP
-      ::MessageBox(NULL, "Error: HtmlHelp support not included",
+      ::MessageBoxA(NULL, "Error: HtmlHelp support not included",
         "LuaCOM", MB_ICONEXCLAMATION);
 #else
       if(context != 0)
