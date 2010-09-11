@@ -218,7 +218,8 @@ public:
     }
 
     HRESULT _stdcall Skip(ULONG celt) {
-        _nextVerb = min(_size, _nextVerb + static_cast<int>(celt));
+        int n = _nextVerb + static_cast<int>(celt);
+        _nextVerb = _size < n ? _size : n;
         return S_OK;
     }
 };
