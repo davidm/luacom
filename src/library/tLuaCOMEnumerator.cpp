@@ -156,8 +156,8 @@ int tLuaCOMEnumerator::call_method(lua_State *L)
   const int user_last_param   = lua_gettop(L);
 
   // upvalues
-  const int enumerator_param  = luaCompat_upvalueIndex(L, 1, 2);
-  const int method_param      = luaCompat_upvalueIndex(L, 2, 2);
+  const int enumerator_param  = lua_upvalueindex(1);
+  const int method_param      = lua_upvalueindex(2);
 
   int num_params = 0;
 

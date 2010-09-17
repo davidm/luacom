@@ -284,14 +284,6 @@ void luaCompat_handleFuncCallEvent(lua_State* L)
   LUASTACK_CLEAN(L, -1);
 }
 
-
-int luaCompat_upvalueIndex(lua_State* L, int which, int num_upvalues)
-{ /* lua5 */
-  UNUSED(num_upvalues);
-
-  return lua_upvalueindex(which);
-}
-
 void luaCompat_moduleCreate(lua_State* L, const char* module)
 { /* lua5 */
   LUASTACK_SET(L);

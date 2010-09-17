@@ -2002,10 +2002,10 @@ static int callhook(lua_State *L)
 try
   {
     // upvalues
-    const int luacom_obj_param  = luaCompat_upvalueIndex(L, 1, 4);
-    const int dispid_param      = luaCompat_upvalueIndex(L, 2, 4);
-    const int invkind_param     = luaCompat_upvalueIndex(L, 3, 4);
-    const int funcdesc_param    = luaCompat_upvalueIndex(L, 4, 4);
+    const int luacom_obj_param  = lua_upvalueindex(1);
+    const int dispid_param      = lua_upvalueindex(2);
+    const int invkind_param     = lua_upvalueindex(3);
+    const int funcdesc_param    = lua_upvalueindex(4);
 
     // self param
     const int self_param  = 1;

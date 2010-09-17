@@ -1629,8 +1629,8 @@ int tLuaCOMConnPoint::call_sinks(lua_State *L)
   const int user_last_param   = lua_gettop(L);
 
   // upvalues
-  const int connpoint         = luaCompat_upvalueIndex(L, 1, 2);
-  const int event             = luaCompat_upvalueIndex(L, 2, 2);
+  const int connpoint         = lua_upvalueindex(1);
+  const int event             = lua_upvalueindex(2);
 
   int num_params = 0;
 

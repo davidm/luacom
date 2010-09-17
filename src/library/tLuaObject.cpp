@@ -195,7 +195,7 @@ int tLuaObject::newindex(lua_State* L)
 int tLuaObject::closure(lua_State *L)
 {
   tLuaObjectMethod method = (tLuaObjectMethod) 
-    luaCompat_getPointer(L, luaCompat_upvalueIndex(L, 1, 1));
+    luaCompat_getPointer(L, lua_upvalueindex(1));
 
   tLuaObject* lua_obj = getObject(L, 1);
 
