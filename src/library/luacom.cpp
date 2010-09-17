@@ -2011,9 +2011,8 @@ try
     const int self_param  = 1;
     const int first_param = 2;
 
-    // number of lua parameters, excluding upvalues and
-    // the self param
-    const int num_params = luaCompat_getNumParams(L, 4) - 1;
+    // number of lua parameters, excluding the self param
+    const int num_params = lua_gettop(L) - 1;
 
     CHECKPARAM_MSG(num_params >= 0, "self parameter not found.");
 

@@ -292,12 +292,6 @@ int luaCompat_upvalueIndex(lua_State* L, int which, int num_upvalues)
   return lua_upvalueindex(which);
 }
 
-int luaCompat_getNumParams(lua_State* L, int num_upvalues)
-{ /* lua5 */
-  UNUSED(num_upvalues);
-  return lua_gettop(L);
-}
-
 void luaCompat_moduleCreate(lua_State* L, const char* module)
 { /* lua5 */
   LUASTACK_SET(L);
