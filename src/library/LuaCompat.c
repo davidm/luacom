@@ -115,30 +115,6 @@ int luaCompat_newTypedObject(lua_State* L, void* object)
 }
 
 
-void luaCompat_moduleSet(lua_State* L, const char* module, const char* key)
-{
-  LUASTACK_SET(L);
-
-  lua_getfield(L, LUA_REGISTRYINDEX, module);
-  lua_pushvalue(L, -2);
-  lua_setfield(L, -2, key);
-  lua_pop(L, 2);
-
-  LUASTACK_CLEAN(L, -1);
-}
-
-void luaCompat_moduleGet(lua_State* L, const char* module, const char* key)
-{
-  LUASTACK_SET(L);
-
-  lua_getfield(L, LUA_REGISTRYINDEX, module);
-  lua_getfield(L, -1, key);
-  lua_remove(L, -2);
-
-  LUASTACK_CLEAN(L, 1);
-}
-
-
 int luaCompat_isOfType(lua_State* L, const char* module, const char* type)
 { /* lua5 */
   int result = 0;
@@ -196,6 +172,29 @@ void luaCompat_moduleCreate(lua_State* L, const char* module)
     lua_pushvalue(L, -1);
     lua_setfield(L, LUA_REGISTRYINDEX, module);
   }
+
+  LUASTACK_CLEAN(L, 1);
+}
+
+void luaCompat_moduleSet(lua_State* L, const char* module, const char* key)
+{
+  LUASTACK_SET(L);
+
+  lua_getfield(L, LUA_REGISTRYINDEX, module);
+  lua_pushvalue(L, -2);
+  lua_setfield(L, -2, key);
+  lua_pop(L, 2);
+
+  LUASTACK_CLEAN(L, -1);
+}
+
+void luaCompat_moduleGet(lua_State* L, const char* module, const char* key)
+{
+  LUASTACK_SET(L);
+
+  lua_getfield(L, LUA_REGISTRYINDEX, module);
+  lua_getfield(L, -1, key);
+  lua_remove(L, -2);
 
   LUASTACK_CLEAN(L, 1);
 }
