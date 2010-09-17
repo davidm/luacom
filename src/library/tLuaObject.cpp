@@ -165,8 +165,9 @@ void tLuaObject::RegisterType(lua_State* L,
   lua_pushcfunction(L, tLuaObject::generic_index);
   luaCompat_handleNoIndexEvent(L);
 
+  lua_pushstring(L, "__newindex");
   lua_pushcfunction(L, tLuaObject::generic_newindex);
-  luaCompat_handleSettableEvent(L);
+  lua_settable(L, -3);
 
   lua_pop(L, 1);
 

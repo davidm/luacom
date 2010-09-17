@@ -60,8 +60,9 @@ void LuaBeans::registerObjectEvents(lua_State* L, class Events& events)
 
   if(events.settable)
   {
+    lua_pushstring(L, "__newindex");
     lua_pushcfunction(L, events.settable);
-    luaCompat_handleSettableEvent(L);
+    lua_settable(L, -3);
   }
 
   if(events.noindex)
@@ -101,8 +102,9 @@ void LuaBeans::registerPointerEvents(lua_State* L, class Events& events)
 
   if(events.settable)
   {
+    lua_pushstring(L, "__newindex");
     lua_pushcfunction(L, events.settable);
-    luaCompat_handleSettableEvent(L);
+    lua_settable(L, -3);
   }
 
   if(events.noindex)
