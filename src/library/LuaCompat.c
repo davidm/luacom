@@ -356,13 +356,6 @@ int luaCompat_toCBool(lua_State* L, int index)
   return value;
 }
 
-
-void luaCompat_needStack(lua_State* L, long size)
-{ /* lua5 */
-  lua_checkstack(L, size);
-}
-
-
 void luaCompat_getglobal(lua_State* L)
 { /* lua5 */
   lua_gettable(L, LUA_GLOBALSINDEX);

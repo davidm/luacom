@@ -1724,7 +1724,7 @@ void tLuaCOMTypeHandler::safearray_com2lua(lua_State* L, VARIANTARG & varg)
     stkIndex stacktop = lua_gettop(L);
 
     // allocates enough stack room
-    luaCompat_needStack(L, luavector.size()*2);
+    lua_checkstack(L, luavector.size()*2);
 
     // copia elementos um por um
     do
