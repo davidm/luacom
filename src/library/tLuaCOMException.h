@@ -5,10 +5,6 @@
 #if !defined(AFX_TLUACOMEXCEPTION_H__26509908_AFD8_11D4_B882_0000B45D7541__INCLUDED_)
 #define AFX_TLUACOMEXCEPTION_H__26509908_AFD8_11D4_B882_0000B45D7541__INCLUDED_
 
-#if _MSC_VER >= 1000
-#pragma once
-#endif // _MSC_VER >= 1000
-
 #include <windows.h>
 
 class tLuaCOMException  

@@ -5,10 +5,6 @@
 #if !defined(AFX_TLUAVECTOR_H__BAD115E6_A282_11D4_9DF6_0000B45D6611__INCLUDED_)
 #define AFX_TLUAVECTOR_H__BAD115E6_A282_11D4_9DF6_0000B45D6611__INCLUDED_
 
-#if _MSC_VER >= 1000
-#pragma once
-#endif // _MSC_VER >= 1000
-
 extern "C"
 {
 #include "lua.h"

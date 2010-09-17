@@ -5,10 +5,6 @@
 #if !defined(AFX_TUTIL_H__0B3E0B68_981F_11D3_A906_0004ACE655F9__INCLUDED_)
 #define AFX_TUTIL_H__0B3E0B68_981F_11D3_A906_0004ACE655F9__INCLUDED_
 
-#if _MSC_VER >= 1000
-#pragma once
-#endif // _MSC_VER >= 1000
-
 #include <windows.h>
 #include <stdio.h>
 #include "tStringBuffer.h"  // Added by ClassView

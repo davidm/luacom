@@ -6,10 +6,6 @@
 #if !defined(AFX_TLUACOMTYPEHANDLER_H__2CAF122C_E09B_11D3_BD2F_444553540000__INCLUDED_)
 #define AFX_TLUACOMTYPEHANDLER_H__2CAF122C_E09B_11D3_BD2F_444553540000__INCLUDED_
 
-#if _MSC_VER >= 1000
-#pragma once
-#endif // _MSC_VER >= 1000
-
 #include <ole2.h>
 
 #include "luabeans.h"
