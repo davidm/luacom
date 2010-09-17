@@ -114,17 +114,6 @@ int luaCompat_newTypedObject(lua_State* L, void* object)
   return 1;
 }
 
-void luaCompat_setType(lua_State* L, int index)
-{ /* lua5 */
-
-  LUASTACK_SET(L);
-
-  lua_setmetatable(L, index);    
-
-  LUASTACK_CLEAN(L,-1);
-}
-
-
 
 void luaCompat_moduleSet(lua_State* L, const char* module, const char* key)
 { /* lua5 */

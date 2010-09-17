@@ -102,7 +102,7 @@ int tLuaObject::generic_PushNew(lua_State* L,
   lua_newtable(L);
   luaCompat_pushTypeByName(L, MODULENAME, type_name);
 
-  luaCompat_setType(L, -2);
+  lua_setmetatable(L, -2);
 
   lua_pushstring(L, TLUAOBJECT_POINTER_FIELD);
 

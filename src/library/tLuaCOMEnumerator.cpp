@@ -73,7 +73,7 @@ void tLuaCOMEnumerator::push(lua_State* L)
     tLuaCOMEnumerator::module_name, 
     tLuaCOMEnumerator::type_name);
 
-  luaCompat_setType(L, -2);
+  lua_setmetatable(L, -2);
 
   lua_pushstring(L, ENUMERATOR_FIELD);
 

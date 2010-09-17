@@ -1586,7 +1586,7 @@ void tLuaCOMConnPoint::push()
 
   lua_newtable(L);
   luaCompat_pushTypeByName(L, MODULENAME, LCOM_CONNPOINT_TYPENAME);
-  luaCompat_setType(L, -2);
+  lua_setmetatable(L, -2);
 
   lua_pushstring(L, CONNPOINT_NAME);
   lua_pushlightuserdata(L, this);

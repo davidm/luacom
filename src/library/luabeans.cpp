@@ -136,7 +136,7 @@ void LuaBeans::push(lua_State* L, void* userdata )
   lua_settable(L, -3);
 
   luaCompat_pushTypeByName(L, module_name, tag_name);
-  luaCompat_setType(L, -2);
+  lua_setmetatable(L, -2);
 
   LUASTACK_CLEAN(L, 1);
 }
