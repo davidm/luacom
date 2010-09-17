@@ -10,11 +10,7 @@
 #include "LuaAux.h"
 
 #include "luacom_internal.h"
-
-extern "C"
-{
 #include "LuaCompat.h"
-}
 
 #define CONNPOINT_NAME "__LUACOM_CONNPOINT"
 

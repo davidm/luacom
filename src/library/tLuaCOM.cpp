@@ -17,7 +17,6 @@ static char const * const rcsname = "$Name:  $";
 #include "tUtil.h"
 #include "tLuaCOMException.h"
 #include "tCOMUtil.h"
-
 #include "LuaCompat.h"
 
 #if defined(__CYGWIN__) || defined(__MINGW32__)

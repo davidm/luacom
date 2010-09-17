@@ -28,7 +28,7 @@ $(OBJ_DIR)/luacom_console.obj : $(SRC_BIN_DIR)/luacom_console.cpp $(INC_DIR)/lua
 
 $(OBJ_DIR)/tLuaCOMConnPoints.obj : $(SRC_LIB_DIR)/tLuaCOMConnPoints.cpp $(SRC_LIB_DIR)/tLuaCOMConnPoints.h $(SRC_LIB_DIR)/tLuaCOM.h $(SRC_LIB_DIR)/tCOMUtil.h $(SRC_LIB_DIR)/tLuaCOMException.h $(SRC_LIB_DIR)/LuaCompat.h $(SRC_LIB_DIR)/LuaAux.h $(SRC_LIB_DIR)/luacom_internal.h
 
-$(OBJ_DIR)/LuaCompat.obj : $(SRC_LIB_DIR)/LuaCompat.c $(SRC_LIB_DIR)/LuaCompat.h
+$(OBJ_DIR)/LuaCompat.obj : $(SRC_LIB_DIR)/LuaCompat.cpp $(SRC_LIB_DIR)/LuaCompat.h
 
 $(OBJ_DIR)/tLuaCOMEnumerator.obj : $(SRC_LIB_DIR)/tLuaCOMEnumerator.cpp $(SRC_LIB_DIR)/tLuaCOMEnumerator.h $(SRC_LIB_DIR)/tLuaCOMTypeHandler.h $(SRC_LIB_DIR)/luabeans.h $(SRC_LIB_DIR)/tCOMUtil.h $(SRC_LIB_DIR)/LuaAux.h $(SRC_LIB_DIR)/tUtil.h $(SRC_LIB_DIR)/tLuaCOMException.h $(SRC_LIB_DIR)/luacom_internal.h $(SRC_LIB_DIR)/luacompat.h
 

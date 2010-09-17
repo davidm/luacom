@@ -4,7 +4,6 @@ extern "C" {
   #include "lua.h"
   #include "lualib.h"
   #include "lauxlib.h"
-  #include "LuaCompat.h"
 #ifdef IUP
   #include "iup.h"
   #ifndef NO_CPICONTROLS
@@ -29,6 +28,7 @@ extern "C" {
   #endif
 #endif
 }
+#include "LuaCompat.h"
 #include "luacom.h"
 #include "luacom_internal.h"
 #include "tLuaCOMClassFactory.h"

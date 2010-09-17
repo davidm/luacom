@@ -40,7 +40,7 @@ SRC = LuaAux.cpp \
            tCOMUtil.cpp \
            tLuaCOMClassFactory.cpp \
            tLuaCOMConnPoints.cpp \
-           LuaCompat.c \
+           LuaCompat.cpp \
            tLuaCOMEnumerator.cpp \
            tLuaObject.cpp \
            tLuaTLB.cpp

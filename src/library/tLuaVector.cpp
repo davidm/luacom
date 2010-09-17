@@ -9,11 +9,7 @@
 #include "tLuaCOM.h"
 #include "LuaAux.h"
 #include "tLuaCOMException.h"
-
-extern "C"
-{
 #include "LuaCompat.h"
-}
 
 
 #define LUA_NOOBJECT 0

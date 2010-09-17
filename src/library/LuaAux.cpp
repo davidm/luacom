@@ -7,11 +7,7 @@
 #include <string.h>
 
 #include "LuaAux.h"
-
-extern "C"
-{
 #include "LuaCompat.h"
-}
 
 
 // RCS Info

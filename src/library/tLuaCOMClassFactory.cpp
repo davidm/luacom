@@ -4,8 +4,8 @@
 
 extern "C" {
   #include "lua.h"
-  #include "LuaCompat.h"
 }
+#include "LuaCompat.h"
 #include "luacom.h"
 #include "tLuaCOMClassFactory.h"
 #include "tLuaCOMException.h"

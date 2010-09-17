@@ -12,11 +12,7 @@
 
 #include "tLuaCOM.h"
 #include "tLuaCOMTypeHandler.h"
-
-extern "C"
-{
 #include "LuaCompat.h"
-}
 
 // dynamic_cast if RTTI enabled.
 // static_cast  if RTTI disabled.

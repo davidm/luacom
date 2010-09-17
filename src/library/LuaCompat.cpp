@@ -11,20 +11,15 @@
 #include <assert.h>
 #include <string.h>
 
+extern "C" {
 #include <lua.h>
 #include <lauxlib.h>
+}
 
 #include "LuaCompat.h"
+#include "LuaAux.h"
 
 #define UNUSED(x) (void)(x)
-
-#define LUASTACK_SET(L) int __LuaAux_luastack_top_index = lua_gettop(L)
-
-#ifdef NDEBUG
-#define LUASTACK_CLEAN(L, n) lua_settop(L, __LuaAux_luastack_top_index + n)
-#else
-#define LUASTACK_CLEAN(L, n) assert((__LuaAux_luastack_top_index + n) == lua_gettop(L))
-#endif
 
 
 /* Lua 5 version of the API */

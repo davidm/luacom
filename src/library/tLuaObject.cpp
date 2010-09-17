@@ -10,11 +10,7 @@
 #include "tLuaCOMException.h"
 #include "luacom_internal.h"
 #include "tUtil.h" 
-
-extern "C"
-{
 #include "LuaCompat.h"
-}
 
 #ifndef MODULENAME
 #define MODULENAME "__tLuaObject_object_types"

@@ -12,8 +12,8 @@ static char const * const rcsname = "$Name:  $";
 extern "C"
 {
 #include <lua.h>
-#include "LuaCompat.h"
 }
+#include "LuaCompat.h"
 
 #include <assert.h>
 #include <stdio.h>

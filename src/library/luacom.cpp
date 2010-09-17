@@ -30,8 +30,8 @@ extern "C"
 {
 #include "lua.h"
 #include "lauxlib.h"
-#include "LuaCompat.h"
 }
+#include "LuaCompat.h"
 
 #include "luabeans.h"
 #include "luacom.h"

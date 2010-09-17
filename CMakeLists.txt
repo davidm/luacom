@@ -59,7 +59,7 @@ SET(SRC_LIB
 	src/library/LuaAux.cpp
 	src/library/luabeans.cpp
 	src/library/luacom.cpp
-	src/library/LuaCompat.c
+	src/library/LuaCompat.cpp
 	src/library/tCOMUtil.cpp
 	src/library/tLuaCOM.cpp
 	src/library/tLuaCOMClassFactory.cpp

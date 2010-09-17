@@ -21,8 +21,8 @@ extern "C"
 #include "lua.h"
 #include "lualib.h"
 #include <lauxlib.h>
-#include "LuaCompat.h"
 }
+#include "LuaCompat.h"
 
 #include "luacom_internal.h"
 #include "tLuaDispatch.h"

@@ -15,11 +15,7 @@ static char const * const rcsname = "$Name:  $";
 #include "tCOMUtil.h"
 #include "LuaAux.h"
 #include "tUtil.h"
-
-extern "C"
-{
 #include "LuaCompat.h"
-}
 
 // hacks for certain compilers
 #if defined(__MINGW32__) || defined(__CYGWIN__)
