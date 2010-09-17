@@ -185,20 +185,16 @@ const void* luaCompat_getType2(lua_State* L, int index)
 }
 
 void luaCompat_moduleCreate(lua_State* L, const char* module)
-{ /* lua5 */
+{
   LUASTACK_SET(L);
 
-  lua_pushstring(L, module);
-  lua_gettable(L, LUA_REGISTRYINDEX);
-
+  lua_getfield(L, LUA_REGISTRYINDEX, module);
   if(lua_isnil(L, -1))
   {
     lua_pop(L, 1);
     lua_newtable(L);
-    lua_pushstring(L, module);
-    lua_pushvalue(L, -2);
-
-    lua_settable(L, LUA_REGISTRYINDEX);
+    lua_pushvalue(L, -1);
+    lua_setfield(L, LUA_REGISTRYINDEX, module);
   }
 
   LUASTACK_CLEAN(L, 1);
