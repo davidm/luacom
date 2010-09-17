@@ -28,7 +28,7 @@ enum
 };
 
 
-/*O+O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O
+/**
   ObjectClass: tLuaCOMEnumConnPoints
 
   Summary:     COM object class for enumerating the Connection Points of
@@ -40,7 +40,7 @@ enum
                  Interface for connection point enumeration.
 
   Aggregation: tLuaCOMEnumConnPoints COM Objects are not aggregatable.
-O---O---O---O---O---O---O---O---O---O---O---O---O---O---O---O---O---O---O-O*/
+*/
 class tLuaCOMEnumConnPoints : public IEnumConnectionPoints
 {
   public:
@@ -88,7 +88,7 @@ class tLuaCOMEnumConnPoints : public IEnumConnectionPoints
 typedef tLuaCOMEnumConnPoints* PtLuaCOMEnumConnPoints;
 
 
-/*O+O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O
+/**
   ObjectClass: tLuaCOMConnPoint
 
   Summary:     Connection Point COM object class. Implements a native
@@ -103,7 +103,7 @@ typedef tLuaCOMEnumConnPoints* PtLuaCOMEnumConnPoints;
                  Interface for connection point features.
 
   Aggregation: tLuaCOMConnPoint COM Objects are not aggregatable.
-O---O---O---O---O---O---O---O---O---O---O---O---O---O---O---O---O---O---O-O*/
+*/
 class tLuaCOMConnPoint : public IConnectionPoint
 {
   public:
@@ -168,7 +168,7 @@ protected:
 typedef tLuaCOMConnPoint* PtLuaCOMConnPoint;
 
 
-/*O+O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O+++O
+/**
   ObjectClass: tLuaCOMEnumConnections
 
   Summary:     COM object class for enumerating the connections of
@@ -180,7 +180,7 @@ typedef tLuaCOMConnPoint* PtLuaCOMConnPoint;
                  Interface for connection enumeration features.
 
   Aggregation: tLuaCOMEnumConnections COM Objects are not aggregatable.
-O---O---O---O---O---O---O---O---O---O---O---O---O---O---O---O---O---O---O-O*/
+*/
 class tLuaCOMEnumConnections : public IEnumConnections
 {
   public:

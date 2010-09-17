@@ -21,7 +21,7 @@
   Next, Skip, Reset, and Clone.
 ---------------------------------------------------------------------------*/
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMEnumConnPoints::tLuaCOMEnumConnPoints
 
   Summary:  tLuaCOMEnumConnPoints Constructor.
@@ -33,7 +33,7 @@
   Modifies: cRefs, pHostObj, iEnumIndex, cConnPts, and paConnPts.
 
   Returns:  void
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 tLuaCOMEnumConnPoints::tLuaCOMEnumConnPoints(IUnknown* pHostObj)
 {
   // Zero the COM object's reference count.
@@ -51,7 +51,7 @@ tLuaCOMEnumConnPoints::tLuaCOMEnumConnPoints(IUnknown* pHostObj)
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMEnumConnPoints::~tLuaCOMEnumConnPoints
 
   Summary:  tLuaCOMEnumConnPoints Destructor.
@@ -61,7 +61,7 @@ tLuaCOMEnumConnPoints::tLuaCOMEnumConnPoints(IUnknown* pHostObj)
   Modifies: paConnPts.
 
   Returns:  void
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 tLuaCOMEnumConnPoints::~tLuaCOMEnumConnPoints(void)
 {
   if (NULL != paConnPts)
@@ -81,7 +81,7 @@ tLuaCOMEnumConnPoints::~tLuaCOMEnumConnPoints(void)
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMEnumConnPoints::Init
 
   Summary:  tLuaCOMEnumConnPoints Initialization method.  Create any
@@ -98,7 +98,7 @@ tLuaCOMEnumConnPoints::~tLuaCOMEnumConnPoints(void)
 
   Returns:  HRESULT
               Standard result code. NOERROR for success.
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 HRESULT tLuaCOMEnumConnPoints::Init(
           ULONG cConnPts,
           IConnectionPoint** paConnPts,
@@ -134,7 +134,7 @@ HRESULT tLuaCOMEnumConnPoints::Init(
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMEnumConnPoints::QueryInterface
 
   Summary:  QueryInterface of the tLuaCOMEnumConnPoints non-delegating
@@ -150,7 +150,7 @@ HRESULT tLuaCOMEnumConnPoints::Init(
 
   Returns:  HRESULT
               Standard result code. NOERROR for success.
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 STDMETHODIMP tLuaCOMEnumConnPoints::QueryInterface(
                REFIID riid,
                void ** ppv)
@@ -176,7 +176,7 @@ STDMETHODIMP tLuaCOMEnumConnPoints::QueryInterface(
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMEnumConnPoints::AddRef
 
   Summary:  AddRef of the tLuaCOMEnumConnPoints non-delegating IUnknown
@@ -188,7 +188,7 @@ STDMETHODIMP tLuaCOMEnumConnPoints::QueryInterface(
 
   Returns:  ULONG
               New value of cRefs (COM object's reference count).
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 STDMETHODIMP_(ULONG) tLuaCOMEnumConnPoints::AddRef(void)
 {
   cRefs = ++cRefs;
@@ -201,7 +201,7 @@ STDMETHODIMP_(ULONG) tLuaCOMEnumConnPoints::AddRef(void)
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMEnumConnPoints::Release
 
   Summary:  Release of the tLuaCOMEnumConnPoints non-delegating IUnknown
@@ -213,7 +213,7 @@ STDMETHODIMP_(ULONG) tLuaCOMEnumConnPoints::AddRef(void)
 
   Returns:  ULONG
               New value of cRefs (COM object's reference count).
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 STDMETHODIMP_(ULONG) tLuaCOMEnumConnPoints::Release(void)
 {
   // Pass this release along to the Host object being enumerated.
@@ -233,7 +233,7 @@ STDMETHODIMP_(ULONG) tLuaCOMEnumConnPoints::Release(void)
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMEnumConnPoints::Next
 
   Summary:  The Next member method of this IEnumConnectionPoints interface
@@ -256,7 +256,7 @@ STDMETHODIMP_(ULONG) tLuaCOMEnumConnPoints::Release(void)
 
   Returns:  HRESULT
               Standard result code. NOERROR for success.
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 STDMETHODIMP tLuaCOMEnumConnPoints::Next(
                ULONG cReq,
                IConnectionPoint** paConnPts,
@@ -311,7 +311,7 @@ STDMETHODIMP tLuaCOMEnumConnPoints::Next(
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMEnumConnPoints::Skip
 
   Summary:  The Skip member method of this IEnumConnectionPoints interface
@@ -325,7 +325,7 @@ STDMETHODIMP tLuaCOMEnumConnPoints::Next(
 
   Returns:  HRESULT
               Standard result code. NOERROR for success.
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 STDMETHODIMP tLuaCOMEnumConnPoints::Skip(
                ULONG cSkip)
 {
@@ -343,7 +343,7 @@ STDMETHODIMP tLuaCOMEnumConnPoints::Skip(
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMEnumConnPoints::Reset
 
   Summary:  The Reset member method of the IEnumConnectionPoints interface
@@ -356,7 +356,7 @@ STDMETHODIMP tLuaCOMEnumConnPoints::Skip(
 
   Returns:  HRESULT
               Standard result code. NOERROR for success.
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 STDMETHODIMP tLuaCOMEnumConnPoints::Reset(
                void)
 {
@@ -367,7 +367,7 @@ STDMETHODIMP tLuaCOMEnumConnPoints::Reset(
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMEnumConnPoints::Clone
 
   Summary:  The Clone member method of this IEnumConnectionPoints
@@ -383,7 +383,7 @@ STDMETHODIMP tLuaCOMEnumConnPoints::Reset(
 
   Returns:  HRESULT
               Standard result code. NOERROR for success.
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 STDMETHODIMP tLuaCOMEnumConnPoints::Clone(
                IEnumConnectionPoints** ppIEnum)
 {
@@ -423,7 +423,7 @@ STDMETHODIMP tLuaCOMEnumConnPoints::Clone(
   and EnumConnections.
 ---------------------------------------------------------------------------*/
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMConnPoint::tLuaCOMConnPoint
 
   Summary:  tLuaCOMConnPoint Constructor.
@@ -435,7 +435,7 @@ STDMETHODIMP tLuaCOMEnumConnPoints::Clone(
   Modifies: ...
 
   Returns:  void
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 tLuaCOMConnPoint::tLuaCOMConnPoint(lua_State *p_L,
                                    IUnknown* pHostObj)
 {
@@ -578,7 +578,7 @@ STDMETHODIMP_(ULONG) tLuaCOMConnPoint::Release(void)
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMConnPoint::GetSlot
 
   Summary:  An internal private utility member method to obtain a free
@@ -594,7 +594,7 @@ STDMETHODIMP_(ULONG) tLuaCOMConnPoint::Release(void)
 
   Returns:  HRESULT
               Standard result code. NOERROR for success.
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 HRESULT tLuaCOMConnPoint::GetSlot(
           UINT* puiFreeSlot)
 {
@@ -627,7 +627,7 @@ HRESULT tLuaCOMConnPoint::GetSlot(
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMConnPoint::FindSlot
 
   Summary:  An internal private utility member method to find an existing
@@ -643,7 +643,7 @@ HRESULT tLuaCOMConnPoint::GetSlot(
 
   Returns:  HRESULT
               Standard result code. NOERROR for success.
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 HRESULT tLuaCOMConnPoint::FindSlot(
           DWORD dwCookie,
           UINT* puiSlot)
@@ -667,7 +667,7 @@ HRESULT tLuaCOMConnPoint::FindSlot(
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMConnPoint::GetConnectionInterface
 
   Summary:  The GetConnectionInterface member method of this
@@ -682,7 +682,7 @@ HRESULT tLuaCOMConnPoint::FindSlot(
 
   Returns:  HRESULT
               Standard result code. NOERROR for success.
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 STDMETHODIMP tLuaCOMConnPoint::GetConnectionInterface(
                IID* piidSink)
 {
@@ -697,7 +697,7 @@ STDMETHODIMP tLuaCOMConnPoint::GetConnectionInterface(
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMConnPoint::GetConnPointContainer
 
   Summary:  The GetConnPointContainer member method of this
@@ -713,7 +713,7 @@ STDMETHODIMP tLuaCOMConnPoint::GetConnectionInterface(
 
   Returns:  HRESULT
               Standard result code. NOERROR for success.
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 STDMETHODIMP tLuaCOMConnPoint::GetConnectionPointContainer(
                IConnectionPointContainer** ppConnPtCon)
 {
@@ -729,7 +729,7 @@ STDMETHODIMP tLuaCOMConnPoint::GetConnectionPointContainer(
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMConnPoint::Advise
 
   Summary:  The Advise member method of this IConnPoint interface
@@ -749,7 +749,7 @@ STDMETHODIMP tLuaCOMConnPoint::GetConnectionPointContainer(
 
   Returns:  HRESULT
               Standard result code. NOERROR for success.
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 STDMETHODIMP tLuaCOMConnPoint::Advise(
                IUnknown* pUnkSink,
                DWORD* pdwCookie)
@@ -811,7 +811,7 @@ STDMETHODIMP tLuaCOMConnPoint::Advise(
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMConnPoint::Unadvise
 
   Summary:  The Unadvise member method of this IConnPoint interface
@@ -828,7 +828,7 @@ STDMETHODIMP tLuaCOMConnPoint::Advise(
 
   Returns:  HRESULT
               Standard result code. NOERROR for success.
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 STDMETHODIMP tLuaCOMConnPoint::Unadvise(
                DWORD dwCookie)
 {
@@ -860,7 +860,7 @@ STDMETHODIMP tLuaCOMConnPoint::Unadvise(
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMConnPoint::EnumConnections
 
   Summary:  The EnumConnections member method of this IConnPoint
@@ -878,7 +878,7 @@ STDMETHODIMP tLuaCOMConnPoint::Unadvise(
 
   Returns:  HRESULT
               Standard result code. NOERROR for success.
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 STDMETHODIMP tLuaCOMConnPoint::EnumConnections(
                IEnumConnections** ppIEnum)
 {
@@ -948,7 +948,7 @@ STDMETHODIMP tLuaCOMConnPoint::EnumConnections(
   Next, Skip, Reset, and Clone.
 ---------------------------------------------------------------------------*/
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMEnumConnections::tLuaCOMEnumConnections
 
   Summary:  tLuaCOMEnumConnections Constructor.
@@ -961,7 +961,7 @@ STDMETHODIMP tLuaCOMConnPoint::EnumConnections(
             and paConnections.
 
   Returns:  void
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 tLuaCOMEnumConnections::tLuaCOMEnumConnections(
   IUnknown* pHostObj)
 {
@@ -980,7 +980,7 @@ tLuaCOMEnumConnections::tLuaCOMEnumConnections(
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMEnumConnections::~tLuaCOMEnumConnections
 
   Summary:  tLuaCOMEnumConnections Destructor.
@@ -990,7 +990,7 @@ tLuaCOMEnumConnections::tLuaCOMEnumConnections(
   Modifies: paConnections.
 
   Returns:  void
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 tLuaCOMEnumConnections::~tLuaCOMEnumConnections(void)
 {
   if (NULL != paConnections)
@@ -1009,7 +1009,7 @@ tLuaCOMEnumConnections::~tLuaCOMEnumConnections(void)
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMEnumConnections::Init
 
   Summary:  tLuaCOMEnumConnections Initialization method.  Create any
@@ -1026,7 +1026,7 @@ tLuaCOMEnumConnections::~tLuaCOMEnumConnections(void)
 
   Returns:  HRESULT
               Standard result code. NOERROR for success.
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 HRESULT tLuaCOMEnumConnections::Init(
           ULONG cConnections,
           CONNECTDATA* paConnections,
@@ -1062,7 +1062,7 @@ HRESULT tLuaCOMEnumConnections::Init(
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMEnumConnections::QueryInterface
 
   Summary:  QueryInterface of the tLuaCOMEnumConnections non-delegating
@@ -1078,7 +1078,7 @@ HRESULT tLuaCOMEnumConnections::Init(
 
   Returns:  HRESULT
               Standard result code. NOERROR for success.
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 STDMETHODIMP tLuaCOMEnumConnections::QueryInterface(
                REFIID riid,
                void ** ppv)
@@ -1104,7 +1104,7 @@ STDMETHODIMP tLuaCOMEnumConnections::QueryInterface(
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMEnumConnections::AddRef
 
   Summary:  AddRef of the tLuaCOMEnumConnections non-delegating IUnknown
@@ -1116,7 +1116,7 @@ STDMETHODIMP tLuaCOMEnumConnections::QueryInterface(
 
   Returns:  ULONG
               New value of cRefs (COM object's reference count).
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 STDMETHODIMP_(ULONG) tLuaCOMEnumConnections::AddRef(void)
 {
   cRefs = ++cRefs;
@@ -1129,7 +1129,7 @@ STDMETHODIMP_(ULONG) tLuaCOMEnumConnections::AddRef(void)
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMEnumConnections::Release
 
   Summary:  Release of the tLuaCOMEnumConnections non-delegating IUnknown
@@ -1141,7 +1141,7 @@ STDMETHODIMP_(ULONG) tLuaCOMEnumConnections::AddRef(void)
 
   Returns:  ULONG
               New value of cRefs (COM object's reference count).
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 STDMETHODIMP_(ULONG) tLuaCOMEnumConnections::Release(void)
 {
   // Pass this release along to the Host object being enumerated.
@@ -1161,7 +1161,7 @@ STDMETHODIMP_(ULONG) tLuaCOMEnumConnections::Release(void)
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMEnumConnections::Next
 
   Summary:  The Next member method of this IEnumConnections interface
@@ -1183,7 +1183,7 @@ STDMETHODIMP_(ULONG) tLuaCOMEnumConnections::Release(void)
 
   Returns:  HRESULT
               Standard result code. NOERROR for success.
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 STDMETHODIMP tLuaCOMEnumConnections::Next(
                ULONG cReq,
                CONNECTDATA* paConnections,
@@ -1240,7 +1240,7 @@ STDMETHODIMP tLuaCOMEnumConnections::Next(
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMEnumConnections::Skip
 
   Summary:  The Skip member method of this IEnumConnections interface
@@ -1254,7 +1254,7 @@ STDMETHODIMP tLuaCOMEnumConnections::Next(
 
   Returns:  HRESULT
               Standard result code. NOERROR for success.
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 STDMETHODIMP tLuaCOMEnumConnections::Skip(
                ULONG cSkip)
 {
@@ -1272,7 +1272,7 @@ STDMETHODIMP tLuaCOMEnumConnections::Skip(
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMEnumConnections::Reset
 
   Summary:  The Reset member method of the IEnumConnections interface
@@ -1285,7 +1285,7 @@ STDMETHODIMP tLuaCOMEnumConnections::Skip(
 
   Returns:  HRESULT
               Standard result code. NOERROR for success.
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 STDMETHODIMP tLuaCOMEnumConnections::Reset(
                void)
 {
@@ -1296,7 +1296,7 @@ STDMETHODIMP tLuaCOMEnumConnections::Reset(
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMEnumConnections::Clone
 
   Summary:  The Clone member method of this IEnumConnections interface
@@ -1313,7 +1313,7 @@ STDMETHODIMP tLuaCOMEnumConnections::Reset(
 
   Returns:  HRESULT
               Standard result code. NOERROR for success.
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 STDMETHODIMP tLuaCOMEnumConnections::Clone(
                IEnumConnections** ppIEnum)
 {
@@ -1348,17 +1348,7 @@ STDMETHODIMP tLuaCOMEnumConnections::Clone(
 
 
 
-
-
-
-
-
-
-
-
-
-
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMConnPointContainer
               ::tLuaCOMConnPointContainer
 
@@ -1373,7 +1363,7 @@ STDMETHODIMP tLuaCOMEnumConnections::Clone(
   Modifies: pBackObj, pUnkOuter.
 
   Returns:  void
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 tLuaCOMConnPointContainer::tLuaCOMConnPointContainer(lua_State* p_L,
                                                      IUnknown* p_pUnkOuter)
 {
@@ -1463,7 +1453,7 @@ STDMETHODIMP_(ULONG) tLuaCOMConnPointContainer::Release(void)
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMConnPointContainer::FindConnectionPoint
 
   Summary:  Given an IID for a connection point sink find and return the
@@ -1478,7 +1468,7 @@ STDMETHODIMP_(ULONG) tLuaCOMConnPointContainer::Release(void)
 
   Returns:  HRESULT
               Standard result code. NOERROR for success.
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 STDMETHODIMP tLuaCOMConnPointContainer::FindConnectionPoint(
                REFIID riid,
                IConnectionPoint** ppConnPt)
@@ -1510,7 +1500,7 @@ STDMETHODIMP tLuaCOMConnPointContainer::FindConnectionPoint(
 }
 
 
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+/**
   Method:   tLuaCOMConnPointContainer::EnumConnectionPoints
 
   Summary:  Return Enumerator for the connectable object's contained
@@ -1525,7 +1515,7 @@ STDMETHODIMP tLuaCOMConnPointContainer::FindConnectionPoint(
 
   Returns:  HRESULT
               Standard result code. NOERROR for success.
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+*/
 STDMETHODIMP tLuaCOMConnPointContainer::EnumConnectionPoints(
                        IEnumConnectionPoints** ppIEnum)
 {
