@@ -21,8 +21,6 @@ const void* luaCompat_getType2(lua_State* L, int index);
 
 void* luaCompat_getPointer(lua_State* L, int index);
 
-void luaCompat_handleNoIndexEvent(lua_State* L);
-
 void luaCompat_moduleCreate(lua_State* L, const char* module);
 void luaCompat_moduleSet(lua_State* L, const char* module, const char* key);
 void luaCompat_moduleGet(lua_State* L, const char* module, const char* key);

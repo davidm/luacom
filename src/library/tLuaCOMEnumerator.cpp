@@ -124,7 +124,7 @@ void tLuaCOMEnumerator::registerLuaType(lua_State *L, const char *module)
     tLuaCOMEnumerator::type_name);
 
   lua_pushcfunction(L, tLuaCOMEnumerator::index);
-  luaCompat_handleNoIndexEvent(L);
+  lua_setfield(L, -2, "__index");
 
   lua_pop(L, 1);
 

@@ -192,18 +192,6 @@ const void* luaCompat_getType2(lua_State* L, int index)
   return result;
 }
 
-void luaCompat_handleNoIndexEvent(lua_State* L)
-{ /* lua5 */
-  LUASTACK_SET(L);
-
-  lua_pushstring(L, "__index");
-  lua_insert(L, -2);
-
-  lua_settable(L, -3);
-
-  LUASTACK_CLEAN(L, -1);
-}
-
 void luaCompat_moduleCreate(lua_State* L, const char* module)
 { /* lua5 */
   LUASTACK_SET(L);

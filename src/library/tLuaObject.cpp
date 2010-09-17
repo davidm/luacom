@@ -163,7 +163,7 @@ void tLuaObject::RegisterType(lua_State* L,
   luaCompat_pushTypeByName(L, MODULENAME, type_name);
 
   lua_pushcfunction(L, tLuaObject::generic_index);
-  luaCompat_handleNoIndexEvent(L);
+  lua_setfield(L, -2, "__index");
 
   lua_pushstring(L, "__newindex");
   lua_pushcfunction(L, tLuaObject::generic_newindex);

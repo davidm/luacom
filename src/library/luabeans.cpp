@@ -68,7 +68,7 @@ void LuaBeans::registerObjectEvents(lua_State* L, class Events& events)
   if(events.noindex)
   {
     lua_pushcfunction(L, events.noindex);
-    luaCompat_handleNoIndexEvent(L);
+    lua_setfield(L, -2, "__index");
   }
 
   if(events.call)
@@ -110,7 +110,7 @@ void LuaBeans::registerPointerEvents(lua_State* L, class Events& events)
   if(events.noindex)
   {
     lua_pushcfunction(L, events.noindex);
-    luaCompat_handleNoIndexEvent(L);
+    lua_setfield(L, -2, "__index");
   }
 
   if(events.gc)

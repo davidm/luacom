@@ -463,7 +463,7 @@ tLuaCOMConnPoint::tLuaCOMConnPoint(lua_State *p_L,
   // creates a new lua tag associated with this connection point
   luaCompat_pushTypeByName(L, MODULENAME, LCOM_CONNPOINT_TYPENAME);
   lua_pushcfunction(L, tagmeth_index);
-  luaCompat_handleNoIndexEvent(L);
+  lua_setfield(L, -2, "__index");
 
   lua_pop(L, 1);
 
