@@ -2603,8 +2603,9 @@ LUACOM_API void luacom_open(lua_State *L)
   lua_pushcfunction(L, IUnknown_tag_gc);
   luaCompat_handleGCEvent(L);
 
+  lua_pushstring(L, "__eq");
   lua_pushcfunction(L, IUnknown_eq);
-  luaCompat_handleEqEvent(L);
+  lua_settable(L, -3);
 
   lua_pop(L, 1);
 
