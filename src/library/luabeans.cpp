@@ -74,7 +74,7 @@ void LuaBeans::registerObjectEvents(lua_State* L, class Events& events)
   if(events.call)
   {
     lua_pushcfunction(L, events.call);
-    luaCompat_handleFuncCallEvent(L);
+    lua_setfield(L, -2, "__call");
   }
 
   if(events.gc)

@@ -204,18 +204,6 @@ void luaCompat_handleNoIndexEvent(lua_State* L)
   LUASTACK_CLEAN(L, -1);
 }
 
-void luaCompat_handleFuncCallEvent(lua_State* L)
-{ /* lua5 */
-  LUASTACK_SET(L);
-
-  lua_pushstring(L, "__call");
-  lua_insert(L, -2);
-
-  lua_settable(L, -3);
-
-  LUASTACK_CLEAN(L, -1);
-}
-
 void luaCompat_moduleCreate(lua_State* L, const char* module)
 { /* lua5 */
   LUASTACK_SET(L);
