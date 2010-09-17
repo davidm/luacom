@@ -990,7 +990,7 @@ static int luacom_ExposeObject(lua_State *L)
 static int luacom_RevokeObject(lua_State *L)
 {
   // check parameters
-  const int cookie = (int) luaL_check_number(L, 1);
+  const int cookie = (int) luaL_checknumber(L, 1);
 
   // revokes class object
   try

@@ -202,7 +202,7 @@ static int _create_process (lua_State *lua_state)
 
 static int _kill_process(lua_State *lua_state)
 {
-   DWORD pid = (DWORD)luaL_check_number(lua_state, 1);
+   DWORD pid = (DWORD)luaL_checknumber(lua_state, 1);
    HANDLE hProcess = OpenProcess(PROCESS_TERMINATE,0,pid);
 
    if (hProcess != NULL)
@@ -216,7 +216,7 @@ static int _kill_process(lua_State *lua_state)
 
 static int _sleep(lua_State *lua_state)
 {
-   double dtime = luaL_check_number(lua_state, 1);
+   double dtime = luaL_checknumber(lua_state, 1);
    DWORD time = (DWORD) (dtime*1000);
    Sleep(time);
 

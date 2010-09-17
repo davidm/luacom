@@ -39,7 +39,6 @@ extern "C"
 // Lua 5.1 compatibility
 #if defined(LUA_VERSION_NUM) && LUA_VERSION_NUM >= 501
 #define LUA5
-#define luaL_check_number luaL_checknumber
 #define luaL_arg_check luaL_argcheck
 #define luaL_opt_lstr luaL_optlstring
 #define lua_boxpointer(L,u) \
