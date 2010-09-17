@@ -129,7 +129,7 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
   lua_gettable(L, LUA_GLOBALSINDEX);
   lua_pushstring(L,"TableVariants");
   lua_gettable(L, -2);
-  bool table_variants = luaCompat_toCBool(L, -1) != 0;
+  bool table_variants = lua_toboolean(L, -1) != 0;
   lua_pop(L, 2);
 
 
@@ -624,7 +624,7 @@ void tLuaCOMTypeHandler::lua2com(lua_State* L, stkIndex luaval, VARIANTARG& varg
             varg.scode = (SCODE)lua_tonumber(L, -1);
           } else if(strcmp(vtype, "bool") == 0) {
             varg.vt = VT_BOOL;
-            varg.boolVal = luaCompat_toCBool(L, -1) ? VARIANT_TRUE : VARIANT_FALSE;
+            varg.boolVal = lua_toboolean(L, -1) ? VARIANT_TRUE : VARIANT_FALSE;
           } else {
             varg.vt = VT_EMPTY;
           }
@@ -686,7 +686,7 @@ void tLuaCOMTypeHandler::lua2com(lua_State* L, stkIndex luaval, VARIANTARG& varg
 
   case LUA_TBOOLEAN:
     varg.vt = VT_BOOL;
-    varg.boolVal = luaCompat_toCBool(L, luaval);
+    varg.boolVal = lua_toboolean(L, luaval);
     break;
 
 

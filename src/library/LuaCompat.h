@@ -25,7 +25,6 @@ void luaCompat_pushPointer(lua_State* L, void *pointer);
 void* luaCompat_getPointer(lua_State* L, int index);
 
 void luaCompat_pushCBool(lua_State* L, int value);
-int luaCompat_toCBool(lua_State* L, int index);
 void luaCompat_pushBool(lua_State* L, int value);
 
 void luaCompat_handleEqEvent(lua_State* L);

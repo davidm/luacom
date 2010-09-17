@@ -349,13 +349,6 @@ void luaCompat_pushCBool(lua_State* L, int value)
   LUASTACK_CLEAN(L, 1);
 }
 
-int luaCompat_toCBool(lua_State* L, int index)
-{ /* lua5 */
-  int value = lua_toboolean(L, index);
-
-  return value;
-}
-
 int luaCompat_checkTagToCom(lua_State *L, int luaval) 
 { /* lua5 */
   /* unused: int has; */

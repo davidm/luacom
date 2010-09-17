@@ -888,7 +888,7 @@ STDMETHODIMP tLuaControl::SetExtent(DWORD  dwDrawAspect, SIZEL *psizel)
         lua_pushnumber(L, sl.cy);
         if(luaCompat_call(L, 3, 1, NULL)) return E_FAIL;
 
-        if(luaCompat_toCBool(L,-1))
+        if(lua_toboolean(L,-1))
         HimetricToPixel(psizel, &m_Size);
 
         // set things up with our HWND
@@ -920,7 +920,7 @@ STDMETHODIMP tLuaControl::SetExtent(DWORD  dwDrawAspect, SIZEL *psizel)
         // return code depending on whether or not user accepted given
         // size
         //
-        return (luaCompat_toCBool(L,-1)) ? S_OK : E_FAIL;
+        return (lua_toboolean(L,-1)) ? S_OK : E_FAIL;
     } else {
         // we don't support any other aspects.
         //

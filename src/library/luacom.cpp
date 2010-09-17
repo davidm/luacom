@@ -134,7 +134,7 @@ static void luacom_err(lua_State* L, const char* message, bool is_API_function)
   else
     luaCompat_moduleGet(L, MODULENAME, LUACOM_SHOULD_ABORT);
 
-  if(luaCompat_toCBool(L, -1))
+  if(lua_toboolean(L, -1))
   {
     luaL_error(L, "%s", message);
   }
@@ -1044,7 +1044,7 @@ static int luacom_RegisterObject(lua_State *L)
 
     lua_pushstring(L, "Control");
     lua_gettable(L, 1);
-    bool control = luaCompat_toCBool(L, -1) != 0;
+    bool control = lua_toboolean(L, -1) != 0;
 
     // gets the registration information from the registration table
     lua_pushstring(L, "VersionIndependentProgID");
