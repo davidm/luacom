@@ -20,6 +20,12 @@ extern "C"
 #define MODULENAME "__tLuaObject_object_types"
 #endif
 
+int const index_table_param = -2;
+int const index_index_param = -1;
+int const newindex_table_param = -3;
+int const newindex_index_param = -2;
+int const newindex_value_param = -1;
+
 const char TLUAOBJECT_POINTER_FIELD[] = "__TLUAOBJECT_pointer__";
 
 

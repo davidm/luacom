@@ -14,13 +14,6 @@ extern "C"
 #include <lua.h>
 }
 
-#define index_table_param -2
-#define index_index_param -1
-
-#define newindex_table_param -3
-#define newindex_index_param -2
-#define newindex_value_param -1
-
 
 #define INSTANCES_CACHE "__luacom_instances_cache"
 
