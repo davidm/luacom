@@ -15,7 +15,6 @@ int luaCompat_call(lua_State* L, int nargs, int nresults, const char** pErrMsg);
 void luaCompat_newLuaType(lua_State* L, const char* module_name, const char* name);
 void luaCompat_pushTypeByName(lua_State* L, const char* module, const char* type_name);
 int luaCompat_newTypedObject(lua_State* L, void* object);
-void* luaCompat_getTypedObject(lua_State* L, int index);
 int luaCompat_isOfType(lua_State* L, const char* module, const char* type);
 void luaCompat_getType(lua_State* L, int index);
 const void* luaCompat_getType2(lua_State* L, int index);

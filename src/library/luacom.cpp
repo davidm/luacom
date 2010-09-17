@@ -1650,7 +1650,7 @@ int luacom_CreateLuaCOM(lua_State* L)
 
   try
   {
-    punk = (IUnknown *) luaCompat_getTypedObject(L, -1);
+    punk = (IUnknown *)*(void **)lua_touserdata(L, -1);
     CHECKPOSCOND(punk);
 
     HRESULT hr = punk->QueryInterface(IID_IDispatch, (void **) &pdisp);
@@ -1834,7 +1834,7 @@ int luacom_GetCurrentDirectory(lua_State* L)
 
 static int IUnknown_tag_gc(lua_State *L)
 {
-  IUnknown* punk = (IUnknown*) luaCompat_getTypedObject(L, -1);
+  IUnknown* punk = (IUnknown*)*(void **)lua_touserdata(L, -1);
 
    if(punk != NULL)
      punk->Release();
@@ -1850,8 +1850,8 @@ static int IUnknown_eq(lua_State *L)
 {
   LUASTACK_SET(L);
 
-  IUnknown* punk1 = (IUnknown*) luaCompat_getTypedObject(L, -1);
-  IUnknown* punk2 = (IUnknown*) luaCompat_getTypedObject(L, -2);
+  IUnknown* punk1 = (IUnknown*)*(void **)lua_touserdata(L, -1);
+  IUnknown* punk2 = (IUnknown*)*(void **)lua_touserdata(L, -2);
 
   lua_pushboolean(L, punk1 == punk2);
 
@@ -1874,7 +1874,7 @@ static int IUnknown_eq(lua_State *L)
 
 static int tagmeth_gc(lua_State *L)
 {
-  tLuaCOM* lcom = (tLuaCOM*) luaCompat_getTypedObject(L, -1);
+  tLuaCOM* lcom = (tLuaCOM*)*(void **)lua_touserdata(L, -1);
 
   assert(lcom);
 

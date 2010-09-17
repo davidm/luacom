@@ -96,7 +96,7 @@ int tLuaCOMEnumerator::garbagecollect(lua_State *L)
 
   // gets the enumerator
   tLuaCOMEnumerator* enumerator = 
-    (tLuaCOMEnumerator*) luaCompat_getTypedObject(L, -1);
+    (tLuaCOMEnumerator*)*(void **)lua_touserdata(L, -1);
 
   delete enumerator;
 
@@ -168,7 +168,7 @@ int tLuaCOMEnumerator::call_method(lua_State *L)
 
   // gets the enumerator
   tLuaCOMEnumerator* enumerator = 
-    (tLuaCOMEnumerator*) luaCompat_getTypedObject(L, enumerator_param);
+    (tLuaCOMEnumerator*)*(void **)lua_touserdata(L, enumerator_param);
 
   // gets the method name
   const char* method_name = lua_tostring(L, method_param);

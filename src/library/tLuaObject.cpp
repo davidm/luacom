@@ -25,7 +25,7 @@ const char TLUAOBJECT_POINTER_FIELD[] = "__TLUAOBJECT_pointer__";
 
 int tLuaObject::garbagecollect(lua_State *L)
 {
-  tLuaObject* lua_obj = (tLuaObject*) luaCompat_getTypedObject(L, -1);
+  tLuaObject* lua_obj = (tLuaObject*)*(void **)lua_touserdata(L, -1);
 
   delete lua_obj;
 
@@ -42,7 +42,7 @@ tLuaObject* tLuaObject::getObject(lua_State *L, int pos)
   // gets lua object
   lua_pushstring(L, TLUAOBJECT_POINTER_FIELD);
   lua_rawget(L, pos);
-  tLuaObject* lua_obj = (tLuaObject*) luaCompat_getTypedObject(L, -1);
+  tLuaObject* lua_obj = (tLuaObject*)*(void **)lua_touserdata(L, -1);
   lua_pop(L, 1);
 
   LUASTACK_CLEAN(L, 0);

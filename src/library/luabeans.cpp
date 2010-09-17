@@ -161,7 +161,7 @@ void* LuaBeans::from_lua(lua_State* L, int index)
   {
     lua_pushstring(L, "_USERDATA_REF_");
     lua_gettable(L, index);
-    obj = luaCompat_getTypedObject(L, -1);
+    obj = *(void **)lua_touserdata(L, -1);
     lua_pop(L, 1);
   }
   lua_pop(L, 1);

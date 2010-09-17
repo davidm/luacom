@@ -694,7 +694,7 @@ void tLuaCOMTypeHandler::lua2com(lua_State* L, stkIndex luaval, VARIANTARG& varg
     if(isIUnknown(L, luaval)) // is an IUnknown?
     {
       varg.vt = VT_UNKNOWN;
-      varg.punkVal = (IUnknown *) luaCompat_getTypedObject(L, luaval);
+      varg.punkVal = (IUnknown *)*(void **)lua_touserdata(L, luaval);
       varg.punkVal->AddRef();
     }
 

@@ -147,16 +147,6 @@ void luaCompat_moduleGet(lua_State* L, const char* module, const char* key)
 }
 
 
-void* luaCompat_getTypedObject(lua_State* L, int index)
-{ /* lua5 */
-  void **pObj = (void **) lua_touserdata(L, index);
-
-  void *Obj= *pObj;
-
-  return Obj;
-}
-
-
 int luaCompat_isOfType(lua_State* L, const char* module, const char* type)
 { /* lua5 */
   int result = 0;
