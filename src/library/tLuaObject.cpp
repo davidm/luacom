@@ -174,7 +174,7 @@ void tLuaObject::RegisterType(lua_State* L,
   luaCompat_pushTypeByName(L, MODULENAME, pointer_type_name);
 
   lua_pushcfunction(L, tLuaObject::garbagecollect);
-  luaCompat_handleGCEvent(L);
+  lua_setfield(L, -2, "__gc");
 
   lua_pop(L, 1);
   

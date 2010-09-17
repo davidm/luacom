@@ -2601,7 +2601,7 @@ LUACOM_API void luacom_open(lua_State *L)
   // Sets a tag method for garbage collection
   luaCompat_pushTypeByName(L, MODULENAME, LCOM_IUNKNOWN_TYPENAME);
   lua_pushcfunction(L, IUnknown_tag_gc);
-  luaCompat_handleGCEvent(L);
+  lua_setfield(L, -2, "__gc");
 
   lua_pushstring(L, "__eq");
   lua_pushcfunction(L, IUnknown_eq);

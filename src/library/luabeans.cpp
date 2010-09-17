@@ -80,7 +80,7 @@ void LuaBeans::registerObjectEvents(lua_State* L, class Events& events)
   if(events.gc)
   {
     lua_pushcfunction(L, events.gc);
-    luaCompat_handleGCEvent(L);
+    lua_setfield(L, -2, "__gc");
   }
 
   lua_pop(L, 1);
@@ -116,7 +116,7 @@ void LuaBeans::registerPointerEvents(lua_State* L, class Events& events)
   if(events.gc)
   {
     lua_pushcfunction(L, events.gc);
-    luaCompat_handleGCEvent(L);
+    lua_setfield(L, -2, "__gc");
   }
 
   lua_pop(L, 1);
