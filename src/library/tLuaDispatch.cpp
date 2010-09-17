@@ -498,8 +498,8 @@ tLuaDispatch * tLuaDispatch::CreateLuaDispatch(lua_State* L,
     new tLuaDispatch(L, interface_typeinfo, ref);
 
   lua_getref(L, ref);
-  luaCompat_pushPointer(L, idxDispatch);
-  luaCompat_pushPointer(L, pdisp);
+  lua_pushlightuserdata(L, idxDispatch);
+  lua_pushlightuserdata(L, pdisp);
   lua_rawset(L,-3);
   lua_pop(L, 1);
 

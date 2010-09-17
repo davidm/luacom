@@ -318,11 +318,6 @@ void luaCompat_moduleCreate(lua_State* L, const char* module)
   LUASTACK_CLEAN(L, 1);
 }
 
-void luaCompat_pushPointer(lua_State* L, void *pointer)
-{ /* lua5 */
-  lua_pushlightuserdata(L, pointer);
-}
-
 void* luaCompat_getPointer(lua_State* L, int index)
 { /* lua5 */
   if(!lua_islightuserdata(L, index))

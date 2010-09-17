@@ -932,7 +932,7 @@ static int luacom_ExposeObject(lua_State *L)
       // Inprocess "registration": stores object in the Lua registry
       lua_getregistry(L);
       lua_pushstring(L,"object");
-      luaCompat_pushPointer(L,(void*)luacom->GetIDispatch());
+      lua_pushlightuserdata(L,(void*)luacom->GetIDispatch());
       lua_settable(L,-3);
       lua_pop(L,1);
     } else {
@@ -2123,7 +2123,7 @@ static int untyped_tagmeth_index(lua_State *L,
     case INVOKE_PROPERTYGET:
       {
         // pushes closure
-        luaCompat_pushPointer(L, (void *) lcom);
+        lua_pushlightuserdata(L, (void *) lcom);
         lua_pushnumber(L, dispid);
         lua_pushnumber(L, INVOKE_PROPERTYGET);
         lua_pushnumber(L, 0); // no funcdesc
@@ -2135,7 +2135,7 @@ static int untyped_tagmeth_index(lua_State *L,
     case INVOKE_PROPERTYPUT:
       {
         // pushes closure
-        luaCompat_pushPointer(L, (void *) lcom);
+        lua_pushlightuserdata(L, (void *) lcom);
         lua_pushnumber(L, dispid);
         lua_pushnumber(L, INVOKE_PROPERTYPUT);
         lua_pushnumber(L, 0); // no funcdesc
@@ -2147,7 +2147,7 @@ static int untyped_tagmeth_index(lua_State *L,
     default:
       {
         // pushes closure
-        luaCompat_pushPointer(L, (void *) lcom);
+        lua_pushlightuserdata(L, (void *) lcom);
         lua_pushnumber(L, dispid);
         lua_pushnumber(L, INVOKE_PROPERTYGET | INVOKE_FUNC);
         lua_pushnumber(L, 0); // no funcdesc
@@ -2262,10 +2262,10 @@ static int typed_tagmeth_index(lua_State *L,
       else if(funcinfo.propget->cParams > 0 || is_propget)
       {
         // pushes closure
-        luaCompat_pushPointer(L, (void *) lcom);
+        lua_pushlightuserdata(L, (void *) lcom);
         lua_pushnumber(L, funcinfo.propget->memid);
         lua_pushnumber(L, INVOKE_PROPERTYGET);
-        luaCompat_pushPointer(L, (void *) funcinfo.propget);
+        lua_pushlightuserdata(L, (void *) funcinfo.propget);
 
         lua_pushcclosure(L, callhook, 4);
         return 1;
@@ -2278,10 +2278,10 @@ static int typed_tagmeth_index(lua_State *L,
       {
         // property put with parameters
         // pushes closure
-        luaCompat_pushPointer(L, (void *) lcom);
+        lua_pushlightuserdata(L, (void *) lcom);
         lua_pushnumber(L, funcinfo.propput->memid);
         lua_pushnumber(L, funcinfo.propput->invkind);
-        luaCompat_pushPointer(L, (void *) funcinfo.propput);
+        lua_pushlightuserdata(L, (void *) funcinfo.propput);
 
         lua_pushcclosure(L, callhook, 4);
         return 1;
@@ -2291,10 +2291,10 @@ static int typed_tagmeth_index(lua_State *L,
     if(funcinfo.func && !is_propget && !is_propput)
     {
       // pushes closure
-      luaCompat_pushPointer(L, (void *) lcom);
+      lua_pushlightuserdata(L, (void *) lcom);
       lua_pushnumber(L, funcinfo.func->memid);
       lua_pushnumber(L, INVOKE_FUNC);
-      luaCompat_pushPointer(L, (void *) funcinfo.func);
+      lua_pushlightuserdata(L, (void *) funcinfo.func);
 
       lua_pushcclosure(L, callhook, 4);
       return 1;
@@ -2344,7 +2344,7 @@ static int tagmeth_index(lua_State *L)
     // checks for some predefined attributes
     if(strcmp(field_name, LCOM_IUNKNOWN_ATTRIBUTE) == 0)
     {
-      luaCompat_pushPointer(L, (IUnknown*) lcom->GetIDispatch());
+      lua_pushlightuserdata(L, (IUnknown*) lcom->GetIDispatch());
       return 1;
     }
 

@@ -69,7 +69,7 @@ int tLuaObject::generic_index(lua_State *L)
   switch(method_type)
   {
   case FUNC:
-    luaCompat_pushPointer(L, (void *) method);
+    lua_pushlightuserdata(L, (void *) method);
     lua_pushcclosure(L, closure, 1);
     return 1;
     break;

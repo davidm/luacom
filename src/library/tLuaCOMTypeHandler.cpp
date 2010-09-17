@@ -520,7 +520,7 @@ void tLuaCOMTypeHandler::lua2com(lua_State* L, stkIndex luaval, VARIANTARG& varg
     else
     {
         // tests if it is an already created tLuaDispatch
-      luaCompat_pushPointer(L, idxDispatch);
+      lua_pushlightuserdata(L, idxDispatch);
       lua_rawget(L, luaval);
       if(!lua_isnil(L, -1)) {
         varg.pdispVal = (IDispatch*)luaCompat_getPointer(L, -1);

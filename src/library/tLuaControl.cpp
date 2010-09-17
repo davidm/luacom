@@ -1852,7 +1852,7 @@ HWND tLuaControl::CreateInPlaceWindow(int x, int y, BOOL fNoRedraw)
     lua_gettable(L, -2);
     lua_pushvalue(L, -2);
     lua_remove(L, -3);
-    luaCompat_pushPointer(L, m_hwndParent);
+    lua_pushlightuserdata(L, m_hwndParent);
     lua_pushnumber(L, x);
     lua_pushnumber(L, y);
     lua_pushnumber(L, m_Size.cx);
@@ -2213,8 +2213,8 @@ tLuaControl *tLuaControl::CreateLuaControl(lua_State* L,
     new tLuaControl(L, interface_typeinfo, ref);
 
   lua_getref(L, ref);
-  luaCompat_pushPointer(L, idxDispatch);
-  luaCompat_pushPointer(L, pcont);
+  lua_pushlightuserdata(L, idxDispatch);
+  lua_pushlightuserdata(L, pcont);
   lua_rawset(L,-3);
   lua_pop(L, 1);
 

@@ -1589,7 +1589,7 @@ void tLuaCOMConnPoint::push()
   luaCompat_setType(L, -2);
 
   lua_pushstring(L, CONNPOINT_NAME);
-  luaCompat_pushPointer(L, this);
+  lua_pushlightuserdata(L, this);
 
   lua_settable(L, -3);
 

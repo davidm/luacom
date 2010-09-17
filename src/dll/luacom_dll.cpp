@@ -88,7 +88,7 @@ static void factoryCache_PutFactory(const char* luaclsid, tLuaCOMClassFactory* p
   pFactory->AddRef();
   lua_getglobal(factoryCache,"factories");
   lua_pushstring(factoryCache,luaclsid);
-  luaCompat_pushPointer(factoryCache,pFactory);
+  lua_pushlightuserdata(factoryCache,pFactory);
   lua_settable(factoryCache,-3);
   lua_pop(factoryCache,1);
 }

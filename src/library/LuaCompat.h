@@ -21,7 +21,6 @@ int luaCompat_isOfType(lua_State* L, const char* module, const char* type);
 void luaCompat_getType(lua_State* L, int index);
 const void* luaCompat_getType2(lua_State* L, int index);
 
-void luaCompat_pushPointer(lua_State* L, void *pointer);
 void* luaCompat_getPointer(lua_State* L, int index);
 
 void luaCompat_pushCBool(lua_State* L, int value);
