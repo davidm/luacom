@@ -762,7 +762,7 @@ static int luacom_isMember(lua_State *L)
   tLuaCOM* lcom = (tLuaCOM*) LuaBeans::check_tag(L, 1);
   const char* member_name = luaL_check_lstr(L, 2, NULL);
 
-  luaCompat_pushBool(L, lcom->isMember(member_name));
+  lua_pushboolean(L, lcom->isMember(member_name));
 
   return 1;
 }
@@ -1005,7 +1005,7 @@ static int luacom_RevokeObject(lua_State *L)
     return 0;
   }
 
-  luaCompat_pushBool(L, true);
+  lua_pushboolean(L, true);
 
   return 1;
 }
@@ -1289,7 +1289,7 @@ static int luacom_RegisterObject(lua_State *L)
   COM_RELEASE(typelib);
 
   // signals success
-  luaCompat_pushBool(L, true);
+  lua_pushboolean(L, true);
 
   return 1;
 }
@@ -1438,7 +1438,7 @@ static int luacom_UnRegisterObject(lua_State *L)
   COM_RELEASE(typelib);
 
   // signals success
-  luaCompat_pushBool(L, true);
+  lua_pushboolean(L, true);
 
   return 1;
 }
@@ -1539,7 +1539,7 @@ static int luacom_StartLog(lua_State* L)
 
   bool result = tUtil::OpenLogFile(filename);
 
-  luaCompat_pushBool(L, result);
+  lua_pushboolean(L, result);
 
   return 1;
 }
@@ -1853,7 +1853,7 @@ static int IUnknown_eq(lua_State *L)
   IUnknown* punk1 = (IUnknown*) luaCompat_getTypedObject(L, -1);
   IUnknown* punk2 = (IUnknown*) luaCompat_getTypedObject(L, -2);
 
-  luaCompat_pushBool(L, punk1 == punk2);
+  lua_pushboolean(L, punk1 == punk2);
 
   LUASTACK_CLEAN(L, 1);
 
@@ -2609,10 +2609,10 @@ LUACOM_API void luacom_open(lua_State *L)
   lua_pop(L, 1);
 
   // sets default behaviour on errors
-  luaCompat_pushBool(L, 1);
+  lua_pushboolean(L, 1);
   luaCompat_moduleSet(L, MODULENAME, LUACOM_SHOULD_ABORT);
 
-  luaCompat_pushBool(L, 0);
+  lua_pushboolean(L, 0);
   luaCompat_moduleSet(L, MODULENAME, LUACOM_SHOULD_ABORT_API);
 
   // loads the lua code that implements the remaining

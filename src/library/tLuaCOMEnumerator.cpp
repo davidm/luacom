@@ -247,7 +247,7 @@ int tLuaCOMEnumerator::callCOMmethod(lua_State* L, const char *name, int first_p
 
     hr = pEV->Skip(num_elements);
 
-    luaCompat_pushBool(L, hr == S_OK);
+    lua_pushboolean(L, hr == S_OK);
 
     return 1;
   }

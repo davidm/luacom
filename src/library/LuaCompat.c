@@ -306,24 +306,6 @@ void* luaCompat_getPointer(lua_State* L, int index)
   return lua_touserdata(L, index);
 }
 
-void luaCompat_pushBool(lua_State* L, int value)
-{ /* lua5 */
-  LUASTACK_SET(L);
-
-  lua_pushboolean(L, value);
-
-  LUASTACK_CLEAN(L, 1);
-}
-
-void luaCompat_pushCBool(lua_State* L, int value)
-{ /* lua5 */
-  LUASTACK_SET(L);
-
-  lua_pushboolean(L, value);
-
-  LUASTACK_CLEAN(L, 1);
-}
-
 int luaCompat_checkTagToCom(lua_State *L, int luaval) 
 { /* lua5 */
   /* unused: int has; */

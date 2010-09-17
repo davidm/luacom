@@ -528,15 +528,15 @@ int tLuaTypeInfo::GetFuncDesc(tLuaObject* lua_obj, lua_State* L)
     USHORT paramFlags = pfuncdesc->lprgelemdescParam[i].paramdesc.wParamFlags;
 
     lua_pushstring(L, "in");
-    luaCompat_pushBool(L,paramFlags & PARAMFLAG_FIN);
+    lua_pushboolean(L,paramFlags & PARAMFLAG_FIN);
     lua_settable(L, -3);
 
     lua_pushstring(L, "out");
-    luaCompat_pushBool(L,paramFlags & PARAMFLAG_FOUT);
+    lua_pushboolean(L,paramFlags & PARAMFLAG_FOUT);
     lua_settable(L, -3);
 
     lua_pushstring(L, "opt");
-    luaCompat_pushBool(L,paramFlags & PARAMFLAG_FOPT);
+    lua_pushboolean(L,paramFlags & PARAMFLAG_FOPT);
     lua_settable(L, -3);
 
     lua_pushstring(L, "default");
@@ -688,19 +688,19 @@ int tLuaTypeInfo::GetImplTypeFlags(tLuaObject* lua_obj, lua_State* L)
   lua_newtable(L);
 
   lua_pushstring(L, "default");
-  luaCompat_pushBool(L, typeflags & IMPLTYPEFLAG_FDEFAULT);
+  lua_pushboolean(L, typeflags & IMPLTYPEFLAG_FDEFAULT);
   lua_settable(L, -3);
 
   lua_pushstring(L, "source");
-  luaCompat_pushBool(L, typeflags & IMPLTYPEFLAG_FSOURCE);
+  lua_pushboolean(L, typeflags & IMPLTYPEFLAG_FSOURCE);
   lua_settable(L, -3);
 
   lua_pushstring(L, "restricted");
-  luaCompat_pushBool(L, typeflags & IMPLTYPEFLAG_FRESTRICTED);
+  lua_pushboolean(L, typeflags & IMPLTYPEFLAG_FRESTRICTED);
   lua_settable(L, -3);
 
   lua_pushstring(L, "defaultvtable");
-  luaCompat_pushBool(L, typeflags & IMPLTYPEFLAG_FDEFAULTVTABLE);
+  lua_pushboolean(L, typeflags & IMPLTYPEFLAG_FDEFAULTVTABLE);
   lua_settable(L, -3);
 
   LUASTACK_CLEAN(L, 1);
@@ -806,27 +806,27 @@ int tLuaTypeInfo::GetTypeAttr(tLuaObject* lua_obj, lua_State* L)
   lua_settable(L, -4);
 
   lua_pushstring(L, "hidden");
-  luaCompat_pushBool(L, ptypeattr->wTypeFlags & TYPEFLAG_FHIDDEN);
+  lua_pushboolean(L, ptypeattr->wTypeFlags & TYPEFLAG_FHIDDEN);
   lua_settable(L, -3);
 
   lua_pushstring(L, "control");
-  luaCompat_pushBool(L, ptypeattr->wTypeFlags & TYPEFLAG_FCONTROL);
+  lua_pushboolean(L, ptypeattr->wTypeFlags & TYPEFLAG_FCONTROL);
   lua_settable(L, -3);
 
   lua_pushstring(L, "appobject");
-  luaCompat_pushBool(L, ptypeattr->wTypeFlags & TYPEFLAG_FAPPOBJECT);
+  lua_pushboolean(L, ptypeattr->wTypeFlags & TYPEFLAG_FAPPOBJECT);
   lua_settable(L, -3);
 
   lua_pushstring(L, "dispatchable");
-  luaCompat_pushBool(L, ptypeattr->wTypeFlags & TYPEFLAG_FDISPATCHABLE);
+  lua_pushboolean(L, ptypeattr->wTypeFlags & TYPEFLAG_FDISPATCHABLE);
   lua_settable(L, -3);
 
   lua_pushstring(L, "oleautomation");
-  luaCompat_pushBool(L, ptypeattr->wTypeFlags & TYPEFLAG_FOLEAUTOMATION);
+  lua_pushboolean(L, ptypeattr->wTypeFlags & TYPEFLAG_FOLEAUTOMATION);
   lua_settable(L, -3);
 
   lua_pushstring(L, "cancreate");
-  luaCompat_pushBool(L, ptypeattr->wTypeFlags & TYPEFLAG_FCANCREATE);
+  lua_pushboolean(L, ptypeattr->wTypeFlags & TYPEFLAG_FCANCREATE);
   lua_settable(L, -3);
 
 

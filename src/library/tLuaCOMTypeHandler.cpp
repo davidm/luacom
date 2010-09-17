@@ -268,10 +268,10 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
             lua_pushstring(L, "bool");
             lua_settable(L, -3);
             lua_pushstring(L, "Value");
-            luaCompat_pushCBool(L, varg.boolVal);
+            lua_pushboolean(L, varg.boolVal);
             lua_settable(L, -3);
         } else
-        luaCompat_pushCBool(L, varg.boolVal);
+        lua_pushboolean(L, varg.boolVal);
         break;
 
       case VT_BSTR:
