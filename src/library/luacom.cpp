@@ -317,8 +317,8 @@ static tLuaCOM *luacom_ImplInterfaceFromTypelibHelper(lua_State *L)
   lua_pushvalue(L, 1);
   const int ref = lua_ref(L, 1);
 
-  const char* typelib_name = luaL_check_lstr(L, 2, NULL);
-  const char* pcInterface = luaL_check_lstr(L, 3, NULL);
+  const char* typelib_name = luaL_checklstring(L, 2, NULL);
+  const char* pcInterface = luaL_checklstring(L, 3, NULL);
   const char* coclassname = luaL_opt_lstr(L, 4, NULL, NULL);
 
   tLuaCOM* lcom           = NULL;
@@ -399,8 +399,8 @@ static tLuaCOM *luacom_ImplInterfaceHelper(lua_State *L)
   lua_pushvalue(L, 1);
   const int ref = lua_ref(L, 1);
 
-  const char* pcProgID = luaL_check_lstr(L, 2, NULL);
-  const char* pcInterface = luaL_check_lstr(L, 3, NULL);
+  const char* pcProgID = luaL_checklstring(L, 2, NULL);
+  const char* pcInterface = luaL_checklstring(L, 3, NULL);
 
   tLuaCOM* lcom = NULL;
   ITypeLib* typelib = NULL;
@@ -460,7 +460,7 @@ static int luacom_ImplInterface(lua_State *L)
 
 static int luacom_CLSIDfromProgID(lua_State *L)
 {
-  const char* str = luaL_check_lstr(L, 1, NULL);
+  const char* str = luaL_checklstring(L, 1, NULL);
   wchar_t* clsid_str  = NULL;
   wchar_t* progId     = NULL;
   CLSID clsid         = IID_NULL;
@@ -507,7 +507,7 @@ static int luacom_CLSIDfromProgID(lua_State *L)
 
 static int luacom_ProgIDfromCLSID(lua_State *L)
 {
-  const char* str = luaL_check_lstr(L, 1, NULL);
+  const char* str = luaL_checklstring(L, 1, NULL);
   wchar_t* clsid_str = NULL;
   LPOLESTR progId = NULL;
   CLSID clsid = IID_NULL;
@@ -560,7 +560,7 @@ static int luacom_CreateObject(lua_State *L)
   IPersistStreamInit* psi = NULL;
   DWORD context           = CLSCTX_SERVER;
 
-  const char *progId = luaL_check_lstr(L, 1, NULL);
+  const char *progId = luaL_checklstring(L, 1, NULL);
   const char *creation_mode = lua_tostring(L, 2);
   const bool untyped = lua_toboolean(L, 3) != 0;
 
@@ -627,7 +627,7 @@ static int luacom_GetObject(lua_State *L)
   IUnknown* punk    = NULL;
   CLSID clsid       = IID_NULL;
 
-  const char *progId = luaL_check_lstr(L, 1, NULL);
+  const char *progId = luaL_checklstring(L, 1, NULL);
 
   tLuaCOM* lcom = NULL;
   IBindCtx* pbc = NULL;
@@ -760,7 +760,7 @@ static int luacom_isMember(lua_State *L)
 {
   // objeto luacom
   tLuaCOM* lcom = (tLuaCOM*) LuaBeans::check_tag(L, 1);
-  const char* member_name = luaL_check_lstr(L, 2, NULL);
+  const char* member_name = luaL_checklstring(L, 2, NULL);
 
   lua_pushboolean(L, lcom->isMember(member_name));
 
@@ -796,7 +796,7 @@ static int luacom_NewObjectOrControl(lua_State *L, int type)
   lua_pushvalue(L, 1);
   const int ref = lua_ref(L, 1);
 
-  const char* pcProgID = luaL_check_lstr(L, 2, NULL);
+  const char* pcProgID = luaL_checklstring(L, 2, NULL);
 
   try
   {
@@ -1535,7 +1535,7 @@ static int luacom_DumpTypeInfo(lua_State *L)
 // Starts logging
 static int luacom_StartLog(lua_State* L)
 {
-  const char *filename = luaL_check_lstr(L, 1, NULL);
+  const char *filename = luaL_checklstring(L, 1, NULL);
 
   bool result = tUtil::OpenLogFile(filename);
 
@@ -1591,7 +1591,7 @@ static int luacom_GetEnumerator(lua_State *L)
 
 static int luacom_LoadTypeLibrary(lua_State *L)
 {
-  const char* typelib_name = luaL_check_lstr(L, -1, NULL);
+  const char* typelib_name = luaL_checklstring(L, -1, NULL);
 
   ITypeLib* typelib = NULL;
 
