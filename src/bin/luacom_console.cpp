@@ -136,7 +136,7 @@ static int _create_process (lua_State *lua_state)
    char* env = NULL;
    static char buffer[1024];
 
-   luaL_arg_check(lua_state,
+   luaL_argcheck(lua_state,
                   lua_istable(lua_state, 1) || lua_isstring(lua_state, 1),1,
                   "must be a table or string");
 

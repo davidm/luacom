@@ -147,7 +147,7 @@ void* LuaBeans::check_tag(lua_State* L, int index)
 {
   void* userdata = from_lua(L, index);
 
-  luaL_arg_check(L, (userdata!=NULL), index, "Object type is wrong");
+  luaL_argcheck(L, (userdata!=NULL), index, "Object type is wrong");
 
   return userdata;
 }
