@@ -227,12 +227,6 @@ void luaCompat_handleEqEvent(lua_State* L)
 }
 
 
-void luaCompat_handleGettableEvent(lua_State* L)
-{ /* lua5 */
-  // there is no gettable_event in Lua5 with the semantics of
-  // Lua4
-}
-
 void luaCompat_handleSettableEvent(lua_State* L)
 { /* lua5 */
   LUASTACK_SET(L);

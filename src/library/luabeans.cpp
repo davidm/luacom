@@ -55,7 +55,7 @@ void LuaBeans::registerObjectEvents(lua_State* L, class Events& events)
   if(events.gettable)
   {
     lua_pushcfunction(L, events.gettable);
-    luaCompat_handleGettableEvent(L);
+    // there is no gettable_event in Lua5 with the semantics of Lua4
   }
 
   if(events.settable)
@@ -96,7 +96,7 @@ void LuaBeans::registerPointerEvents(lua_State* L, class Events& events)
   if(events.gettable)
   {
     lua_pushcfunction(L, events.gettable);
-    luaCompat_handleGettableEvent(L);
+    // there is no gettable_event in Lua5 with the semantics of Lua4
   }
 
   if(events.settable)
