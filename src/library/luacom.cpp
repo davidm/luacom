@@ -319,7 +319,7 @@ static tLuaCOM *luacom_ImplInterfaceFromTypelibHelper(lua_State *L)
 
   const char* typelib_name = luaL_checklstring(L, 2, NULL);
   const char* pcInterface = luaL_checklstring(L, 3, NULL);
-  const char* coclassname = luaL_opt_lstr(L, 4, NULL, NULL);
+  const char* coclassname = luaL_optlstring(L, 4, NULL, NULL);
 
   tLuaCOM* lcom           = NULL;
   ITypeLib* typelib       = NULL;
