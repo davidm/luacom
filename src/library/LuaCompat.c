@@ -356,12 +356,6 @@ int luaCompat_toCBool(lua_State* L, int index)
   return value;
 }
 
-void luaCompat_setglobal(lua_State* L)
-{ /* lua5 */
-  lua_settable(L, LUA_GLOBALSINDEX);
-}
-
-
 int luaCompat_checkTagToCom(lua_State *L, int luaval) 
 { /* lua5 */
   /* unused: int has; */

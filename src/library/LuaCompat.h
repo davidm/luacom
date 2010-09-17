@@ -43,8 +43,6 @@ void luaCompat_moduleGet(lua_State* L, const char* module, const char* key);
 int luaCompat_upvalueIndex(lua_State* L, int which, int num_upvalues);
 int luaCompat_getNumParams(lua_State* L, int num_upvalues);
 
-void luaCompat_setglobal(lua_State* L);
-
 int luaCompat_checkTagToCom(lua_State *L, int luaval);
 
 #ifdef __cplusplus
