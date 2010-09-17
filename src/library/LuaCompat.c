@@ -116,31 +116,23 @@ int luaCompat_newTypedObject(lua_State* L, void* object)
 
 
 void luaCompat_moduleSet(lua_State* L, const char* module, const char* key)
-{ /* lua5 */
+{
   LUASTACK_SET(L);
 
-  lua_pushstring(L, module);
-  lua_gettable(L, LUA_REGISTRYINDEX);
-
-  lua_pushstring(L, key);
-  lua_pushvalue(L, -3);
-  lua_settable(L, -3);
-
+  lua_getfield(L, LUA_REGISTRYINDEX, module);
+  lua_pushvalue(L, -2);
+  lua_setfield(L, -2, key);
   lua_pop(L, 2);
 
   LUASTACK_CLEAN(L, -1);
 }
 
 void luaCompat_moduleGet(lua_State* L, const char* module, const char* key)
-{ /* lua5 */
+{
   LUASTACK_SET(L);
 
-  lua_pushstring(L, module);
-  lua_gettable(L, LUA_REGISTRYINDEX);
-
-  lua_pushstring(L, key);
-  lua_gettable(L, -2);
-
+  lua_getfield(L, LUA_REGISTRYINDEX, module);
+  lua_getfield(L, -1, key);
   lua_remove(L, -2);
 
   LUASTACK_CLEAN(L, 1);
