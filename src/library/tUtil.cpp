@@ -11,6 +11,7 @@ static char const * const rcsname = "$Name:  $";
 #if !defined(__WINE__) || defined(__MSVCRT__)
 #include <process.h>
 #endif
+#include <limits.h>
 
 #include "tUtil.h"
 #include "tLuaCOMException.h"
@@ -65,113 +66,66 @@ const char *tUtil::GetErrorMessage(DWORD errorcode)
   return tUtil::string_buffer.getBuffer();
 }
 
+
+static size_t null_terminated; // special symbol used by bstr2string.
+
+
 const char * tUtil::bstr2string(BSTR bstr)
 {
-  char* str = NULL;
-  long size = 0;
-  int result = 0;
+  return bstr2string(bstr, null_terminated);
+}
 
+
+// note: if (&len == &null_terminated), then '\0' char is appended
+// to result, but returned len does not count '\0'.
+const char * tUtil::bstr2string(BSTR bstr, size_t& len)
+{
+  char* str = NULL;
   try
   {
-    if(bstr != NULL)
+    if(bstr == NULL) // NULL BSTR indicates empty string.
     {
-      // gets the size of the buffer
-      size = WideCharToMultiByte(
-        CP_UTF8,            // code page
-        0,            // performance and mapping flags
-        bstr,    // wide-character string
-        -1,          // number of chars in string
-        str,     // buffer for new string
-        0,          // size of buffer
-        NULL,     // default for unmappable chars
-        NULL  // set when default char used
-      );
-
-      if(!size)
-        LUACOM_ERROR(tUtil::GetErrorMessage(GetLastError()));
-
-      str = new char[size];
-
-      result = WideCharToMultiByte(
-        CP_UTF8,            // code page
-        0,            // performance and mapping flags
-        bstr,    // wide-character string
-        -1,          // number of chars in string
-        str,     // buffer for new string
-        size,          // size of buffer
-        NULL,     // default for unmappable chars
-        NULL  // set when default char used
-      );
-
-      if(!result)
-        LUACOM_ERROR(tUtil::GetErrorMessage(GetLastError()));
-
+      len = 0;
+      return "";
     }
     else
     {
-      str = new char[1];
-      str[0] = '\0';
-    }
-  }
-  catch(class tLuaCOMException& e)
-  {
-    UNUSED(e);
+      bool const use_null = (&len == &null_terminated); // add '\0' terminator?
 
-    if(str)
-      delete[] str;
+      UINT lenWide = SysStringLen(bstr); // not including '\0' terminator
+      if (lenWide > INT_MAX) LUACOM_ERROR("string too long");
 
-    str = new char[1];
-    str[0] = '\0';
-  }
-
-  tUtil::string_buffer.copyToBuffer(str);
-
-  delete[] str;
-
-  return tUtil::string_buffer.getBuffer();
-}
-
-const char * tUtil::bstr2string(BSTR bstr, size_t& computedSize)
-{
-  char* str = NULL;
-  long size = 0;
-  int result = 0;
-
-  computedSize = 0;
-
-  try
-  {
-    if(bstr != NULL)
-    {
-      computedSize = SysStringLen(bstr);
-      if(!computedSize) {
+      if(lenWide == 0)
+      {
+        len = 0;
         return "";
       }
 
-      // gets the size of the buffer
-      size = WideCharToMultiByte(
+      // gets string length
+      int lenMulti = WideCharToMultiByte(
         CP_UTF8,            // code page
         0,            // performance and mapping flags
         bstr,    // wide-character string
-        computedSize,  // number of chars in string
+        static_cast<int>(lenWide),  // number of chars in string
         str,     // buffer for new string
-        0,          // size of buffer
+        0,          // size of buffer (0=return it)
         NULL,     // default for unmappable chars
         NULL  // set when default char used
       );
 
-      if(!size)
+      if(!lenMulti)
         LUACOM_ERROR(tUtil::GetErrorMessage(GetLastError()));
 
-      str = new char[size];
+      struct C { C(int size) { s = new char[size]; }
+                ~C() { delete [] s; } char * s; } str(lenMulti);
 
-      result = WideCharToMultiByte(
+      int result = WideCharToMultiByte(
         CP_UTF8,            // code page
         0,            // performance and mapping flags
         bstr,    // wide-character string
-        computedSize,  // number of chars in string
-        str,     // buffer for new string
-        size,          // size of buffer
+        static_cast<int>(lenWide),  // number of chars in string
+        str.s,     // buffer for new string
+        lenMulti,          // size of buffer
         NULL,     // default for unmappable chars
         NULL  // set when default char used
       );
@@ -179,30 +133,19 @@ const char * tUtil::bstr2string(BSTR bstr, size_t& computedSize)
       if(!result)
         LUACOM_ERROR(tUtil::GetErrorMessage(GetLastError()));
       
-      computedSize = size;	// Now holds the actual length of the string
-    }
-    else
-    {
-      str = new char[1];
-      str[0] = '\0';
+      tUtil::string_buffer.copyToBuffer(str.s, lenMulti);
+      if (use_null) str.s[lenMulti] = '\0';
+      len = lenMulti;
+      return tUtil::string_buffer.getBuffer();
     }
   }
   catch(class tLuaCOMException& e)
   {
     UNUSED(e);
-
-    if(str)
-      delete[] str;
-
-    str = new char[1];
-    str[0] = '\0';
+    len = 0;
+    return "";
   }
 
-  tUtil::string_buffer.copyToBuffer(str, computedSize);
-
-  delete[] str;
-
-  return tUtil::string_buffer.getBuffer();
 }
 
 BSTR tUtil::string2bstr(const char * string, size_t len)
@@ -210,30 +153,30 @@ BSTR tUtil::string2bstr(const char * string, size_t len)
   if(!string)
     return NULL;
 
-  BSTR bstr;
-  if(len == 0)
+  try
   {
-    bstr = SysAllocStringLen(NULL, 0);
-  }
-  else
-  {
-    long wclength =
-      MultiByteToWideChar(CP_UTF8, 0, string, len, NULL, 0);
-    try
+    BSTR bstr;
+    if(len == 0)
     {
-      if(wclength == 0)
+      bstr = SysAllocStringLen(NULL, 0);
+    }
+    else
+    {
+      if (len != -1 && len > INT_MAX) LUACOM_ERROR("string too long");
+      int lenWide =
+        MultiByteToWideChar(CP_UTF8, 0, string, static_cast<int>(len), NULL, 0);
+      if(lenWide == 0)
         LUACOM_ERROR(tUtil::GetErrorMessage(GetLastError()));
+      bstr = SysAllocStringLen(NULL, lenWide); // plus initializes '\0' terminator
+      MultiByteToWideChar(  CP_UTF8, 0, string, static_cast<int>(len), bstr, lenWide);
     }
-    catch(class tLuaCOMException& e)
-    {
-      UNUSED(e);
-      return NULL;
-    }
-    bstr = SysAllocStringLen(NULL, wclength);
-    MultiByteToWideChar(CP_UTF8, 0, string, len, bstr, wclength);
+    return bstr;
   }
-
-  return bstr;
+  catch(class tLuaCOMException& e)
+  {
+    UNUSED(e);
+    return NULL;
+  }
 }
 
 bool tUtil::OpenLogFile(const char *name)
