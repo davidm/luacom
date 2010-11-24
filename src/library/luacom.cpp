@@ -253,12 +253,12 @@ static int luacom_Connect(lua_State *L)
 
     /* gets a reference to the implementation */
     lua_pushvalue(L, 2);
-    int ref = lua_ref(L, 1);
+    int ref = luaL_ref(L, LUA_REGISTRYINDEX);
 
     server_disp = 
       tLuaDispatch::CreateLuaDispatch(L, pTypeinfo, ref);
 
-    lua_unref(L, ref);
+    luaL_unref(L, LUA_REGISTRYINDEX, ref);
 
     CHECKPOSCOND(server_disp);
 
@@ -315,7 +315,7 @@ static tLuaCOM *luacom_ImplInterfaceFromTypelibHelper(lua_State *L)
   }
 
   lua_pushvalue(L, 1);
-  const int ref = lua_ref(L, 1);
+  const int ref = luaL_ref(L, LUA_REGISTRYINDEX);
 
   const char* typelib_name = luaL_checklstring(L, 2, NULL);
   const char* pcInterface = luaL_checklstring(L, 3, NULL);
@@ -347,7 +347,7 @@ static tLuaCOM *luacom_ImplInterfaceFromTypelibHelper(lua_State *L)
     lcom = 
       ImplInterface(L, typelib, clsid, pcInterface, ref);
 
-    lua_unref(L, ref);
+    luaL_unref(L, LUA_REGISTRYINDEX, ref);
 
     CHECKPOSCOND(lcom);
   }
@@ -397,7 +397,7 @@ static tLuaCOM *luacom_ImplInterfaceHelper(lua_State *L)
 
   // pushes lua table on top of stack
   lua_pushvalue(L, 1);
-  const int ref = lua_ref(L, 1);
+  const int ref = luaL_ref(L, LUA_REGISTRYINDEX);
 
   const char* pcProgID = luaL_checklstring(L, 2, NULL);
   const char* pcInterface = luaL_checklstring(L, 3, NULL);
@@ -423,7 +423,7 @@ static tLuaCOM *luacom_ImplInterfaceHelper(lua_State *L)
     lcom =
       ImplInterface(L, typelib, clsid, pcInterface, ref);
 
-    lua_unref(L, ref);
+    luaL_unref(L, LUA_REGISTRYINDEX, ref);
 
     COM_RELEASE(typelib);
 
@@ -794,7 +794,7 @@ static int luacom_NewObjectOrControl(lua_State *L, int type)
 
   // pushes lua table on top of stack
   lua_pushvalue(L, 1);
-  const int ref = lua_ref(L, 1);
+  const int ref = luaL_ref(L, LUA_REGISTRYINDEX);
 
   const char* pcProgID = luaL_checklstring(L, 2, NULL);
 
@@ -832,7 +832,7 @@ static int luacom_NewObjectOrControl(lua_State *L, int type)
       iluacom = 
         tLuaDispatch::CreateLuaDispatch(L, interface_typeinfo, ref);
 
-    lua_unref(L, ref);
+    luaL_unref(L, LUA_REGISTRYINDEX, ref);
 
 
     // Creates associated luacom object

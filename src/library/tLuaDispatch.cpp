@@ -164,7 +164,7 @@ tLuaDispatch::Release()
   if(--m_refs == 0)
   {
     // destrava tabela LUA
-    lua_unref(L, table_ref);
+    luaL_unref(L, LUA_REGISTRYINDEX, table_ref);
 
     // libera libs
 
@@ -284,7 +284,7 @@ tLuaDispatch::Invoke(
   }
 
   // gets a reference to the implementation table
-  lua_getref(L, table_ref);
+  lua_rawgeti(L, LUA_REGISTRYINDEX, table_ref);
   int implementation_table = lua_gettop(L);
 
   try
@@ -386,13 +386,13 @@ tLuaDispatch::Invoke(
 }
 
 STDMETHODIMP tLuaDispatch::PushIfSameState(lua_State *p_L) {
-  lua_getref(p_L, table_ref);
+  lua_rawgeti(L, LUA_REGISTRYINDEX, table_ref);
   if(lua_isnil(p_L, -1)) {
     lua_pop(p_L,1);
     return E_FAIL;
   }
   const void *p1 = lua_topointer(p_L, -1);
-  lua_getref(L, table_ref);
+  lua_rawgeti(L, LUA_REGISTRYINDEX, table_ref);
   const void *p2 = lua_topointer(L, -1);
   if(p1 == p2) {
     lua_pop(L, 1);
@@ -411,8 +411,8 @@ tLuaDispatch::tLuaDispatch(lua_State* p_L, ITypeInfo * pTypeinfo, int ref)
   L = p_L;
 
   // gets a locked reference to the implementation object
-  lua_getref(L, ref);
-  int locked_ref = lua_ref(L, 1);
+  lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
+  int locked_ref = luaL_ref(L, LUA_REGISTRYINDEX);
   table_ref = locked_ref;
 
   m_refs = 0;
@@ -493,7 +493,7 @@ tLuaDispatch * tLuaDispatch::CreateLuaDispatch(lua_State* L,
   tLuaDispatch *pdisp = 
     new tLuaDispatch(L, interface_typeinfo, ref);
 
-  lua_getref(L, ref);
+  lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
   lua_pushlightuserdata(L, idxDispatch);
   lua_pushlightuserdata(L, pdisp);
   lua_rawset(L,-3);
@@ -698,7 +698,7 @@ HRESULT tLuaDispatch::method(const char* name,
   /* converte parametros e empilha */
 
   // push self argument
-  lua_getref(L, table_ref);
+  lua_rawgeti(L, LUA_REGISTRYINDEX, table_ref);
   
   // push COM arguments
   typehandler->pushLuaArgs(

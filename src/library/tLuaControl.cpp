@@ -216,7 +216,7 @@ tLuaControl::tLuaControl(lua_State* L, ITypeInfo *pTypeinfo, int ref) : tLuaDisp
     // certain hosts don't like 0,0 as your initial size, so we're going to set
     // our initial size to 100,50 [so it's at least sort of visible on the screen]
     //
-    lua_getref(L, table_ref);
+    lua_rawgeti(L, LUA_REGISTRYINDEX, table_ref);
     lua_pushstring(L, "InitialSize");
     lua_gettable(L, -2);
     lua_pushvalue(L, -2);
@@ -275,7 +275,7 @@ tLuaControl::~tLuaControl() {
 }
 
 void tLuaControl::DestroyWindow() {
-    lua_getref(L, table_ref);
+    lua_rawgeti(L, LUA_REGISTRYINDEX, table_ref);
     lua_pushstring(L, "DestroyWindow");
     lua_gettable(L, -2);
     lua_pushvalue(L, -2);
@@ -396,7 +396,7 @@ STDMETHODIMP_(ULONG) tLuaControl::Release()
   if(--m_refs == 0)
   {
     // destrava tabela LUA
-    lua_unref(L, table_ref);
+    luaL_unref(L, LUA_REGISTRYINDEX, table_ref);
 
     // libera libs
 
@@ -820,7 +820,7 @@ STDMETHODIMP tLuaControl::Update() {
 //
 STDMETHODIMP tLuaControl::GetUserClassID(CLSID* pClsid) {
   if(!pClsid) return E_POINTER;
-    lua_getref(L, table_ref);
+    lua_rawgeti(L, LUA_REGISTRYINDEX, table_ref);
   lua_pushstring(L, "GetClass");
   lua_gettable(L, -2);
   lua_pushvalue(L, -2);
@@ -879,7 +879,7 @@ STDMETHODIMP tLuaControl::SetExtent(DWORD  dwDrawAspect, SIZEL *psizel)
         // first call the user version.  if they return FALSE, they want
         // to keep their current size
         //
-        lua_getref(L, table_ref);
+        lua_rawgeti(L, LUA_REGISTRYINDEX, table_ref);
         lua_pushstring(L, "SetExtent");
         lua_gettable(L, -2);
         lua_pushvalue(L, -2);
@@ -1847,7 +1847,7 @@ HWND tLuaControl::CreateInPlaceWindow(int x, int y, BOOL fNoRedraw)
     //
     m_fCreatingWindow = TRUE;
 
-    lua_getref(L, table_ref);
+    lua_rawgeti(L, LUA_REGISTRYINDEX, table_ref);
     lua_pushstring(L, "CreateWindow");
     lua_gettable(L, -2);
     lua_pushvalue(L, -2);
@@ -2212,7 +2212,7 @@ tLuaControl *tLuaControl::CreateLuaControl(lua_State* L,
   tLuaControl *pcont = 
     new tLuaControl(L, interface_typeinfo, ref);
 
-  lua_getref(L, ref);
+  lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
   lua_pushlightuserdata(L, idxDispatch);
   lua_pushlightuserdata(L, pcont);
   lua_rawset(L,-3);
