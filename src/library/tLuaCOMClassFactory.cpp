@@ -109,7 +109,7 @@ tLuaCOMClassFactory::tLuaCOMClassFactory(lua_State* L)
   m_cRef = 0;
 
   L_inproc = L;
-  lua_getregistry(L);
+  lua_pushvalue(L, LUA_REGISTRYINDEX);
   lua_pushstring(L,"object");
   lua_gettable(L,-2);
   object = (IDispatch*)luaCompat_getPointer(L,-1);

@@ -147,7 +147,7 @@ static lua_State* luacom_DoRegistryFile(const char* luaclsid) {
     #endif
 
     luacom_open(L_inproc);
-    lua_getregistry(L_inproc);
+    lua_pushvalue(L_inproc, LUA_REGISTRYINDEX);
     lua_pushstring(L_inproc,"inproc");
     lua_pushboolean(L_inproc,TRUE);
     lua_settable(L_inproc,-3);

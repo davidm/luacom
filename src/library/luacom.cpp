@@ -930,7 +930,7 @@ static int luacom_ExposeObject(lua_State *L)
 
     if(luacom_runningInprocess(L)) {
       // Inprocess "registration": stores object in the Lua registry
-      lua_getregistry(L);
+      lua_pushvalue(L, LUA_REGISTRYINDEX);
       lua_pushstring(L,"object");
       lua_pushlightuserdata(L,(void*)luacom->GetIDispatch());
       lua_settable(L,-3);
@@ -2391,7 +2391,7 @@ static int tagmeth_index(lua_State *L)
 }
 
 static bool luacom_runningInprocess(lua_State* L) {
-  lua_getregistry(L);
+  lua_pushvalue(L, LUA_REGISTRYINDEX);
   lua_pushstring(L,"inproc");
   lua_gettable(L,-2);
   bool inproc = lua_toboolean(L,-1) != 0;
