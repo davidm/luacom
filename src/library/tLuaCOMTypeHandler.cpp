@@ -125,8 +125,7 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
   VARIANT varg;
   VariantInit(&varg);
 
-  lua_pushstring(L,"luacom");
-  lua_gettable(L, LUA_GLOBALSINDEX);
+  lua_getglobal(L,"luacom");
   lua_pushstring(L,"TableVariants");
   lua_gettable(L, -2);
   bool table_variants = lua_toboolean(L, -1) != 0;
@@ -205,8 +204,7 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
 
       case VT_DATE:
         {
-          lua_pushstring(L,"luacom");
-          lua_gettable(L, LUA_GLOBALSINDEX);
+          lua_getglobal(L,"luacom");
           lua_pushstring(L,"DateFormat");
           lua_gettable(L, -2);
           const char *dateformat = lua_tostring(L, -1);
@@ -439,8 +437,7 @@ tLuaCOM *tLuaCOMTypeHandler::convert_table(lua_State *L, stkIndex luaval)
   lua_gettable(L, table);
   if(!lua_isnil(L, -1))
   {
-    lua_pushstring(L, "luacom");
-    lua_gettable(L, LUA_GLOBALSINDEX);
+    lua_getglobal(L, "luacom");
     lua_pushstring(L, "ImplInterfaceFromTypelib");
     lua_gettable(L, -2);
     lua_remove(L, -2);
@@ -459,8 +456,7 @@ tLuaCOM *tLuaCOMTypeHandler::convert_table(lua_State *L, stkIndex luaval)
   else
   {
     lua_pop(L, 1);
-    lua_pushstring(L, "luacom");
-    lua_gettable(L, LUA_GLOBALSINDEX);
+    lua_getglobal(L, "luacom");
     lua_pushstring(L, "ImplInterface");
     lua_gettable(L, -2);
     lua_remove(L, -2);
