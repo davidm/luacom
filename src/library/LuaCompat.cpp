@@ -24,7 +24,7 @@ extern "C" {
 
 /* Lua 5 version of the API */
 
-void luaCompat_openlib(lua_State* L, const char* libname, const struct luaL_reg* funcs)
+void luaCompat_openlib(lua_State* L, const char* libname, const struct luaL_Reg* funcs)
 { /* lua5 */
   LUASTACK_SET(L);
 

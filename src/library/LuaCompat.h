@@ -9,7 +9,7 @@
 #ifndef __LUACOMPAT_H
 #define __LUACOMPAT_H
 
-void luaCompat_openlib(lua_State* L, const char* libname, const struct luaL_reg* funcs);
+void luaCompat_openlib(lua_State* L, const char* libname, const struct luaL_Reg* funcs);
 int luaCompat_call(lua_State* L, int nargs, int nresults, const char** pErrMsg);
 
 void luaCompat_newLuaType(lua_State* L, const char* module_name, const char* name);

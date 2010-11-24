@@ -2459,7 +2459,7 @@ static int luacom_RoundTrip(lua_State *L) {
 //                                         //
 /////////////////////////////////////////////
 
-static struct luaL_reg functions_tb []= 
+static struct luaL_Reg functions_tb []= 
 {
   {"CreateObject",luacom_CreateObject},
   {"GetObject",luacom_GetObject},
