@@ -37,17 +37,19 @@ bool tUtil::IsValidString(LPCTSTR string)
 
 const char *tUtil::GetErrorMessage(DWORD errorcode)
 {
-  LPTSTR lpMsgBuf;
+  LPSTR lpMsgBuf;
   DWORD result = 0;
 
-  result = FormatMessage( 
+  result = FormatMessageA( 
     FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
     NULL,
     errorcode,
     MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-    (LPTSTR) &lpMsgBuf,
+    (LPSTR)&lpMsgBuf,
     0,
     NULL);
+  // note: non-Unicode (FormatMessageA not FormatMessage/LPTSTR).  How would we
+  // propogate Unicode error messages to Lua?
 
   if(result == 0)
     return NULL;
@@ -58,7 +60,7 @@ const char *tUtil::GetErrorMessage(DWORD errorcode)
     result--;
   lpMsgBuf[result] = '\0';
 
-  tUtil::string_buffer.copyToBuffer((char *) lpMsgBuf);
+  tUtil::string_buffer.copyToBuffer(lpMsgBuf);
 
   // Free the buffer.
   LocalFree( lpMsgBuf );
