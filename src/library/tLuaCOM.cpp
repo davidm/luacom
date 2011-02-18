@@ -24,7 +24,7 @@ static char const * const rcsname = "$Name:  $";
 DEFINE_GUID(IID_IProxyManager, 0x00000008, 0x0000, 0x0000, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46);
 #endif
 
-long tLuaCOM::NEXT_ID = 0;
+volatile long tLuaCOM::NEXT_ID = 0;
 
 tLuaCOM::tLuaCOM(lua_State* L,
                  IDispatch *pdisp_arg,
@@ -84,7 +84,7 @@ tLuaCOM::tLuaCOM(lua_State* L,
   for(i = 0; i < MAX_FUNCINFOS; i++)
     pFuncInfo[i].name = NULL;
 
-  ID = tLuaCOM::NEXT_ID++;
+  ID = InterlockedIncrement(&(tLuaCOM::NEXT_ID));
 
 #ifdef VERBOSE
   {

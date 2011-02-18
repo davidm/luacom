@@ -22,7 +22,7 @@ static char const * const rcsname = "$Name:  $";
 #define GUIDKIND_DEFAULT_SOURCE_DISP_IID 1
 #endif
 
-long tLuaDispatch::NEXT_ID = 0;
+volatile long tLuaDispatch::NEXT_ID = 0;
 
 tLuaDispatch::ProvideClassInfo2::ProvideClassInfo2(ITypeInfo* p_coclassinfo,
                                                    IUnknown* p_pUnk)
@@ -476,7 +476,7 @@ tLuaDispatch::tLuaDispatch(lua_State* p_L, ITypeInfo * pTypeinfo, int ref)
   cpc = NULL;
   classinfo2 = NULL;
 
-  ID = tLuaDispatch::NEXT_ID++;
+  ID = InterlockedIncrement(&(tLuaDispatch::NEXT_ID));
   tUtil::log_verbose("tLuaDispatch", "%.4d:created", ID);
 
   // agora sim esta' inicializado

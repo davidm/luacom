@@ -77,7 +77,7 @@ public:
    bool getConstant(lua_State* L, const char* name);
    bool getDISPID(const char* name, DISPID* dispid);
 
-  static long NEXT_ID;
+  volatile static long NEXT_ID;
 protected:
   ITypeComp* ptcomp;
   ITypeComp* plib_tcomp;

@@ -147,7 +147,7 @@ protected:
   int table_ref;
 
 private:
-  static long NEXT_ID;
+  volatile static long NEXT_ID;
   long ID;
 
 };
