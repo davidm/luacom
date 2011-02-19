@@ -154,6 +154,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="htmlhelp.lib shlwapi.lib lua$(LUA_SUFFIX).lib"
+				OutputFile="$(OutDir)\$(ProjectName)"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="../../lua5.1/lib"
 				ModuleDefinitionFile="..\src\dll\luacom_dll.def"
