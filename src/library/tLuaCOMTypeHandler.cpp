@@ -213,7 +213,7 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
             HRESULT hr = VariantChangeType(&new_varg, &varg, 0, VT_BSTR);
             CHK_COM_CODE(hr);
 
-            lua_pushstring(L, (char *) tUtil::bstr2string(new_varg.bstrVal));
+            lua_pushstring(L, tUtil::bstr2string(new_varg.bstrVal));
           } else if(strcmp("table",dateformat)==0) {
             SYSTEMTIME date;
             VariantTimeToSystemTime(varg.date,&date);
@@ -403,7 +403,7 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
 
       default:
         {
-          static char msg[100];
+          char msg[100];
 
           sprintf(msg, "COM->Lua - Type 0x%.2x not implemented.", varg.vt);
 

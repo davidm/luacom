@@ -32,7 +32,7 @@ protected:
   static int index(lua_State* L);
 
   static const char* type_name;
-  static const char* module_name;
+  static const char module_name_key;
   static const char* pointer_type_name;
   IEnumVARIANT* pEV;
 

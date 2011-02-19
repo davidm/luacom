@@ -53,8 +53,11 @@ extern "C" int luaopen_luacom(lua_State* L) {
 
 
 static lua_State* factoryCache; // Maps CLSIDs to factories
+CRITICAL_SECTION cs_factoryCache;
 
 static void factoryCache_Init() {
+  InitializeCriticalSection(&cs_factoryCache);
+
 #ifdef IUP
   /* iup initialization */
   IupOpen();
@@ -76,6 +79,7 @@ static void factoryCache_Init() {
 }
 
 static tLuaCOMClassFactory* factoryCache_GetFactory(const char* luaclsid) {
+  CriticalSectionObject cs(&cs_factoryCache); // won't let other threads enter till it goes out of scope
   lua_getglobal(factoryCache,"factories");
   lua_pushstring(factoryCache,luaclsid);
   lua_gettable(factoryCache,-2);
@@ -85,6 +89,7 @@ static tLuaCOMClassFactory* factoryCache_GetFactory(const char* luaclsid) {
 }
 
 static void factoryCache_PutFactory(const char* luaclsid, tLuaCOMClassFactory* pFactory) {
+  CriticalSectionObject cs(&cs_factoryCache); // won't let other threads enter till it goes out of scope
   pFactory->AddRef();
   lua_getglobal(factoryCache,"factories");
   lua_pushstring(factoryCache,luaclsid);
@@ -94,6 +99,7 @@ static void factoryCache_PutFactory(const char* luaclsid, tLuaCOMClassFactory* p
 }
 
 static void factoryCache_Release() {
+  CriticalSectionObject cs(&cs_factoryCache); // won't let other threads enter till it goes out of scope
   lua_getglobal(factoryCache,"factories");
     lua_pushnil(factoryCache); 
     while(lua_next(factoryCache,-2) != 0) {

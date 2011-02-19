@@ -16,10 +16,29 @@ static char const * const rcsname = "$Name:  $";
 #include "tUtil.h"
 #include "tLuaCOMException.h"
 
-tStringBuffer tUtil::string_buffer = tStringBuffer();
-FILE* tUtil::log_file = NULL;
+extern "C"
+{
+#include <lua.h>
+#include <lauxlib.h>
+}
+
 
 #define MAX_VALID_STRING_SIZE 1000
+
+
+FILE* tUtil::log_file = NULL;
+CRITICAL_SECTION log_file_cs;
+volatile bool g_log_file_cs_initialized = false;
+// log methods are all static; there's no clear initialization time;
+// so just always check that the CS is initialized before using it
+void CSInit()
+{
+  if(!g_log_file_cs_initialized)
+  {
+	  g_log_file_cs_initialized = true;
+	  InitializeCriticalSection(&log_file_cs);
+  }
+}
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -35,7 +54,7 @@ bool tUtil::IsValidString(LPCTSTR string)
   return return_value;
 }
 
-const char *tUtil::GetErrorMessage(DWORD errorcode)
+tStringBuffer tUtil::GetErrorMessage(DWORD errorcode)
 {
   LPSTR lpMsgBuf;
   DWORD result = 0;
@@ -60,27 +79,25 @@ const char *tUtil::GetErrorMessage(DWORD errorcode)
     result--;
   lpMsgBuf[result] = '\0';
 
-  tUtil::string_buffer.copyToBuffer(lpMsgBuf);
+  tStringBuffer ret(lpMsgBuf);
 
   // Free the buffer.
   LocalFree( lpMsgBuf );
 
-  return tUtil::string_buffer.getBuffer();
+  return ret;
 }
 
 
-static size_t null_terminated; // special symbol used by bstr2string.
-
-
-const char * tUtil::bstr2string(BSTR bstr)
+tStringBuffer tUtil::bstr2string(BSTR bstr)
 {
-  return bstr2string(bstr, null_terminated);
+  size_t dontcare = 0;
+  return bstr2string(bstr, dontcare, true);
 }
 
 
-// note: if (&len == &null_terminated), then '\0' char is appended
+// note: if appendNull, then '\0' char is appended
 // to result, but returned len does not count '\0'.
-const char * tUtil::bstr2string(BSTR bstr, size_t& len)
+tStringBuffer tUtil::bstr2string(BSTR bstr, size_t& len, bool appendNull)
 {
   char* str = NULL;
   try
@@ -92,7 +109,6 @@ const char * tUtil::bstr2string(BSTR bstr, size_t& len)
     }
     else
     {
-      bool const use_null = (&len == &null_terminated); // add '\0' terminator?
 
       UINT lenWide = SysStringLen(bstr); // not including '\0' terminator
       if (lenWide > INT_MAX) LUACOM_ERROR("string too long");
@@ -119,7 +135,7 @@ const char * tUtil::bstr2string(BSTR bstr, size_t& len)
         LUACOM_ERROR(tUtil::GetErrorMessage(GetLastError()));
 
       struct C { C(int size) { s = new char[size]; }
-                ~C() { delete [] s; } char * s; } str(lenMulti);
+		~C() { delete [] s; } char * s; } str(lenMulti + (appendNull? 1 : 0));
 
       int result = WideCharToMultiByte(
         CP_UTF8,            // code page
@@ -135,10 +151,9 @@ const char * tUtil::bstr2string(BSTR bstr, size_t& len)
       if(!result)
         LUACOM_ERROR(tUtil::GetErrorMessage(GetLastError()));
       
-      tUtil::string_buffer.copyToBuffer(str.s, lenMulti);
-      if (use_null) str.s[lenMulti] = '\0';
+      if (appendNull) str.s[lenMulti] = '\0';
       len = lenMulti;
-      return tUtil::string_buffer.getBuffer();
+      return tStringBuffer(str.s);
     }
   }
   catch(class tLuaCOMException& e)
@@ -183,6 +198,7 @@ BSTR tUtil::string2bstr(const char * string, size_t len)
 
 bool tUtil::OpenLogFile(const char *name)
 {
+  CSInit();CriticalSectionObject cs(&log_file_cs); // prevent other threads from concurrent access
   tUtil::CloseLogFile();
 
   tUtil::log_file = fopen(name, "w");
@@ -195,6 +211,7 @@ bool tUtil::OpenLogFile(const char *name)
 
 void tUtil::CloseLogFile()
 {
+  CSInit();CriticalSectionObject cs(&log_file_cs); // prevent other threads from concurrent access
   if(tUtil::log_file)
   {
     fclose(tUtil::log_file);
@@ -204,6 +221,7 @@ void tUtil::CloseLogFile()
 
 void tUtil::log(const char *who, const char *what, ...)
 {
+  CSInit();CriticalSectionObject cs(&log_file_cs); // prevent other threads from concurrent access
   if(tUtil::log_file && who && what)
   {
     int size = 0;
@@ -245,6 +263,7 @@ void tUtil::log(const char *who, const char *what, ...)
 
 void tUtil::log_verbose(const char *who, const char *what, ...)
 {
+  CSInit();CriticalSectionObject cs(&log_file_cs); // prevent other threads from concurrent access
 #ifdef VERBOSE
   if(tUtil::log_file && who && what)
   {
@@ -308,4 +327,20 @@ void tUtil::ShowHelp(const char *filename, unsigned long context)
     else
       WinHelpA(NULL, filename, HELP_FINDER, 0);
   }
+}
+
+void tUtil::RegistrySetString(lua_State* L, const char& Key, const char* value)
+{
+	lua_pushlightuserdata(L, (void *)&Key);  /* push address */ 
+	lua_pushstring(L, value); 
+	/* registry[&Key] = value */ 
+    lua_settable(L, LUA_REGISTRYINDEX); 
+}
+
+const char* tUtil::RegistryGetString(lua_State* L, const char& Key)
+{
+	lua_pushlightuserdata(L, (void *)&Key);  /* push address */ 
+    lua_gettable(L, LUA_REGISTRYINDEX);  /* retrieve value */ 
+    return lua_tostring(L, -1);  /* convert to string */
+	// NOTE this ptr will only be valid till it comes off the stack!
 }

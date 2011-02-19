@@ -1808,7 +1808,7 @@ int luacom_ImportIUnknown(lua_State* L)
 // Returns current directory
 int luacom_GetCurrentDirectory(lua_State* L)
 {
-  static char buffer[1025];
+  char buffer[1025];
 
   DWORD size = GetCurrentDirectoryA(1024, buffer);
 

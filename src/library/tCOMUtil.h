@@ -7,6 +7,7 @@
 
 #include <windows.h>
 #include <oleauto.h>
+#include "tStringBuffer.h"
 
 class tCOMUtil  
 {
@@ -14,7 +15,7 @@ public:
   static HRESULT GUID2String(GUID& Guid, char** ppGuid);
   static const char* getPrintableTypeKind(const TYPEKIND tkind);
   static const char* getPrintableInvokeKind(const INVOKEKIND invkind);
-  static const char* getPrintableTypeDesc(const TYPEDESC& tdesc);
+  static tStringBuffer getPrintableTypeDesc(const TYPEDESC& tdesc);
   static void DumpTypeInfo(ITypeInfo* typeinfo);
     static bool GetRegKeyValue(const char* key, char** pValue);
   static bool SetRegKeyValue(const char* key, const char* subkey, const char* value);

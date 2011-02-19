@@ -6,18 +6,19 @@
 #define AFX_TLUACOMEXCEPTION_H__26509908_AFD8_11D4_B882_0000B45D7541__INCLUDED_
 
 #include <windows.h>
+#include "tStringBuffer.h"
 
 class tLuaCOMException  
 {
 public:
   void getDebugMessage(void);
-  const char * getMessage(void);
+  tStringBuffer getMessage(void);
   enum Errors {INTERNAL_ERROR, PARAMETER_OUT_OF_RANGE,
     TYPECONV_ERROR, COM_ERROR, COM_EXCEPTION, UNSUPPORTED_FEATURE,
     WINDOWS_ERROR, LUACOM_ERROR, MALLOC_ERROR
   };
 
-  static const char *GetErrorMessage(DWORD errorcode);
+  static tStringBuffer GetErrorMessage(DWORD errorcode);
 
   tLuaCOMException(Errors p_code, const char *p_file, int p_line, const char *usermessage = NULL);
   virtual ~tLuaCOMException();

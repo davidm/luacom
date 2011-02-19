@@ -9,6 +9,7 @@ extern "C"
 {
 #include "lua.h"
 }
+#include "tStringBuffer.h"
 
 typedef int stkIndex;
 
@@ -18,7 +19,7 @@ public:
   static void printLuaTable(lua_State *L, stkIndex index);
   static void printLuaStack(lua_State *L);
   static void printPreDump(int expected);
-  static const char* makeLuaErrorMessage(int return_value, const char* msg);
+  static tStringBuffer makeLuaErrorMessage(int return_value, const char* msg);
   LuaAux();
   virtual ~LuaAux();
 
@@ -27,9 +28,10 @@ public:
 #include <assert.h>
 
 #define LUASTACK_SET(L) const int __LuaAux_luastack_top_index = lua_gettop(L)
+#define LUASTACK_DOCLEAN(L, n) lua_settop(L, __LuaAux_luastack_top_index + n)
 
 #ifdef NDEBUG
-#define LUASTACK_CLEAN(L, n) lua_settop(L, __LuaAux_luastack_top_index + n)
+#define LUASTACK_CLEAN(L, n) LUASTACK_DOCLEAN(L, n)
 #else
 #define LUASTACK_CLEAN(L, n) if((__LuaAux_luastack_top_index + n) != lua_gettop(L)) { LuaAux::printPreDump(__LuaAux_luastack_top_index + n); LuaAux::printLuaStack(L); assert(0); }
 #endif

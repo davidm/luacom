@@ -800,9 +800,9 @@ const char* tCOMUtil::getPrintableInvokeKind(const INVOKEKIND invkind)
   return NULL;
 }
 
-const char* tCOMUtil::getPrintableTypeDesc(const TYPEDESC& tdesc)
+tStringBuffer tCOMUtil::getPrintableTypeDesc(const TYPEDESC& tdesc)
 {
-  static char buffer[200];
+  char buffer[200];
   buffer[0] = '\0';
 
   switch(tdesc.vt & ~(VT_ARRAY | VT_BYREF))
@@ -878,7 +878,7 @@ const char* tCOMUtil::getPrintableTypeDesc(const TYPEDESC& tdesc)
   if(tdesc.vt & VT_ARRAY)
     strcat(buffer, "[]");
 
-  return buffer;
+  return tStringBuffer(buffer);
 }
 
 const char* tCOMUtil::getPrintableTypeKind(const TYPEKIND tkind)

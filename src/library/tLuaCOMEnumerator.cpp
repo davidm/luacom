@@ -18,7 +18,9 @@
 
 const char *tLuaCOMEnumerator::type_name = "__ENUMERATOR_LUACOM_TYPE"; 
 const char *tLuaCOMEnumerator::pointer_type_name = "__ENUMERATOR_POINTER_LUACOM_TYPE"; 
-const char *tLuaCOMEnumerator::module_name = NULL; 
+// the address of each static is a unique memory location used as the key to the lua registry
+// see http://www.lua.org/pil/27.3.1.html
+const char tLuaCOMEnumerator::module_name_key = 'k';
 
 #define ENUMERATOR_FIELD "__TLUACOMENUMERATOR__internal"
 
@@ -62,10 +64,13 @@ void tLuaCOMEnumerator::push(lua_State* L)
 {
   LUASTACK_SET(L);
 
+  tStringBuffer module_name(tUtil::RegistryGetString(L, module_name_key));
+  LUASTACK_DOCLEAN(L, 0);
+
   // creates table
   lua_newtable(L);
   luaCompat_pushTypeByName(L, 
-    tLuaCOMEnumerator::module_name, 
+    module_name, 
     tLuaCOMEnumerator::type_name);
 
   lua_setmetatable(L, -2);
@@ -74,7 +79,7 @@ void tLuaCOMEnumerator::push(lua_State* L)
 
   // pushes typed pointer
   luaCompat_pushTypeByName(L, 
-    tLuaCOMEnumerator::module_name, 
+    module_name, 
     tLuaCOMEnumerator::pointer_type_name);
 
   luaCompat_newTypedObject(L, this);
@@ -104,18 +109,21 @@ void tLuaCOMEnumerator::registerLuaType(lua_State *L, const char *module)
 {
   LUASTACK_SET(L);
 
-  tLuaCOMEnumerator::module_name = module;
+  tStringBuffer module_name(module);
+  // store value for later use (used to be DLL-static)
+  tUtil::RegistrySetString(L, module_name_key, module_name);
+  LUASTACK_CLEAN(L, 0);
 
   luaCompat_newLuaType(L, 
-    tLuaCOMEnumerator::module_name, 
+    module_name, 
     tLuaCOMEnumerator::type_name);
 
   luaCompat_newLuaType(L, 
-    tLuaCOMEnumerator::module_name, 
+    module_name, 
     tLuaCOMEnumerator::pointer_type_name);
 
   luaCompat_pushTypeByName(L, 
-    tLuaCOMEnumerator::module_name, 
+    module_name, 
     tLuaCOMEnumerator::type_name);
 
   lua_pushcfunction(L, tLuaCOMEnumerator::index);
@@ -124,7 +132,7 @@ void tLuaCOMEnumerator::registerLuaType(lua_State *L, const char *module)
   lua_pop(L, 1);
 
   luaCompat_pushTypeByName(L, 
-    tLuaCOMEnumerator::module_name, 
+    module_name, 
     tLuaCOMEnumerator::pointer_type_name);
 
   lua_pushcfunction(L, tLuaCOMEnumerator::garbagecollect);

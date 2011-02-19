@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include "tStringBuffer.h"  // Added by ClassView
 
+struct lua_State;
 class tUtil  
 {
 public:
@@ -19,13 +20,30 @@ public:
   static void CloseLogFile(void);
   static bool OpenLogFile(const char *name);
   static BSTR string2bstr(const char *string, size_t len = -1);
-  static const char * bstr2string(BSTR bstr);
-  static const char * bstr2string(BSTR bstr, size_t& computedSize);
-  static const char *GetErrorMessage(DWORD errorcode);
+  static tStringBuffer bstr2string(BSTR bstr);
+  static tStringBuffer bstr2string(BSTR bstr, size_t& computedSize, bool appendNull = false);
+  static tStringBuffer GetErrorMessage(DWORD errorcode);
   static bool IsValidString(LPCTSTR string);
+  static void RegistrySetString(lua_State* L, const char& Key, const char* value);
+  static const char* RegistryGetString(lua_State* L, const char& Key);
 
-  static tStringBuffer string_buffer;
   static FILE* log_file;
+};
+
+class CriticalSectionObject
+{
+protected:
+	LPCRITICAL_SECTION m_cs;
+public:
+	CriticalSectionObject(LPCRITICAL_SECTION cs)
+	{
+		m_cs = cs;
+		EnterCriticalSection(m_cs);
+	}
+	~CriticalSectionObject()
+	{
+		LeaveCriticalSection(m_cs);
+	}
 };
 
 // algumas macros uteis

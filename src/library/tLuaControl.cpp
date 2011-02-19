@@ -44,14 +44,12 @@ const OLEVERB verbs[] = {
 
 #define ASSERT(fTest, szMsg)                                \
     if (!(fTest))  {                                        \
-        static char szMsgCode[] = szMsg;                    \
-        static char szAssert[] = #fTest;                    \
-        DisplayAssert(szMsgCode, szAssert, __FILE__, __LINE__); \
+		DisplayAssert(szMsg, #fTest, __FILE__, __LINE__); \
     }
 
 #define FAIL(szMsg)                                         \
-        { static const char szMsgCode[] = szMsg;                    \
-        DisplayAssert(szMsgCode, "FAIL", __FILE__, __LINE__); }
+        { \
+        DisplayAssert(szMsg, "FAIL", __FILE__, __LINE__); }
 
 // macro that checks a pointer for validity on input
 //

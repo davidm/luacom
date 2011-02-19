@@ -45,9 +45,9 @@ tLuaCOMException::~tLuaCOMException()
 
 
 
-const char * tLuaCOMException::getMessage()
+tStringBuffer tLuaCOMException::getMessage()
 {
-  static char string[5000];
+  char string[5000];
   char error_position[1000];
 
 
@@ -67,10 +67,10 @@ const char * tLuaCOMException::getMessage()
     strncat(string, usermessage, sizeof(string) - strlen(string) - 1);
   }
 
-  return string;
+  return tStringBuffer(string);
 }
 
-const char *tLuaCOMException::GetErrorMessage(DWORD errorcode)
+tStringBuffer tLuaCOMException::GetErrorMessage(DWORD errorcode)
 {
   return tUtil::GetErrorMessage(errorcode);
 }

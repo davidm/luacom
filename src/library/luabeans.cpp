@@ -14,10 +14,11 @@ extern "C"
 #include "LuaAux.h"
 #include "tUtil.h"
 
-char* LuaBeans::tag_name          = NULL;
-char* LuaBeans::udtag_name        = NULL;
-LuaBeans::Events* LuaBeans::pEvents         = NULL;
-const char* LuaBeans::module_name = NULL;
+// the address of each static is a unique memory location used as the key to the lua registry
+// see http://www.lua.org/pil/27.3.1.html
+const char LuaBeans::tag_name_key = 'k';
+const char LuaBeans::udtag_name_key = 'k';
+const char LuaBeans::module_name_key = 'k';
 
 void LuaBeans::createBeans(lua_State *L,
                            const char* p_module_name,
@@ -27,28 +28,38 @@ void LuaBeans::createBeans(lua_State *L,
 
   char lua_name[500];
 
-  module_name = tUtil::strdup(p_module_name);
-
+  tStringBuffer module_name(p_module_name);
   sprintf(lua_name, "%s" ,name);
-  tag_name = tUtil::strdup(lua_name);
+  tStringBuffer tag_name(lua_name);
   luaCompat_newLuaType(L, module_name, tag_name);
 
   sprintf(lua_name,"%s_UDTAG",name);
-  udtag_name = tUtil::strdup(lua_name);
+  tStringBuffer udtag_name(lua_name);
   luaCompat_newLuaType(L, module_name, udtag_name);
+
+  // store values for later use (used to be DLL-statics)
+  tUtil::RegistrySetString(L, module_name_key, module_name);
+  tUtil::RegistrySetString(L, tag_name_key, tag_name);
+  tUtil::RegistrySetString(L, udtag_name_key, udtag_name);
+
   LUASTACK_CLEAN(L, 0);
 }
 
 
-void LuaBeans::Clean()
+/*void LuaBeans::Clean()
 {
   free(LuaBeans::tag_name);
   free(LuaBeans::udtag_name);
-}
+}*/
 
 void LuaBeans::registerObjectEvents(lua_State* L, class Events& events)
 {
   LUASTACK_SET(L);
+
+  tStringBuffer module_name(tUtil::RegistryGetString(L, module_name_key));
+  tStringBuffer tag_name(tUtil::RegistryGetString(L, tag_name_key));
+  tStringBuffer udtag_name(tUtil::RegistryGetString(L, udtag_name_key));
+  LUASTACK_DOCLEAN(L, 0);
 
   luaCompat_pushTypeByName(L, module_name, tag_name);
 
@@ -92,6 +103,11 @@ void LuaBeans::registerPointerEvents(lua_State* L, class Events& events)
 {
   LUASTACK_SET(L);
 
+  tStringBuffer module_name(tUtil::RegistryGetString(L, module_name_key));
+  tStringBuffer tag_name(tUtil::RegistryGetString(L, tag_name_key));
+  tStringBuffer udtag_name(tUtil::RegistryGetString(L, udtag_name_key));
+  LUASTACK_DOCLEAN(L, 0);
+
   luaCompat_pushTypeByName(L, module_name, udtag_name);
 
   if(events.gettable)
@@ -128,6 +144,11 @@ void LuaBeans::push(lua_State* L, void* userdata )
 {
   LUASTACK_SET(L);
 
+  tStringBuffer module_name(tUtil::RegistryGetString(L, module_name_key));
+  tStringBuffer tag_name(tUtil::RegistryGetString(L, tag_name_key));
+  tStringBuffer udtag_name(tUtil::RegistryGetString(L, udtag_name_key));
+  LUASTACK_DOCLEAN(L, 0);
+
   lua_newtable(L);
 
   lua_pushstring(L, "_USERDATA_REF_");
@@ -155,6 +176,11 @@ void* LuaBeans::check_tag(lua_State* L, int index)
 void* LuaBeans::from_lua(lua_State* L, int index)
 {
   LUASTACK_SET(L);
+
+  tStringBuffer module_name(tUtil::RegistryGetString(L, module_name_key));
+  tStringBuffer tag_name(tUtil::RegistryGetString(L, tag_name_key));
+  tStringBuffer udtag_name(tUtil::RegistryGetString(L, udtag_name_key));
+  LUASTACK_DOCLEAN(L, 0);
 
   void *obj = NULL;
 

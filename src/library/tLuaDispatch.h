@@ -114,7 +114,6 @@ protected:
   lua_State* L;
   IID interface_iid;
   tLuaCOMTypeHandler * typehandler;
-  static int tag;
 
   unsigned long m_refs;
 

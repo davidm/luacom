@@ -98,9 +98,9 @@ void LuaAux::printLuaTable(lua_State *L, stkIndex t)
   }
 }
 
-const char* LuaAux::makeLuaErrorMessage(int return_value, const char* msg)
+tStringBuffer LuaAux::makeLuaErrorMessage(int return_value, const char* msg)
 {
-  static char message[1000];
+  char message[1000];
   message[0] = '\0';
 
   if(return_value == 0)
