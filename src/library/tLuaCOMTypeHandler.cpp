@@ -281,10 +281,10 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
             lua_pushstring(L, "string");
             lua_settable(L, -3);
             lua_pushstring(L, "Value");
-            lua_pushlstring(L, str, str.getSize());
+            lua_pushlstring(L, str, str.getSize()-1);
             lua_settable(L, -3);
           } else {
-              lua_pushlstring(L, str, str.getSize());
+              lua_pushlstring(L, str, str.getSize()-1);
           }
 
           break;

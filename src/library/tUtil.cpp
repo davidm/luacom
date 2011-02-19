@@ -88,7 +88,7 @@ tStringBuffer tUtil::GetErrorMessage(DWORD errorcode)
 }
 
 
-tStringBuffer tUtil::bstr2string(BSTR bstr, bool appendNull)
+tStringBuffer tUtil::bstr2string(BSTR bstr, bool nullTerminated)
 {
   char* str = NULL;
   size_t len = 0;
@@ -127,7 +127,7 @@ tStringBuffer tUtil::bstr2string(BSTR bstr, bool appendNull)
         LUACOM_ERROR(tUtil::GetErrorMessage(GetLastError()));
 
       struct C { C(int size) { s = new char[size]; }
-		~C() { delete [] s; } char * s; } str(lenMulti + (appendNull? 1 : 0));
+		~C() { delete [] s; } char * s; } str(lenMulti + (nullTerminated? 1 : 0));
 
       int result = WideCharToMultiByte(
         CP_UTF8,            // code page
@@ -143,8 +143,8 @@ tStringBuffer tUtil::bstr2string(BSTR bstr, bool appendNull)
       if(!result)
         LUACOM_ERROR(tUtil::GetErrorMessage(GetLastError()));
       
-      if (appendNull) str.s[lenMulti] = '\0';
-      len = lenMulti;
+      if (nullTerminated) str.s[lenMulti] = '\0';
+	  len = lenMulti + (nullTerminated? 1 : 0);
       return tStringBuffer(str.s, len);
     }
   }
