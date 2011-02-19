@@ -219,8 +219,8 @@ tLuaControl::tLuaControl(lua_State* L, ITypeInfo *pTypeinfo, int ref) : tLuaDisp
     lua_gettable(L, -2);
     lua_pushvalue(L, -2);
     lua_remove(L, -3);
-    const char * err;
-    if(!luaCompat_call(L, 1, 2, &err)) {
+    tStringBuffer err;
+    if(!luaCompat_call(L, 1, 2, err)) {
       m_Size.cx = (LONG)lua_tointeger(L,-2);
       m_Size.cy = (LONG)lua_tointeger(L,-1);
     } else {
@@ -278,7 +278,7 @@ void tLuaControl::DestroyWindow() {
     lua_gettable(L, -2);
     lua_pushvalue(L, -2);
     lua_remove(L, -3);
-    luaCompat_call(L, 1, 0, NULL);
+    luaCompat_call(L, 1, 0);
 }
 
 STDMETHODIMP tLuaControl::QueryInterface(REFIID riid, void FAR* FAR* ppv)
@@ -823,8 +823,8 @@ STDMETHODIMP tLuaControl::GetUserClassID(CLSID* pClsid) {
   lua_gettable(L, -2);
   lua_pushvalue(L, -2);
   lua_remove(L, -3);
-  if(luaCompat_call(L, 1, 1, NULL)) return E_FAIL;
-  const char * classID = lua_tostring(L, -1);
+  if(luaCompat_call(L, 1, 1)) return E_FAIL;
+  tStringBuffer classID(lua_tostring(L, -1));
   return CLSIDFromString(tUtil::string2bstr(classID),pClsid);
 }
 
@@ -884,7 +884,7 @@ STDMETHODIMP tLuaControl::SetExtent(DWORD  dwDrawAspect, SIZEL *psizel)
         lua_remove(L, -3);
         lua_pushnumber(L, sl.cx);
         lua_pushnumber(L, sl.cy);
-        if(luaCompat_call(L, 3, 1, NULL)) return E_FAIL;
+        if(luaCompat_call(L, 3, 1)) return E_FAIL;
 
         if(lua_toboolean(L,-1))
         HimetricToPixel(psizel, &m_Size);
@@ -1855,8 +1855,8 @@ HWND tLuaControl::CreateInPlaceWindow(int x, int y, BOOL fNoRedraw)
     lua_pushnumber(L, y);
     lua_pushnumber(L, m_Size.cx);
     lua_pushnumber(L, m_Size.cy);
-    const char *err;
-    int res = luaCompat_call(L, 6, 1, &err);
+    tStringBuffer err;
+    int res = luaCompat_call(L, 6, 1, err);
     if(res) return NULL;
 
     m_hwnd = (HWND)luaCompat_getPointer(L, -1);

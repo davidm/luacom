@@ -25,7 +25,7 @@ public:
   static tStringBuffer GetErrorMessage(DWORD errorcode);
   static bool IsValidString(LPCTSTR string);
   static void RegistrySetString(lua_State* L, const char& Key, const char* value);
-  static const char* RegistryGetString(lua_State* L, const char& Key);
+  static tStringBuffer RegistryGetString(lua_State* L, const char& Key);
 
   static FILE* log_file;
 };

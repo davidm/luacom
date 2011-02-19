@@ -40,14 +40,18 @@ void luaCompat_openlib(lua_State* L, const char* libname, const struct luaL_Reg*
   LUASTACK_CLEAN(L, 1);
 }
 
-int luaCompat_call(lua_State* L, int nargs, int nresults, const char** pErrMsg)
+int luaCompat_call(lua_State* L, int nargs, int nresults)
+{
+	tStringBuffer err;
+	return luaCompat_call(L, nargs, nresults, err);
+}
+int luaCompat_call(lua_State* L, int nargs, int nresults, tStringBuffer& ErrMsg)
 { /* lua5 */
   int result = lua_pcall(L, nargs, nresults, 0);
 
   if(result)
   {
-    if(pErrMsg)
-      *pErrMsg = lua_tostring(L, -1);
+    ErrMsg.copyToBuffer(lua_tostring(L, -1));
 
     lua_pop(L, 1);
   }

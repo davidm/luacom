@@ -20,6 +20,8 @@ public:
 
 
 protected:
+  void Init();
+  void Reset();
   size_t size;
   char * buffer;
 };

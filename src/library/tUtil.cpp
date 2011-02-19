@@ -337,10 +337,9 @@ void tUtil::RegistrySetString(lua_State* L, const char& Key, const char* value)
     lua_settable(L, LUA_REGISTRYINDEX); 
 }
 
-const char* tUtil::RegistryGetString(lua_State* L, const char& Key)
+tStringBuffer tUtil::RegistryGetString(lua_State* L, const char& Key)
 {
 	lua_pushlightuserdata(L, (void *)&Key);  /* push address */ 
     lua_gettable(L, LUA_REGISTRYINDEX);  /* retrieve value */ 
-    return lua_tostring(L, -1);  /* convert to string */
-	// NOTE this ptr will only be valid till it comes off the stack!
+    return tStringBuffer(lua_tostring(L, -1));  /* convert to string */
 }

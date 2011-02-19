@@ -57,7 +57,7 @@ int tLuaObject::generic_index(lua_State *L)
   tLuaObject* lua_obj = tLuaObject::getObject(L, index_table_param);
 
   // gets the field name
-  const char* field_name = lua_tostring(L, index_index_param);
+  tStringBuffer field_name(lua_tostring(L, index_index_param));
 
   // finds in the method table
   tMethodType method_type;

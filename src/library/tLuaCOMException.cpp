@@ -32,9 +32,9 @@ tLuaCOMException::tLuaCOMException(Errors p_code, const char *p_file, int p_line
 {
   code = p_code;
 
-  file = p_file;
+  file = tStringBuffer(p_file);
   line = p_line;
-  usermessage = p_usermessage;
+  usermessage = tStringBuffer(p_usermessage);
 
   tUtil::log("luacom", getMessage());
 }
@@ -55,7 +55,7 @@ tStringBuffer tLuaCOMException::getMessage()
 
   if(file != NULL)
   {
-    sprintf(error_position, ":(%s,%d)", file, line);
+    sprintf(error_position, ":(%s,%d)", (const char*)file, line);
     strcat(string, error_position);
   }
   

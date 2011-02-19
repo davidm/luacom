@@ -207,7 +207,7 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
           lua_getglobal(L,"luacom");
           lua_pushstring(L,"DateFormat");
           lua_gettable(L, -2);
-          const char *dateformat = lua_tostring(L, -1);
+          tStringBuffer dateformat(lua_tostring(L, -1));
              lua_pop(L, 2);
           if(dateformat == NULL || (strcmp("string",dateformat)==0)) {
             HRESULT hr = VariantChangeType(&new_varg, &varg, 0, VT_BSTR);
@@ -275,7 +275,7 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
       case VT_BSTR:
         {
           size_t computedSize;
-          const char* str = tUtil::bstr2string(varg.bstrVal, computedSize);
+          tStringBuffer str(tUtil::bstr2string(varg.bstrVal, computedSize));
             if(is_variant && table_variants) {
               lua_newtable(L);
             lua_pushstring(L, "Type");
@@ -492,7 +492,7 @@ void tLuaCOMTypeHandler::lua2com(lua_State* L, stkIndex luaval, VARIANTARG& varg
 
   case LUA_TSTRING:
     {
-      const char* str = lua_tostring(L, luaval);
+      tStringBuffer str(lua_tostring(L, luaval));
       size_t l_len = lua_strlen(L, luaval);
       varg.vt = VT_BSTR;
       varg.bstrVal = tUtil::string2bstr(str, l_len);
@@ -551,7 +551,7 @@ void tLuaCOMTypeHandler::lua2com(lua_State* L, stkIndex luaval, VARIANTARG& varg
         lua_pushstring(L, "Type");
         lua_gettable(L, luaval);
         if(!lua_isnil(L, -1)) { // Table describes a variant
-          const char* vtype = lua_tostring(L, -1);
+          tStringBuffer vtype(lua_tostring(L, -1));
           lua_pushstring(L, "Value");
           lua_gettable(L, luaval);
           if(strcmp(vtype, "double") == 0) {

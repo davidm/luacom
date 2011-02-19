@@ -16,9 +16,9 @@ extern "C"
 
 // the address of each static is a unique memory location used as the key to the lua registry
 // see http://www.lua.org/pil/27.3.1.html
-const char LuaBeans::tag_name_key = 'k';
-const char LuaBeans::udtag_name_key = 'k';
-const char LuaBeans::module_name_key = 'k';
+const char LuaBeans::tag_name_key = 't';
+const char LuaBeans::udtag_name_key = 'u';
+const char LuaBeans::module_name_key = 'm';
 
 void LuaBeans::createBeans(lua_State *L,
                            const char* p_module_name,

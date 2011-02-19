@@ -317,9 +317,9 @@ static tLuaCOM *luacom_ImplInterfaceFromTypelibHelper(lua_State *L)
   lua_pushvalue(L, 1);
   const int ref = luaL_ref(L, LUA_REGISTRYINDEX);
 
-  const char* typelib_name = luaL_checklstring(L, 2, NULL);
-  const char* pcInterface = luaL_checklstring(L, 3, NULL);
-  const char* coclassname = luaL_optlstring(L, 4, NULL, NULL);
+  tStringBuffer typelib_name(luaL_checklstring(L, 2, NULL));
+  tStringBuffer pcInterface(luaL_checklstring(L, 3, NULL));
+  tStringBuffer coclassname(luaL_optlstring(L, 4, NULL, NULL));
 
   tLuaCOM* lcom           = NULL;
   ITypeLib* typelib       = NULL;
@@ -399,8 +399,8 @@ static tLuaCOM *luacom_ImplInterfaceHelper(lua_State *L)
   lua_pushvalue(L, 1);
   const int ref = luaL_ref(L, LUA_REGISTRYINDEX);
 
-  const char* pcProgID = luaL_checklstring(L, 2, NULL);
-  const char* pcInterface = luaL_checklstring(L, 3, NULL);
+  tStringBuffer pcProgID(luaL_checklstring(L, 2, NULL));
+  tStringBuffer pcInterface(luaL_checklstring(L, 3, NULL));
 
   tLuaCOM* lcom = NULL;
   ITypeLib* typelib = NULL;
@@ -460,7 +460,7 @@ static int luacom_ImplInterface(lua_State *L)
 
 static int luacom_CLSIDfromProgID(lua_State *L)
 {
-  const char* str = luaL_checklstring(L, 1, NULL);
+  tStringBuffer str(luaL_checklstring(L, 1, NULL));
   wchar_t* clsid_str  = NULL;
   wchar_t* progId     = NULL;
   CLSID clsid         = IID_NULL;
@@ -507,7 +507,7 @@ static int luacom_CLSIDfromProgID(lua_State *L)
 
 static int luacom_ProgIDfromCLSID(lua_State *L)
 {
-  const char* str = luaL_checklstring(L, 1, NULL);
+  tStringBuffer str(luaL_checklstring(L, 1, NULL));
   wchar_t* clsid_str = NULL;
   LPOLESTR progId = NULL;
   CLSID clsid = IID_NULL;
@@ -560,8 +560,8 @@ static int luacom_CreateObject(lua_State *L)
   IPersistStreamInit* psi = NULL;
   DWORD context           = CLSCTX_SERVER;
 
-  const char *progId = luaL_checklstring(L, 1, NULL);
-  const char *creation_mode = lua_tostring(L, 2);
+  tStringBuffer progId(luaL_checklstring(L, 1, NULL));
+  tStringBuffer creation_mode(lua_tostring(L, 2));
   const bool untyped = lua_toboolean(L, 3) != 0;
 
   if(creation_mode != NULL)
@@ -627,7 +627,7 @@ static int luacom_GetObject(lua_State *L)
   IUnknown* punk    = NULL;
   CLSID clsid       = IID_NULL;
 
-  const char *progId = luaL_checklstring(L, 1, NULL);
+  tStringBuffer progId(luaL_checklstring(L, 1, NULL));
 
   tLuaCOM* lcom = NULL;
   IBindCtx* pbc = NULL;
@@ -760,7 +760,7 @@ static int luacom_isMember(lua_State *L)
 {
   // objeto luacom
   tLuaCOM* lcom = (tLuaCOM*) LuaBeans::check_tag(L, 1);
-  const char* member_name = luaL_checklstring(L, 2, NULL);
+  tStringBuffer member_name(luaL_checklstring(L, 2, NULL));
 
   lua_pushboolean(L, lcom->isMember(member_name));
 
@@ -796,7 +796,7 @@ static int luacom_NewObjectOrControl(lua_State *L, int type)
   lua_pushvalue(L, 1);
   const int ref = luaL_ref(L, LUA_REGISTRYINDEX);
 
-  const char* pcProgID = luaL_checklstring(L, 2, NULL);
+  tStringBuffer pcProgID(luaL_checklstring(L, 2, NULL));
 
   try
   {
@@ -1049,32 +1049,32 @@ static int luacom_RegisterObject(lua_State *L)
     // gets the registration information from the registration table
     lua_pushstring(L, "VersionIndependentProgID");
     lua_gettable(L, 1);
-    const char* VersionIndependentProgID = lua_tostring(L, -1);
+	tStringBuffer VersionIndependentProgID(lua_tostring(L, -1));
 
     // gets the registration information from the registration table
     lua_pushstring(L, "ProgID");
     lua_gettable(L, 1);
-    const char* ProgID = lua_tostring(L, -1);
+    tStringBuffer ProgID(lua_tostring(L, -1));
 
     lua_pushstring(L, "TypeLib");
     lua_gettable(L, 1);
-    const char* typelib_path = lua_tostring(L, -1);
+    tStringBuffer typelib_path(lua_tostring(L, -1));
 
     lua_pushstring(L, "CoClass");
     lua_gettable(L, 1);
-    const char* CoClass = lua_tostring(L, -1);
+    tStringBuffer CoClass(lua_tostring(L, -1));
 
     lua_pushstring(L, "ComponentName");
     lua_gettable(L, 1);
-    const char* ComponentName= lua_tostring(L, -1);
+    tStringBuffer ComponentName(lua_tostring(L, -1));
 
     lua_pushstring(L, "Arguments");
     lua_gettable(L, 1);
-    const char* arguments = lua_tostring(L, -1);
+    tStringBuffer arguments(lua_tostring(L, -1));
 
     lua_pushstring(L, "ScriptFile");
     lua_gettable(L, 1);
-    const char* scriptFile = lua_tostring(L, -1);
+    tStringBuffer scriptFile(lua_tostring(L, -1));
 
     CHK_LCOM_ERR(ProgID && typelib_path &&  CoClass, 
       "Incomplete registration table.");
@@ -1328,20 +1328,20 @@ static int luacom_UnRegisterObject(lua_State *L)
     // gets the registration information from the registration table
     lua_pushstring(L, "VersionIndependentProgID");
     lua_gettable(L, 1);
-    const char* VersionIndependentProgID = lua_tostring(L, -1);
+    tStringBuffer VersionIndependentProgID(lua_tostring(L, -1));
 
     // gets the registration information from the registration table
     lua_pushstring(L, "ProgID");
     lua_gettable(L, 1);
-    const char* ProgID = lua_tostring(L, -1);
+    tStringBuffer ProgID(lua_tostring(L, -1));
 
     lua_pushstring(L, "TypeLib");
     lua_gettable(L, 1);
-    const char* typelib_path = lua_tostring(L, -1);
+    tStringBuffer typelib_path(lua_tostring(L, -1));
 
     lua_pushstring(L, "CoClass");
     lua_gettable(L, 1);
-    const char* CoClass = lua_tostring(L, -1);
+    tStringBuffer CoClass(lua_tostring(L, -1));
 
     CHK_LCOM_ERR(ProgID && typelib_path &&  CoClass, 
       "Incomplete registration table.");
@@ -1535,7 +1535,7 @@ static int luacom_DumpTypeInfo(lua_State *L)
 // Starts logging
 static int luacom_StartLog(lua_State* L)
 {
-  const char *filename = luaL_checklstring(L, 1, NULL);
+  tStringBuffer filename(luaL_checklstring(L, 1, NULL));
 
   bool result = tUtil::OpenLogFile(filename);
 
@@ -1591,7 +1591,7 @@ static int luacom_GetEnumerator(lua_State *L)
 
 static int luacom_LoadTypeLibrary(lua_State *L)
 {
-  const char* typelib_name = luaL_checklstring(L, -1, NULL);
+  tStringBuffer typelib_name(luaL_checklstring(L, -1, NULL));
 
   ITypeLib* typelib = NULL;
 
@@ -1678,8 +1678,8 @@ int luacom_StartMessageLoop(lua_State *L)
 {
   MSG msg;
   if(lua_gettop(L) > 0) {
-    const char *err;
-    if(luaCompat_call(L, lua_gettop(L)-1, 0, &err)) {
+    tStringBuffer err;
+    if(luaCompat_call(L, lua_gettop(L)-1, 0, err)) {
           luacom_APIerror(L, err);
       return 0;
     }
@@ -1689,8 +1689,8 @@ int luacom_StartMessageLoop(lua_State *L)
     TranslateMessage(&msg);
     DispatchMessage(&msg);
     if(lua_gettop(L) > 0) {
-      const char *err;
-      if(luaCompat_call(L, lua_gettop(L)-1, 0, &err)) {
+      tStringBuffer err;
+      if(luaCompat_call(L, lua_gettop(L)-1, 0, err)) {
               luacom_APIerror(L, err);
         return 0;
       }
@@ -1712,15 +1712,15 @@ int luacom_LuaDetectAutomation(lua_State* L)
     // Running out-of-process
     lua_pushnumber(L,1);
     lua_gettable(L,-2);
-    const char* cmdSwitch = lua_tostring(L,-1);
+    tStringBuffer cmdSwitch(lua_tostring(L,-1));
     lua_pop(L,2);
     if(cmdSwitch != NULL) {
-      const char* errMsg;
+      tStringBuffer errMsg;
       if(_stricmp("/Register",cmdSwitch) == 0) {
         lua_pushstring(L,"Register");
         lua_gettable(L,-2);
         lua_pushvalue(L,-2);
-        if(luaCompat_call(L,1,0,&errMsg)) {
+        if(luaCompat_call(L,1,0,errMsg)) {
           lua_pushnil(L);
           lua_pushstring(L,errMsg);
           return 2;
@@ -1731,7 +1731,7 @@ int luacom_LuaDetectAutomation(lua_State* L)
         lua_pushstring(L,"UnRegister");
         lua_gettable(L,-2);
         lua_pushvalue(L,-2);
-        if(luaCompat_call(L,1,0,&errMsg)) {
+        if(luaCompat_call(L,1,0,errMsg)) {
           lua_pushnil(L);
           lua_pushstring(L,errMsg);
           return 2;
@@ -1742,7 +1742,7 @@ int luacom_LuaDetectAutomation(lua_State* L)
         lua_pushstring(L,"StartAutomation");
         lua_gettable(L,-2);
         lua_pushvalue(L,-2);
-        if(luaCompat_call(L,1,0,&errMsg)) {
+        if(luaCompat_call(L,1,0,errMsg)) {
           lua_pushnil(L);
           lua_pushstring(L,errMsg);
           return 2;
@@ -1895,7 +1895,6 @@ static int tagmeth_settable(lua_State *L)
   DISPID dispid;
   HRESULT hr              = S_OK;
   FUNCDESC* pfuncdesc     = NULL;
-  const char* field_name  = NULL;
   bool set = false;
 
   /* indexes to the parameters coming from lua */
@@ -1908,9 +1907,9 @@ static int tagmeth_settable(lua_State *L)
     tLuaCOM* lcom = (tLuaCOM*) LuaBeans::from_lua(L, table_param);
     CHECK(lcom, INTERNAL_ERROR);
 
-    field_name = lua_tostring(L, index_param);
+    tStringBuffer field_name(lua_tostring(L, index_param));
 
-    if(!field_name)
+    if(!(field_name.getBuffer()))
       return 0;
 
     if(lua_type(L, value_param) == LUA_TFUNCTION)
@@ -2319,7 +2318,6 @@ static int tagmeth_index(lua_State *L)
   tLuaCOM* lcom           = NULL;
   LuaBeans *lbeans        = NULL;
   int retval              = 0;
-  const char *field_name  = NULL;
   bool isnumber           = false;
 
   // indexes for the parameters in the Lua stack
@@ -2333,7 +2331,7 @@ static int tagmeth_index(lua_State *L)
     CHECK(lcom, INTERNAL_ERROR);
 
     // retrieves the field name
-    field_name = lua_tostring(L, index_param);
+    tStringBuffer field_name(lua_tostring(L, index_param));
 
     if(!field_name)
       return 0;
@@ -2666,7 +2664,7 @@ LUACOM_API int luacom_detectAutomation(lua_State *L, int argc, char *argv[])
     {
       lua_pushstring(L, "StartAutomation");
       lua_gettable(L, -2);
-      lua_result = luaCompat_call(L, 0, 0, NULL);
+      lua_result = luaCompat_call(L, 0, 0);
 
       if(!lua_result)
         automation_result = LUACOM_AUTOMATION;
@@ -2679,7 +2677,7 @@ LUACOM_API int luacom_detectAutomation(lua_State *L, int argc, char *argv[])
     {
       lua_pushstring(L, "Register");
       lua_gettable(L, -2);
-      lua_result = luaCompat_call(L, 0, 0, NULL);
+      lua_result = luaCompat_call(L, 0, 0);
 
       if(!lua_result)
         automation_result = LUACOM_REGISTER;

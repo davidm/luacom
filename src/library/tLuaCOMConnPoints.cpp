@@ -1657,7 +1657,7 @@ int tLuaCOMConnPoint::call_sinks(lua_State *L)
 
     // calls function (including self param)
     // ignoring errors
-    luaCompat_call(L, num_params+1, 0, NULL);
+    luaCompat_call(L, num_params+1, 0);
 
     // cleans stack
     lua_settop(L, user_last_param);

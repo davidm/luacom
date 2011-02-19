@@ -24,9 +24,9 @@ public:
   virtual ~tLuaCOMException();
 
   Errors code;
-  const char *file;
+  tStringBuffer file;
   int line;
-  const char *usermessage;
+  tStringBuffer usermessage;
 
 protected:
   static char const * const messages[];

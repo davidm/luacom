@@ -174,7 +174,7 @@ int tLuaCOMEnumerator::call_method(lua_State *L)
     (tLuaCOMEnumerator*)*(void **)lua_touserdata(L, enumerator_param);
 
   // gets the method name
-  const char* method_name = lua_tostring(L, method_param);
+  tStringBuffer method_name(lua_tostring(L, method_param));
 
   // call method
   int retval = 0;

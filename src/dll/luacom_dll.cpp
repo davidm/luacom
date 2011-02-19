@@ -162,7 +162,7 @@ static lua_State* luacom_DoRegistryFile(const char* luaclsid) {
     if(!lua_dofile(L_inproc,fileName)) {
       lua_pushstring(L_inproc,"StartAutomation");
       lua_gettable(L_inproc,-2);
-      if(luaCompat_call(L_inproc, 0, 0, NULL)) {
+      if(luaCompat_call(L_inproc, 0, 0)) {
         luacom_close(L_inproc);
         lua_close(L_inproc);
         L_inproc = NULL;
@@ -183,7 +183,7 @@ static tLuaCOMClassFactory* luacom_GetInprocFactory(REFCLSID rclsid) {
   BSTR clsid;
   try {
     CHK_COM_CODE(StringFromCLSID(rclsid, &clsid));
-    const char* luaclsid = tUtil::bstr2string(clsid);
+    tStringBuffer luaclsid = tUtil::bstr2string(clsid);
     CoTaskMemFree(clsid);
     tLuaCOMClassFactory* pFactory = factoryCache_GetFactory(luaclsid);
     if(pFactory == NULL) {

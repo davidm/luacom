@@ -558,8 +558,8 @@ HRESULT tLuaDispatch::propertyget(const char* name,
     while(i--)
       typehandler->com2lua(L, pdispparams->rgvarg[i]);
 
-    const char* err = NULL;
-    luaCompat_call(L, pdispparams->cArgs + 1, 1, &err);
+    tStringBuffer err;
+    luaCompat_call(L, pdispparams->cArgs + 1, 1, err);
 
     if(err)
     {
@@ -620,8 +620,8 @@ HRESULT tLuaDispatch::propertyput(const char* name,
     while(i--)
       typehandler->com2lua(L, pdispparams->rgvarg[i]);
 
-    const char* err = NULL;
-    luaCompat_call(L, pdispparams->cArgs + 1, 0, &err);
+    tStringBuffer err;
+    luaCompat_call(L, pdispparams->cArgs + 1, 0, err);
 
     if(err)
     {
@@ -707,11 +707,11 @@ HRESULT tLuaDispatch::method(const char* name,
     funcdesc->lprgelemdescParam);
 
   // chama funcao Lua
-  const char* errmsg = NULL;
+  tStringBuffer errmsg;
   int result = 0;
 
   // call function
-  result = luaCompat_call(L, lua_gettop(L) - memberidx, LUA_MULTRET, &errmsg);
+  result = luaCompat_call(L, lua_gettop(L) - memberidx, LUA_MULTRET, errmsg);
   if(result)
   {
     FillExceptionInfo(pexcepinfo, LuaAux::makeLuaErrorMessage(result, errmsg));

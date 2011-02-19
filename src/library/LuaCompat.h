@@ -9,8 +9,11 @@
 #ifndef __LUACOMPAT_H
 #define __LUACOMPAT_H
 
+#include "tStringBuffer.h"
+
 void luaCompat_openlib(lua_State* L, const char* libname, const struct luaL_Reg* funcs);
-int luaCompat_call(lua_State* L, int nargs, int nresults, const char** pErrMsg);
+int luaCompat_call(lua_State* L, int nargs, int nresults);
+int luaCompat_call(lua_State* L, int nargs, int nresults, tStringBuffer& ErrMsg);
 
 void luaCompat_newLuaType(lua_State* L, const char* module_name, const char* name);
 void luaCompat_pushTypeByName(lua_State* L, const char* module, const char* type_name);
