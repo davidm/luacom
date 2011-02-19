@@ -9,10 +9,12 @@ class tStringBuffer
 {
 public:
   const char * getBuffer(void);
+  const size_t getSize();
   void copyToBuffer(const char *source);
   void copyToBuffer(const char *source, size_t length);
   tStringBuffer();
   tStringBuffer(const char* source);
+  tStringBuffer(const char* source, size_t length);
   tStringBuffer(const tStringBuffer& copy);
   tStringBuffer& operator=(const tStringBuffer& other);
   operator const char*();

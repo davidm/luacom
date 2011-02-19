@@ -88,18 +88,10 @@ tStringBuffer tUtil::GetErrorMessage(DWORD errorcode)
 }
 
 
-tStringBuffer tUtil::bstr2string(BSTR bstr)
-{
-  size_t dontcare = 0;
-  return bstr2string(bstr, dontcare, true);
-}
-
-
-// note: if appendNull, then '\0' char is appended
-// to result, but returned len does not count '\0'.
-tStringBuffer tUtil::bstr2string(BSTR bstr, size_t& len, bool appendNull)
+tStringBuffer tUtil::bstr2string(BSTR bstr, bool appendNull)
 {
   char* str = NULL;
+  size_t len = 0;
   try
   {
     if(bstr == NULL) // NULL BSTR indicates empty string.
@@ -153,7 +145,7 @@ tStringBuffer tUtil::bstr2string(BSTR bstr, size_t& len, bool appendNull)
       
       if (appendNull) str.s[lenMulti] = '\0';
       len = lenMulti;
-      return tStringBuffer(str.s);
+      return tStringBuffer(str.s, len);
     }
   }
   catch(class tLuaCOMException& e)

@@ -30,6 +30,12 @@ tStringBuffer::tStringBuffer(const char* source)
   copyToBuffer(source);
 }
 
+tStringBuffer::tStringBuffer(const char* source, size_t length)
+{
+	Init();
+	copyToBuffer(source, length);
+}
+
 tStringBuffer::tStringBuffer(const tStringBuffer& copy)
 {
   Init();
@@ -78,4 +84,8 @@ void tStringBuffer::copyToBuffer(const char *source, size_t length)
 const char * tStringBuffer::getBuffer()
 {
   return buffer;
+}
+const size_t tStringBuffer::getSize()
+{
+	return size;
 }

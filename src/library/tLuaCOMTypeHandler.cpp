@@ -274,18 +274,17 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
 
       case VT_BSTR:
         {
-          size_t computedSize;
-          tStringBuffer str(tUtil::bstr2string(varg.bstrVal, computedSize));
+          tStringBuffer str = tUtil::bstr2string(varg.bstrVal);
             if(is_variant && table_variants) {
               lua_newtable(L);
             lua_pushstring(L, "Type");
             lua_pushstring(L, "string");
             lua_settable(L, -3);
             lua_pushstring(L, "Value");
-            lua_pushlstring(L, str, computedSize);
+            lua_pushlstring(L, str, str.getSize());
             lua_settable(L, -3);
           } else {
-              lua_pushlstring(L, str, computedSize);
+              lua_pushlstring(L, str, str.getSize());
           }
 
           break;
@@ -492,8 +491,9 @@ void tLuaCOMTypeHandler::lua2com(lua_State* L, stkIndex luaval, VARIANTARG& varg
 
   case LUA_TSTRING:
     {
-      tStringBuffer str(lua_tostring(L, luaval));
+      tStringBuffer str;
       size_t l_len = lua_strlen(L, luaval);
+	  str.copyToBuffer(lua_tostring(L, luaval), l_len);
       varg.vt = VT_BSTR;
       varg.bstrVal = tUtil::string2bstr(str, l_len);
     }

@@ -20,8 +20,7 @@ public:
   static void CloseLogFile(void);
   static bool OpenLogFile(const char *name);
   static BSTR string2bstr(const char *string, size_t len = -1);
-  static tStringBuffer bstr2string(BSTR bstr);
-  static tStringBuffer bstr2string(BSTR bstr, size_t& computedSize, bool appendNull = false);
+  static tStringBuffer bstr2string(BSTR bstr, bool appendNull = false);
   static tStringBuffer GetErrorMessage(DWORD errorcode);
   static bool IsValidString(LPCTSTR string);
   static void RegistrySetString(lua_State* L, const char& Key, const char* value);
