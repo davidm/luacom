@@ -2547,7 +2547,7 @@ LUACOM_API void luacom_open(lua_State *L)
   LUASTACK_SET(L);
 
   // creates LuaCOM library table
-  luaCompat_openlib(L, LIBNAME, functions_tb);  
+  luaL_register(L, LIBNAME, functions_tb);
 
   // prepares to store configuration table in
   // library table

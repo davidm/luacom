@@ -11,7 +11,6 @@
 
 #include "tStringBuffer.h"
 
-void luaCompat_openlib(lua_State* L, const char* libname, const struct luaL_Reg* funcs);
 int luaCompat_call(lua_State* L, int nargs, int nresults);
 int luaCompat_call(lua_State* L, int nargs, int nresults, tStringBuffer& ErrMsg);
 

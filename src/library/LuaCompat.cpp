@@ -23,16 +23,6 @@ extern "C" {
 
 #define UNUSED(x) (void)(x)
 
-
-void luaCompat_openlib(lua_State* L, const char* libname, const struct luaL_Reg* funcs)
-{
-  LUASTACK_SET(L);
-
-  luaL_register(L, libname, funcs);
-
-  LUASTACK_CLEAN(L, 1);
-}
-
 int luaCompat_call(lua_State* L, int nargs, int nresults)
 {
 	tStringBuffer err;
