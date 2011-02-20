@@ -9,13 +9,13 @@ public:
   {
   public:
     lua_CFunction settable;
-    lua_CFunction noindex;
+    lua_CFunction index;
     lua_CFunction call;
     lua_CFunction gc;
 
     Events()
     {
-      settable = noindex = call = gc = NULL;
+      settable = index = call = gc = NULL;
     }
   };
 

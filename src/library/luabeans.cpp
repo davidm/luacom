@@ -65,14 +65,13 @@ void LuaBeans::registerObjectEvents(lua_State* L, class Events& events)
 
   if(events.settable)
   {
-    lua_pushstring(L, "__newindex");
     lua_pushcfunction(L, events.settable);
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "__newindex");
   }
 
-  if(events.noindex)
+  if(events.index)
   {
-    lua_pushcfunction(L, events.noindex);
+    lua_pushcfunction(L, events.index);
     lua_setfield(L, -2, "__index");
   }
 
@@ -106,14 +105,13 @@ void LuaBeans::registerPointerEvents(lua_State* L, class Events& events)
 
   if(events.settable)
   {
-    lua_pushstring(L, "__newindex");
     lua_pushcfunction(L, events.settable);
-    lua_settable(L, -3);
+    lua_setfield(L, -2, "__newindex");
   }
 
-  if(events.noindex)
+  if(events.index)
   {
-    lua_pushcfunction(L, events.noindex);
+    lua_pushcfunction(L, events.index);
     lua_setfield(L, -2, "__index");
   }
 

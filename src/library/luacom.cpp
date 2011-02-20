@@ -2567,7 +2567,7 @@ LUACOM_API void luacom_open(lua_State *L)
   {
     LuaBeans::Events obj_events, pointer_events;
 
-    obj_events.noindex = tagmeth_index;
+    obj_events.index = tagmeth_index;
     obj_events.settable = tagmeth_settable;
     obj_events.call = call_event;
     pointer_events.gc = tagmeth_gc;
