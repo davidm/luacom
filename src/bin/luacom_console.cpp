@@ -42,8 +42,6 @@ static lua_State *global_lua_state = NULL;
 /////////////////////////////////////////////////////////////////////
 // Lua compatibility functions
 
-#if defined(LUA5)
-
 lua_Hook lua_setcallhook (lua_State *L, lua_Hook func)
 {
   lua_Hook old_hook = lua_gethook(L);
@@ -67,16 +65,13 @@ void make_lua_error(lua_State* L, const char *error)
   lua_pushstring(L, error);
   lua_error(L);
 }
-#endif
 
-#if defined(LUA_VERSION_NUM) && LUA_VERSION_NUM >= 501
 static int lua_dostring(lua_State* L, const char* code) {
   return luaL_dostring(L, code);
 }
 static int lua_dofile(lua_State* L, const char* filename) {
   return luaL_dofile(L, filename);
 }
-#endif
 
 
 /////////////////////////////////////////////////////////////////////
@@ -335,17 +330,8 @@ int main (int argc, char *argv[])
 
   SetConsoleTitle(LUACOM_VERSION);
 
-#if defined(LUA_VERSION_NUM) && LUA_VERSION_NUM >= 501
   lua_State *lua_state = lua_open();
   luaL_openlibs(lua_state);
-#elif defined(LUA5)
-  lua_State *lua_state = lua_open();
-  luaopen_base (lua_state);
-  luaopen_math (lua_state);
-  luaopen_io   (lua_state);
-  luaopen_string (lua_state);
-  luaopen_table (lua_state);
-#endif
 
   lua_pushstring(lua_state, "> "); lua_setglobal(lua_state, "_PROMPT");
 

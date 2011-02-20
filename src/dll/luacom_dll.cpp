@@ -40,16 +40,13 @@ extern "C" int luacom_openlib(lua_State* L) {
   luacom_open(L);
   return 0;
 }
-#if defined(LUA_VERSION_NUM) && LUA_VERSION_NUM >= 501
+
 extern "C" int luaopen_luacom(lua_State* L) {
   return luacom_openlib(L);
 }
-#endif
 
 
-#if defined(LUA_VERSION_NUM) && LUA_VERSION_NUM >= 501
 #define lua_dofile luaL_dofile
-#endif
 
 
 static lua_State* factoryCache; // Maps CLSIDs to factories
@@ -69,11 +66,7 @@ static void factoryCache_Init() {
   IupSpeechOpen();
   #endif
 #endif
-#ifdef LUA5
   factoryCache = lua_open();
-#else
-  factoryCache = lua_open(0);
-#endif
   lua_newtable(factoryCache);
   lua_setglobal(factoryCache,"factories");
 }
@@ -124,16 +117,7 @@ static lua_State* luacom_DoRegistryFile(const char* luaclsid) {
 
   if(tCOMUtil::GetRegKeyValue(key,&fileName)) {
     L_inproc = lua_open();
-    #if defined(LUA_VERSION_NUM) && LUA_VERSION_NUM >= 501
-     luaL_openlibs(L_inproc);
-     #else
-    luaopen_base(L_inproc);
-    luaopen_math(L_inproc);
-    luaopen_io(L_inproc);
-    luaopen_string(L_inproc);
-    luaopen_table(L_inproc);
-    luaopen_loadlib(L_inproc); // luaopen_package(L_inproc);
-     #endif
+    luaL_openlibs(L_inproc);
     #ifdef IUP
       /* iuplua initialization */
       iuplua_open(L_inproc);

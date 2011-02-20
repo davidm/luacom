@@ -5,6 +5,8 @@
  *  which tries to hide almost all diferences
  *  between Lua versions
  *
+ *  This file isn't as useful as it used to be since
+ *  we no longer support Lua < 5.1.
  */
 
 
@@ -22,20 +24,11 @@ extern "C" {
 #define UNUSED(x) (void)(x)
 
 
-/* Lua 5 version of the API */
-
 void luaCompat_openlib(lua_State* L, const char* libname, const struct luaL_Reg* funcs)
-{ /* lua5 */
+{
   LUASTACK_SET(L);
 
-
-#if defined(LUA_VERSION_NUM) && LUA_VERSION_NUM >= 501
   luaL_register(L, libname, funcs);
-#elif defined(COMPAT51)
-  luaL_module(L, libname, funcs, 0);
-#else
-  luaL_openlib(L, libname, funcs, 0);
-#endif
 
   LUASTACK_CLEAN(L, 1);
 }
@@ -46,7 +39,7 @@ int luaCompat_call(lua_State* L, int nargs, int nresults)
 	return luaCompat_call(L, nargs, nresults, err);
 }
 int luaCompat_call(lua_State* L, int nargs, int nresults, tStringBuffer& ErrMsg)
-{ /* lua5 */
+{
   int result = lua_pcall(L, nargs, nresults, 0);
 
   if(result)
@@ -61,7 +54,7 @@ int luaCompat_call(lua_State* L, int nargs, int nresults, tStringBuffer& ErrMsg)
 
 
 void luaCompat_newLuaType(lua_State* L, const char* module, const char* type)
-{ /* lua5 */
+{
   LUASTACK_SET(L);
 
   lua_newtable(L);
@@ -80,7 +73,7 @@ void luaCompat_newLuaType(lua_State* L, const char* module, const char* type)
 void luaCompat_pushTypeByName(lua_State* L,
                                const char* module_name,
                                const char* type_name)
-{ /* lua5 */
+{
   LUASTACK_SET(L);
 
   luaCompat_moduleGet(L, module_name, type_name);
@@ -97,7 +90,7 @@ void luaCompat_pushTypeByName(lua_State* L,
 
 
 int luaCompat_newTypedObject(lua_State* L, void* object)
-{ /* lua5 */
+{
   LUASTACK_SET(L);
 
   luaL_checktype(L, -1, LUA_TTABLE);
@@ -115,7 +108,7 @@ int luaCompat_newTypedObject(lua_State* L, void* object)
 
 
 int luaCompat_isOfType(lua_State* L, const char* module, const char* type)
-{ /* lua5 */
+{
   int result = 0;
   LUASTACK_SET(L);
 
@@ -132,7 +125,7 @@ int luaCompat_isOfType(lua_State* L, const char* module, const char* type)
 }
 
 void luaCompat_getType(lua_State* L, int index)
-{ /* lua5 */
+{
   LUASTACK_SET(L);
   int result = lua_getmetatable(L, index);
 
@@ -143,7 +136,7 @@ void luaCompat_getType(lua_State* L, int index)
 }
 
 const void* luaCompat_getType2(lua_State* L, int index)
-{ /* lua5 */
+{
   const void* result = 0;
 
   LUASTACK_SET(L);
@@ -199,7 +192,7 @@ void luaCompat_moduleGet(lua_State* L, const char* module, const char* key)
 }
 
 void* luaCompat_getPointer(lua_State* L, int index)
-{ /* lua5 */
+{
   if(!lua_islightuserdata(L, index))
     return NULL;
 
@@ -207,7 +200,7 @@ void* luaCompat_getPointer(lua_State* L, int index)
 }
 
 int luaCompat_checkTagToCom(lua_State *L, int luaval) 
-{ /* lua5 */
+{
   /* unused: int has; */
 
   if(!lua_getmetatable(L, luaval)) return 0;

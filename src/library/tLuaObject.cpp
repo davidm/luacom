@@ -135,7 +135,6 @@ void tLuaObject::RegisterType(lua_State* L,
 
   luaCompat_newLuaType(L, MODULENAME, pointer_type_name);
 
-#ifdef LUA5
   // Registers the weak table to store the pairs
   // (pointer, LuaObject) to avoid duplication
   // of Lua objects. This step must be done
@@ -160,7 +159,6 @@ void tLuaObject::RegisterType(lua_State* L,
   }
   else
     lua_pop(L, 1);
-#endif  
 
   luaCompat_pushTypeByName(L, MODULENAME, type_name);
 
@@ -292,7 +290,6 @@ bool tLuaObject::pushCachedObject(lua_State *L, void *pointer)
 {
   LUASTACK_SET(L);
 
-#ifdef LUA5
   luaCompat_moduleGet(L, MODULENAME, INSTANCES_CACHE);
 
   lua_pushlightuserdata(L, pointer);
@@ -311,16 +308,12 @@ bool tLuaObject::pushCachedObject(lua_State *L, void *pointer)
   LUASTACK_CLEAN(L, 1);
 
   return true;
-#else
-  return false;
-#endif
 }
 
 void tLuaObject::cacheObject(lua_State *L, void* pointer)
 {
   LUASTACK_SET(L);
 
-#ifdef LUA5
   luaCompat_moduleGet(L, MODULENAME, INSTANCES_CACHE);
 
   lua_pushlightuserdata(L, pointer);
@@ -328,7 +321,6 @@ void tLuaObject::cacheObject(lua_State *L, void* pointer)
   lua_settable(L, -3);
 
   lua_remove(L, -1);
-#endif
 
   LUASTACK_CLEAN(L, 0);
 }
