@@ -63,12 +63,6 @@ void LuaBeans::registerObjectEvents(lua_State* L, class Events& events)
 
   luaCompat_pushTypeByName(L, module_name, tag_name);
 
-  if(events.gettable)
-  {
-    lua_pushcfunction(L, events.gettable);
-    // there is no gettable_event in Lua5 with the semantics of Lua4
-  }
-
   if(events.settable)
   {
     lua_pushstring(L, "__newindex");
@@ -109,12 +103,6 @@ void LuaBeans::registerPointerEvents(lua_State* L, class Events& events)
   LUASTACK_DOCLEAN(L, 0);
 
   luaCompat_pushTypeByName(L, module_name, udtag_name);
-
-  if(events.gettable)
-  {
-    lua_pushcfunction(L, events.gettable);
-    // there is no gettable_event in Lua5 with the semantics of Lua4
-  }
 
   if(events.settable)
   {

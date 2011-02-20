@@ -8,7 +8,6 @@ public:
   class Events
   {
   public:
-    lua_CFunction gettable;
     lua_CFunction settable;
     lua_CFunction noindex;
     lua_CFunction call;
@@ -16,7 +15,7 @@ public:
 
     Events()
     {
-      gettable = settable = noindex = call = gc = NULL;
+      settable = noindex = call = gc = NULL;
     }
   };
 
