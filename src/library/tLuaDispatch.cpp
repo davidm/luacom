@@ -5,7 +5,7 @@
  */
 
 // RCS Info
-static char const * const rcsid = "$Id: tLuaDispatch.cpp,v 1.9 2008/01/06 04:57:48 dmanura Exp $";
+static char const * const rcsid = "$Id: tLuaDispatch $";
 static char const * const rcsname = "$Name:  $";
 
 

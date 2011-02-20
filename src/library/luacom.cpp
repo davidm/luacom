@@ -1,15 +1,14 @@
 /*
  * LUACOM.cpp
  *
- *   Bind de Lua com COM/OLE
+ * Lua binding for COM/OLE.
  *
- *  Renato Cerqueira
- *  Vinicius Almendra
- *
+ * Renato Cerqueira
+ * Vinicius Almendra
  */
 
 // RCS Info
-static char const * const rcsid = "$Id: luacom.cpp,v 1.5 2008/05/16 15:26:43 mascarenhas Exp $";
+static char const * const rcsid = "$Id: luacom$";
 static char const * const rcsname = "$Name:  $";
 static char const * const g_version = "1.4";
 
@@ -67,9 +66,9 @@ HWND     g_hwndParking;
 
 
 ////////////////////////
-//                    //
-//  FUNCOES INTERNAS  //
-//                    //
+//
+// Internal functions.
+//
 ////////////////////////
 
 
@@ -116,12 +115,12 @@ static tLuaCOM* ImplInterface(lua_State* L,
   return lcom;
 }
 
-
-// deals with runtime errors, calling lua_error or
-// logging them, depending on the client's choice
-// The message string is left on the top of the
-// stack, to allow passing it to the caller
-
+/*
+ Deals with runtime errors, calling lua_error or
+ logging them, depending on the client's choice
+ The message string is left on the top of the
+ stack, to allow passing it to the caller
+*/
 static void luacom_err(lua_State* L, const char* message, bool is_API_function)
 {
   LUASTACK_SET(L);
@@ -158,22 +157,21 @@ static void luacom_APIerror(lua_State* L, const char* message)
 
 
 ///////////////////////////////////
-//                               //
-//  FUNCOES EXPORTADAS PARA LUA  //
-//                               //
+//
+// Functions exported by Lua.
+//
 ///////////////////////////////////
 
 /*
  * luacom_ShowHelp
  *
- * Parametros: 
+ * Parameters: 
  *
- *  (1) objeto luacom
+ *  (1) LuaCOM object
  *
- *   Mostra Help da type library associada ao objeto
- *   luacom
+ * Shows help from the type library associated with the
+ * LuaCOM object.
  */
-
 static int luacom_ShowHelp(lua_State *L)
 {
   char *pHelpFile = NULL; 
@@ -213,12 +211,12 @@ static int luacom_ShowHelp(lua_State *L)
 /*
  * luacom_Connect
  *
- *   Parametros (Lua):
+ *   Parameters (Lua):
  *
  *    objeto luacom
  *    tabela que implementara a interface de conexao
  *
- *   Retorno
+ *   Returns
  *    objeto luacom que encapsula objeto luacom implementado pela
  *    tabela fornecida ou nil se nao for possível estabelecer a
  *    conexao
@@ -291,7 +289,7 @@ static int luacom_Connect(lua_State *L)
 /*
  *  luacom_ImplInterfaceFromTypelib (Lua2C)
  *
- *  Parametros:
+ *  Parameters:
  *    1. Tabela de implementacao
  *    2. Nome da type library
  *    3. Nome da interface a ser implementada
@@ -300,7 +298,7 @@ static int luacom_Connect(lua_State *L)
  *       com essa interface ou no caso de se querer localizar uma
  *       interface source (eventos)
  *
- *  Retorno:
+ *  Returns:
  *    1. Objeto LuaCOM que encapsula a implementacao via Lua
  *        ou nil em caso de erro
  *
@@ -454,10 +452,8 @@ static int luacom_ImplInterface(lua_State *L)
 }
 
 /*
- *  luacom_CLSIDfromProgID
- *  Retorna string contendo CLSID associado a um ProgID
+ * Retorns a string containing the CLSID associated with a ProgID.
  */
-
 static int luacom_CLSIDfromProgID(lua_State *L)
 {
   tStringBuffer str(luaL_checklstring(L, 1, NULL));
@@ -501,10 +497,8 @@ static int luacom_CLSIDfromProgID(lua_State *L)
 }
 
 /*
- *  luacom_ProgIDfromCLSID
- *  Retorna string contendo o ProgID associado a um CLSID
+ * Returns a string containing the ProgID associaded with a CLSID.
  */
-
 static int luacom_ProgIDfromCLSID(lua_State *L)
 {
   tStringBuffer str(luaL_checklstring(L, 1, NULL));
@@ -547,8 +541,7 @@ static int luacom_ProgIDfromCLSID(lua_State *L)
 }
 
 /*
- *  luacom_CreateObject
- *  Retorna um objeto LuaCOM que instancia o objeto
+ * Retorna um objeto LuaCOM que instancia o objeto
  *  COM identificado pelo ProgID dado
  */
 
@@ -1701,9 +1694,7 @@ int luacom_StartMessageLoop(lua_State *L)
 
 /*
  * Detects automation in a pure Lua server
- *
  */
-
 int luacom_LuaDetectAutomation(lua_State* L)
 {
   lua_getglobal(L,"arg");
@@ -1772,9 +1763,7 @@ int luacom_LuaDetectAutomation(lua_State* L)
 /*
  * Transforms a pointer into
  * an IUnknown typed object
- * 
  */
-
 int luacom_ImportIUnknown(lua_State* L)
 {
   IUnknown* punk = (IUnknown*) luaCompat_getPointer(L, -1);
@@ -1829,9 +1818,8 @@ int luacom_GetCurrentDirectory(lua_State* L)
 //////////////////////////////////////
 
 /*
- * tag method que gerencia garbage collection
+ * Tag method that manages garbage collection.
  */
-
 static int IUnknown_tag_gc(lua_State *L)
 {
   IUnknown* punk = (IUnknown*)*(void **)lua_touserdata(L, -1);
@@ -1845,7 +1833,6 @@ static int IUnknown_tag_gc(lua_State *L)
 /*
  * Checks for IUnknown equality
  */
-
 static int IUnknown_eq(lua_State *L)
 {
   LUASTACK_SET(L);
@@ -1863,15 +1850,14 @@ static int IUnknown_eq(lua_State *L)
 
 
 ////////////////////////////////////
-//                                //
-//  TAG METHODS DO OBJETO LUACOM  //
-//                                //
+//
+//  TAG METHODS FOR LUACOM OBJECT
+//
 ////////////////////////////////////
 
 /*
- * tag method que gerencia garbage collection
+ * Tag method that manages garbage collection.
  */
-
 static int tagmeth_gc(lua_State *L)
 {
   tLuaCOM* lcom = (tLuaCOM*)*(void **)lua_touserdata(L, -1);
@@ -1889,7 +1875,6 @@ static int tagmeth_gc(lua_State *L)
  * tag method que gerencia atribuicoes a campos
  * do objeto luacom
  */
-
 static int tagmeth_settable(lua_State *L)
 {
   DISPID dispid;
@@ -1986,7 +1971,6 @@ static int tagmeth_settable(lua_State *L)
 
 /*
  * Closure que gerencia chamadas de metodos
- *
  */
 static int callhook(lua_State *L)
 {
@@ -2306,12 +2290,10 @@ static int typed_tagmeth_index(lua_State *L,
 
 
 /*
- * tag method que gerencia leituras de campos
- * do objeto luacom
+ * Tag method that manages reading LuaCOM object fields.
  *
  * In: table, index
  */
-
 static int tagmeth_index(lua_State *L)
 {
   // used variables
@@ -2452,9 +2434,9 @@ static int luacom_RoundTrip(lua_State *L) {
 }
 
 /////////////////////////////////////////////
-//                                         //
-//  TABELA DAS FUNCOES EXPORTADAS PARA LUA //
-//                                         //
+//
+// Table of functions exported by Lua.
+//
 /////////////////////////////////////////////
 
 static struct luaL_Reg functions_tb []= 
@@ -2494,9 +2476,9 @@ static struct luaL_Reg functions_tb []=
   
 
 /////////////////////////////////////
-//                                 //
-//  FUNCOES EXPORTADAS PARA C/C++  //
-//                                 //
+//
+// Functions exported by C/C++.
+//
 /////////////////////////////////////
 
 /*
@@ -2508,7 +2490,6 @@ static struct luaL_Reg functions_tb []=
  *  interface. O objeto criado e' colocado na
  *  pilha de Lua
  */
-
 LUACOM_API int luacom_IDispatch2LuaCOM(lua_State *L, void *pdisp_arg)
 {
   if(pdisp_arg == NULL)
@@ -2536,9 +2517,8 @@ LUACOM_API int luacom_IDispatch2LuaCOM(lua_State *L, void *pdisp_arg)
 }
 
 /*
- *  Inicializacao da biblioteca
+ * Initializes the library.
  */
-
 LUACOM_API void luacom_open(lua_State *L)
 {
   if(L == NULL)
@@ -2551,7 +2531,6 @@ LUACOM_API void luacom_open(lua_State *L)
 
   // prepares to store configuration table in
   // library table
-
   lua_pushstring(L, CONFIGTABLE_NAME);
 
   // creates and registers configuration table
@@ -2630,9 +2609,8 @@ LUACOM_API void luacom_open(lua_State *L)
 }
 
 /*
- *  Fechamento da biblioteca
+ * Closes the library.
  */
-
 LUACOM_API void luacom_close(lua_State *L)
 {
 }
@@ -2641,7 +2619,6 @@ LUACOM_API void luacom_close(lua_State *L)
 /*
  * Helper for implementing automation servers with LuaCOM
  */
-
 LUACOM_API int luacom_detectAutomation(lua_State *L, int argc, char *argv[])
 {
   int automation_result = LUACOM_NOAUTOMATION;
