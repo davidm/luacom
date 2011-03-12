@@ -16,7 +16,7 @@ endif
 # Sources
 
 
-DEF_FILE = library/luacom.def
+DEF_FILE = dll/luacom_dll.def
 
 ifeq "$(LUA_VERSION_NUMBER)" "5"
 SRCLUA = library/luacom5.lua
