@@ -18,6 +18,26 @@ local teste_progid = "LuaCOM.Test"
 luacom.StartLog("luacom.log")
 luacom.abort_on_API_error = true
 
+-- Tests whether file exists (and is readable).
+local function file_exists(path)
+  local fh = io.open(path)
+  if fh then
+    fh:close()
+	return true
+  end
+  return false
+end
+
+-- Command line arguments.
+local top_path = ...
+top_path = top_path or arg[0]:gsub('[^\\/]*$', './../..', 1)
+
+-- Check that top_path is valid.
+local tlb_path = top_path .. '/src/test/test.tlb'
+if not file_exists(tlb_path) then
+  error('not found: ' .. tlb_path .. ' .  usage: test.lua <path_to_top>')
+end
+
 --UNUSED: Unk = luacom.GetIUnknown
 
 local Events
@@ -79,7 +99,7 @@ END-UNUSED
 
 local function impl_interface(t, ...)
   if SKIP_REGISTER then
-    return luacom.ImplInterfaceFromTypelib(t, "test.tlb", ...)
+    return luacom.ImplInterfaceFromTypelib(t, tlb_path, ...)
   else
     return luacom.ImplInterface(t, "LUACOM.Test", ...)
   end
@@ -90,7 +110,7 @@ local function init()
   local reginfo = {}  
   reginfo.VersionIndependentProgID = "LUACOM.Test"
   reginfo.ProgID = reginfo.VersionIndependentProgID..".1"
-  reginfo.TypeLib = "test.tlb"
+  reginfo.TypeLib = tlb_path
   reginfo.CoClass = "Test"
   reginfo.ComponentName = "LuaCOM-Test"
   reginfo.Arguments = "/Automation"
@@ -487,7 +507,7 @@ local function test_optional_params()
   nt(1)
 
   local teste = {}
-  local obj = luacom.ImplInterfaceFromTypelib(teste, "test.tlb", "ITest1" )
+  local obj = luacom.ImplInterfaceFromTypelib(teste, tlb_path, "ITest1" )
   assert(obj)
 
   nt('[in, optional]')
@@ -612,7 +632,7 @@ local function test_safearrays()
 
   nt(1)
 
-  local obj = luacom.ImplInterfaceFromTypelib(teste, "test.tlb", "ITest2" )
+  local obj = luacom.ImplInterfaceFromTypelib(teste, tlb_path, "ITest2" )
   assert(obj)
 
   array = {}
@@ -711,14 +731,14 @@ local function test_safearrays()
     end
   end
 
-  local obj = luacom.ImplInterfaceFromTypelib(teste, "test.tlb", "ITest2" )
+  local obj = luacom.ImplInterfaceFromTypelib(teste, tlb_path, "ITest2" )
   assert(obj)
 
   array = {}
   teste.Teste = 10
 
   for i=1,9 do
-    array[i] = luacom.ImplInterfaceFromTypelib(teste, "test.tlb", "ITest2" )
+    array[i] = luacom.ImplInterfaceFromTypelib(teste, tlb_path, "ITest2" )
   end
 
   obj:TestSafeArrayIDispatch(array)
