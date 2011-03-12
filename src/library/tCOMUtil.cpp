@@ -770,7 +770,7 @@ void tCOMUtil::DumpTypeInfo(ITypeInfo *typeinfo)
     typeinfo->GetNames(pfd->memid, names, 1, &dumb);
 
     printf("%.3d: %-30s\tid=0x%d\t%d param(s)\n", i,
-      tUtil::bstr2string(names[0]), pfd->memid, pfd->cParams);
+      tUtil::bstr2string(names[0]).getBuffer(), pfd->memid, pfd->cParams);
 
     typeinfo->ReleaseFuncDesc(pfd);
     SysFreeString(names[0]);

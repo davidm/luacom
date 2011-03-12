@@ -2318,7 +2318,7 @@ static int tagmeth_index(lua_State *L)
     if(!field_name)
       return 0;
 
-    tUtil::log_verbose("tagmeth_index", "looking for name '%s'", field_name);
+    tUtil::log_verbose("tagmeth_index", "looking for name '%s'", field_name.getBuffer());
 
     // checks for some predefined attributes
     if(strcmp(field_name, LCOM_IUNKNOWN_ATTRIBUTE) == 0)
