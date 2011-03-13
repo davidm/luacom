@@ -31,6 +31,13 @@ end
 -- Command line arguments.
 local top_path = ...
 top_path = top_path or arg[0]:gsub('[^\\/]*$', './../..', 1)
+if package.config:sub(1,1) == '/' then -- detect Cygwin (improve?)
+  -- Convert to Windows style path expected by WinAPI.
+  local cmd = "cygpath -wa '" .. top_path .. "'"
+  local fh = assert(io.popen(cmd))
+  top_path = fh:read'*a':gsub('[\r\n]+', '')
+  fh:close()
+end
 
 -- Check that top_path is valid.
 local tlb_path = top_path .. '/src/test/test.tlb'
