@@ -4,7 +4,7 @@
 # For details see the COPYRIGHT file distributed with LuaDist.
 # Please note that the package source code is licensed under its own license.
 
-PROJECT(luacom CXX C)
+PROJECT(luacom C CXX)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 INCLUDE(dist.cmake)
 INCLUDE(CheckIncludeFiles)
