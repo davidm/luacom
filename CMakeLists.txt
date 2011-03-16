@@ -7,14 +7,24 @@
 PROJECT(luacom C CXX)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 INCLUDE(dist.cmake)
-INCLUDE(CheckIncludeFiles)
+INCLUDE(CheckCSourceCompiles)
 INCLUDE(CheckSymbolExists) # note: requires 'C' in PROJECT.
 
 # Build
 INCLUDE_DIRECTORIES(include src/dll src/library ${CMAKE_CURRENT_BINARY_DIR})
 
-# Note: htmlhelp not available in Cygwin 1.7.
-CHECK_INCLUDE_FILES("windows.h;htmlhelp.h" HAVE_HTMLHELP)
+# Detect htmlhelp (not normally available in Cygwin 1.7, MinGW, and Wine).
+# Use CHECK_C_SOURCE_COMPILES because these two aren't reliable:
+#   CHECK_INCLUDE_FILES("windows.h;htmlhelp.h" HAVE_HTMLHELP)
+#          # On MinGW and Wine, htmlhelp.h may exist but not htmlhelp.lib.
+#   CHECK_LIBRARY_EXISTS(htmlhelp HtmlHelpA "" HAVE_HTMLHELP) # detection fails in MSVC
+set(CMAKE_REQUIRED_LIBRARIES htmlhelp)
+CHECK_C_SOURCE_COMPILES("
+#include <windows.h>
+	#include <htmlhelp.h>
+	int main() { HtmlHelp(NULL, NULL, HH_HELP_CONTEXT, 0); return 0; }
+" HAVE_HTMLHELP)
+set(CMAKE_REQUIRED_LIBRARIES)
 IF(NOT HAVE_HTMLHELP)
 	ADD_DEFINITIONS(-DNO_HTMLHELP)
 ENDIF(NOT HAVE_HTMLHELP)
