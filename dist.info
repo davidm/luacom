@@ -1,0 +1,13 @@
+--- This file is part of LuaDist project
+
+name = "luacom"
+version = "1.4"
+
+desc  = "LuaCOM is an add-on library to the Lua language that allows Lua programs to use and implement objects that follow Microsoft's Component Object Model (COM) specification and use the ActiveX technology for property access and method calls"
+author = "Vinicius Almendra, Renato Cerqueira"
+url = "http://lua-users.org/wiki/LuaCom"
+maintainer = "Peter Kapec"
+
+depends = {
+	"lua ~> 5.1"
+}
