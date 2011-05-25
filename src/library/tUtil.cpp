@@ -244,7 +244,7 @@ void tUtil::log(const char *who, const char *what, ...)
 
     va_end(marker);
 
-    MessageBox(NULL, buffer, "LuaCOM Log", MB_OK | MB_ICONEXCLAMATION);
+    MessageBoxA(NULL, buffer, "LuaCOM Log", MB_OK | MB_ICONEXCLAMATION);
 
     delete[] buffer;
     buffer = NULL;
@@ -308,7 +308,7 @@ void tUtil::ShowHelp(const char *filename, unsigned long context)
 #if !defined(__WINE__) && !defined(__CYGWIN__)
     _spawnlp(_P_NOWAIT, "hh.exe", "hh.exe", context_param, filename, NULL);
 #else
-    MessageBox(NULL, "FIX - not implemented - _spawnlp", "LuaCOM", MB_ICONEXCLAMATION);
+    MessageBoxA(NULL, "FIX - not implemented - _spawnlp", "LuaCOM", MB_ICONEXCLAMATION);
     #warning FIX - not implemented - _spawnlp
 #endif
   }
