@@ -4,14 +4,14 @@
 # For details see the COPYRIGHT file distributed with LuaDist.
 # Please note that the package source code is licensed under its own license.
 
-PROJECT(luacom C CXX)
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-INCLUDE(dist.cmake)
-INCLUDE(CheckCSourceCompiles)
-INCLUDE(CheckSymbolExists) # note: requires 'C' in PROJECT.
+project(luacom C CXX)
+cmake_minimum_required(VERSION 2.6)
+include(dist.cmake)
+include(CheckCSourceCompiles)
+include(CheckSymbolExists) # note: requires 'C' in PROJECT.
 
 # Build
-INCLUDE_DIRECTORIES(include src/dll src/library ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(include src/dll src/library ${CMAKE_CURRENT_BINARY_DIR})
 
 # Detect htmlhelp (not normally available in Cygwin 1.7, MinGW, and Wine).
 # Use CHECK_C_SOURCE_COMPILES because these two aren't reliable:
@@ -19,82 +19,79 @@ INCLUDE_DIRECTORIES(include src/dll src/library ${CMAKE_CURRENT_BINARY_DIR})
 #          # On MinGW and Wine, htmlhelp.h may exist but not htmlhelp.lib.
 #   CHECK_LIBRARY_EXISTS(htmlhelp HtmlHelpA "" HAVE_HTMLHELP) # detection fails in MSVC
 set(CMAKE_REQUIRED_LIBRARIES htmlhelp)
-CHECK_C_SOURCE_COMPILES("
+check_c_source_compiles("
 #include <windows.h>
-	#include <htmlhelp.h>
-	int main() { HtmlHelp(NULL, NULL, HH_HELP_CONTEXT, 0); return 0; }
+  #include <htmlhelp.h>
+  int main() { HtmlHelp(NULL, NULL, HH_HELP_CONTEXT, 0); return 0; }
 " HAVE_HTMLHELP)
 set(CMAKE_REQUIRED_LIBRARIES)
-IF(NOT HAVE_HTMLHELP)
-	ADD_DEFINITIONS(-DNO_HTMLHELP)
-ENDIF(NOT HAVE_HTMLHELP)
+if(NOT HAVE_HTMLHELP)
+  add_definitions(-DNO_HTMLHELP)
+endif()
 
 # _stricmp (is there a simpler way of doing this?)
-CHECK_SYMBOL_EXISTS(_stricmp string.h HAVE__STRICMP)
-IF(HAVE__STRICMP)
-	SET(STRICMP _stricmp)
-ENDIF()
-IF(NOT STRICMP)
-	CHECK_SYMBOL_EXISTS(stricmp string.h HAVE_STRICMP)
-	IF(HAVE_STRICMP)
-		SET(STRICMP stricmp)
-	ENDIF()
-ENDIF()
-IF(NOT STRICMP)
-	CHECK_SYMBOL_EXISTS(strcasecmp string.h HAVE_STRCASECMP)
-	IF(HAVE_STRCASECMP)
-		SET(STRICMP strcasecmp)
-	ENDIF()
-ENDIF()
-IF(NOT STRICMP)
-	MESSAGE(FATAL_ERROR "_stricmp, stricmp, or strcasecmp not found")
-ENDIF()
-ADD_DEFINITIONS(-D_stricmp=${STRICMP})
+check_symbol_exists(_stricmp string.h HAVE__STRICMP)
+if(HAVE__STRICMP)
+  set(STRICMP _stricmp)
+endif()
+if(NOT STRICMP)
+  check_symbol_exists(stricmp string.h HAVE_STRICMP)
+  if(HAVE_STRICMP)
+    set(STRICMP stricmp)
+  endif()
+endif()
+if(NOT STRICMP)
+  check_symbol_exists(string.h HAVE_STRCASECMP)
+  if(HAVE_STRCASECMP)
+    set(STRICMP strcasecmp)
+  endif()
+endif()
+if(NOT STRICMP)
+  message(FATAL_ERROR "_stricmp, stricmp, or strcasecmp not found")
+endif()
+add_definitions(-D_stricmp=${STRICMP})
 
-SET(SRC_LIB
-	src/library/LuaAux.cpp
-	src/library/luabeans.cpp
-	src/library/luacom.cpp
-	src/library/tLuaCOM.cpp
-	src/library/tLuaCOMException.cpp
-	src/library/tLuaCOMTypeHandler.cpp
-	src/library/tLuaDispatch.cpp
-	src/library/tLuaObjList.cpp
-	src/library/tLuaVector.cpp
-	src/library/tStringBuffer.cpp
-	src/library/tUtil.cpp
-	src/library/tCOMUtil.cpp
-	src/library/tLuaCOMClassFactory.cpp
-	src/library/tLuaCOMConnPoints.cpp
-	src/library/LuaCompat.cpp
-	src/library/tLuaCOMEnumerator.cpp
-	src/library/tLuaObject.cpp
-	src/library/tLuaControl.cpp
-	src/library/tLuaTLB.cpp
+set(SRC_LIB
+  src/library/LuaAux.cpp
+  src/library/luabeans.cpp
+  src/library/luacom.cpp
+  src/library/tLuaCOM.cpp
+  src/library/tLuaCOMException.cpp
+  src/library/tLuaCOMTypeHandler.cpp
+  src/library/tLuaDispatch.cpp
+  src/library/tLuaObjList.cpp
+  src/library/tLuaVector.cpp
+  src/library/tStringBuffer.cpp
+  src/library/tUtil.cpp
+  src/library/tCOMUtil.cpp
+  src/library/tLuaCOMClassFactory.cpp
+  src/library/tLuaCOMConnPoints.cpp
+  src/library/LuaCompat.cpp
+  src/library/tLuaCOMEnumerator.cpp
+  src/library/tLuaObject.cpp
+  src/library/tLuaControl.cpp
+  src/library/tLuaTLB.cpp
 )
 
-SET(LIBS gdi32 shell32 advapi32 ole32 winspool uuid oleaut32 shlwapi) # kernel32 user32
-IF(HAVE_HTMLHELP)
-	SET(LIBS ${LIBS} htmlhelp)
-ENDIF(HAVE_HTMLHELP)
+set(LIBS gdi32 shell32 advapi32 ole32 winspool uuid oleaut32 shlwapi) # kernel32 user32
+if(HAVE_HTMLHELP)
+  set(LIBS ${LIBS} htmlhelp)
+endif()
 
-ADD_LUA_BIN2C(${CMAKE_CURRENT_BINARY_DIR}/luacom5.loh src/library/luacom5.lua
-	${CMAKE_CURRENT_SOURCE_DIR}/mak/bin2c.lua
-	${CMAKE_CURRENT_SOURCE_DIR}/mak/luac.lua)
-SET_SOURCE_FILES_PROPERTIES(src/library/luacom.cpp PROPERTIES OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/luacom5.loh)
+add_lua_bin2c(
+  ${CMAKE_CURRENT_BINARY_DIR}/luacom5.loh src/library/luacom5.lua
+  ${CMAKE_CURRENT_SOURCE_DIR}/mak/bin2c.lua
+  ${CMAKE_CURRENT_SOURCE_DIR}/mak/luac.lua)
+set_source_files_properties(src/library/luacom.cpp PROPERTIES OBJECT_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/luacom5.loh)
 
-SET(SRC_DLL src/dll/luacom_dll.cpp)
-ADD_DEFINITIONS(-DLUACOM_DLL="luacom.dll")
+set(SRC_DLL src/dll/luacom_dll.cpp)
+add_definitions(-DLUACOM_DLL="luacom.dll")
 
-ADD_LUA_MODULE(luacom ${SRC_DLL} ${SRC_LIB} src/dll/luacom_dll.def)
-TARGET_LINK_LIBRARIES(luacom ${LIBS})
+install_lua_module(luacom ${SRC_DLL} ${SRC_LIB} src/dll/luacom_dll.def)
+target_link_libraries(luacom ${LIBS})
 
-# Install all files and documentation
-INSTALL (TARGETS luacom DESTINATION ${INSTALL_CMOD})
-#~ INSTALL (FILES src/library/luacom5.lua DESTINATION ${INSTALL_LMOD})
+install_data(README COPYRIGHT announce.txt todo.txt)
+install_doc(doc/luacom.gif doc/luacom.pdf www/index.html)
+install_example(demo/)
 
-INSTALL (FILES INSTALL README COPYRIGHT announce.txt todo.txt DESTINATION ${INSTALL_DATA})
-INSTALL (FILES doc/luacom.gif doc/luacom.pdf www/index.html DESTINATION ${INSTALL_DOC})
-INSTALL (DIRECTORY demo DESTINATION ${INSTALL_EXAMPLE})
-
-ADD_LUA_TEST(${CMAKE_CURRENT_SOURCE_DIR}/src/test/luacom_tests5.lua)
+add_lua_test(${CMAKE_CURRENT_SOURCE_DIR}/src/test/luacom_tests5.lua)
