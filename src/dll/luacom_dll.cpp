@@ -66,7 +66,7 @@ static void factoryCache_Init() {
   IupSpeechOpen();
   #endif
 #endif
-  factoryCache = lua_open();
+  factoryCache = luaL_newstate();
   lua_newtable(factoryCache);
   lua_setglobal(factoryCache,"factories");
 }
@@ -116,7 +116,7 @@ static lua_State* luacom_DoRegistryFile(const char* luaclsid) {
   strcat(key,"\\ScriptFile");
 
   if(tCOMUtil::GetRegKeyValue(key,&fileName)) {
-    L_inproc = lua_open();
+    L_inproc = luaL_newstate();
     luaL_openlibs(L_inproc);
     #ifdef IUP
       /* iuplua initialization */

@@ -739,7 +739,7 @@ void tCOMUtil::DumpTypeInfo(ITypeInfo *typeinfo)
 
 #ifdef __WINE__
   hr = 0;
-  MessageBox(NULL, "FIX - not implemented - StringFromIID", "LuaCOM", MB_ICONEXCLAMATION);
+  MessageBoxA(NULL, "FIX - not implemented - StringFromIID", "LuaCOM", MB_ICONEXCLAMATION);
   #warning FIX - not implemented - StringFromIID
 #else
   hr = StringFromIID(pta->guid, &lpsz);
