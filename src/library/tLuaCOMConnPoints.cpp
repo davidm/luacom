@@ -1400,7 +1400,7 @@ tLuaCOMConnPointContainer::tLuaCOMConnPointContainer(lua_State* p_L,
   {
     COM_RELEASE(ci2);
     COM_RELEASE(coclassinfo);
-	  throw e;
+    throw e;
   }
 
   COM_RELEASE(ci2);
