@@ -2,6 +2,11 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+// Required for VARIANT field accessors to compile under wineg++.
+#ifdef __WINE__
+# define _FORCENAMELESSUNION  // used by oaidl.h
+#endif
+
 #include <ole2.h>
 
 extern "C"
@@ -109,10 +114,6 @@ void tLuaCOMTypeHandler::pushTableVarNumber(lua_State *L, VARTYPE vt, double val
 
 void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_variant)
 {
-#ifdef __WINE__
-  MessageBoxA(NULL, "FIX - not implemented - VARIANT", "LuaCOM", MB_ICONEXCLAMATION);
-#else
-
   LUASTACK_SET(L);
 
   HRESULT hr = S_OK;
@@ -419,7 +420,6 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
   }
 
   LUASTACK_CLEAN(L, 1);
-#endif
 }
 
 tLuaCOM *tLuaCOMTypeHandler::convert_table(lua_State *L, stkIndex luaval)
@@ -468,9 +468,6 @@ tLuaCOM *tLuaCOMTypeHandler::convert_table(lua_State *L, stkIndex luaval)
 
 void tLuaCOMTypeHandler::lua2com(lua_State* L, stkIndex luaval, VARIANTARG& varg, VARTYPE type)
 {
-#ifdef __WINE__
-  MessageBoxA(NULL, "FIX - not implemented - VARIANT", "LuaCOM", MB_ICONEXCLAMATION);
-#else
   CHECKPARAM(luaval > 0);
 
   VariantClear(&varg);
@@ -700,7 +697,6 @@ void tLuaCOMTypeHandler::lua2com(lua_State* L, stkIndex luaval, VARIANTARG& varg
     TYPECONV_ERROR("No lua value to convert.");
     break;
   }
-#endif
 }
 
 bool tLuaCOMTypeHandler::setRetval(lua_State* L,
@@ -728,12 +724,6 @@ bool tLuaCOMTypeHandler::setRetval(lua_State* L,
 
 int tLuaCOMTypeHandler::pushOutValues(lua_State* L, const DISPPARAMS& dispparams, const FUNCDESC* pfuncdesc)
 {
-#ifdef __WINE__
-  MessageBoxA(NULL, "FIX - not implemented - VARIANT", "LuaCOM", MB_ICONEXCLAMATION);
-  // only done once in this file:
-  #warning FIX - not implemented VARIANT
-  return 0;
-#else
   CHECKPRECOND(!pfuncdesc || dispparams.cArgs == pfuncdesc->cParams);
 
   unsigned int i = 0;
@@ -754,7 +744,6 @@ int tLuaCOMTypeHandler::pushOutValues(lua_State* L, const DISPPARAMS& dispparams
   }
 
   return num_pushed_values;
-#endif
 }
 
 
@@ -790,9 +779,6 @@ void tLuaCOMTypeHandler::fillDispParams(lua_State* L,
                                         tLuaObjList params,
                                         int invkind)
 {
-#ifdef __WINE__
-  MessageBoxA(NULL, "FIX - not implemented - VARIANT", "LuaCOM", MB_ICONEXCLAMATION);
-#else
   // initializes DISPPARAMS
   rDispParams.cArgs = 0;
   rDispParams.cNamedArgs = 0;
@@ -1042,7 +1028,6 @@ void tLuaCOMTypeHandler::fillDispParams(lua_State* L,
   }
 
   return;
-#endif
 }
 
 
@@ -1050,9 +1035,6 @@ void tLuaCOMTypeHandler::pushLuaArgs(lua_State* L,
                                      DISPPARAMS* pDispParams,
                                      const ELEMDESC* pElemDesc)
 {
-#ifdef __WINE__
-  MessageBoxA(NULL, "FIX - not implemented - VARIANT", "LuaCOM", MB_ICONEXCLAMATION);
-#else
   unsigned int arg = 0;
   VARIANT var;
   HRESULT hr = S_OK;
@@ -1132,7 +1114,6 @@ void tLuaCOMTypeHandler::pushLuaArgs(lua_State* L,
       VariantClear(&var);
     }
   }
-#endif
 }
 
 void tLuaCOMTypeHandler::setOutValues(lua_State* L,
@@ -1141,9 +1122,6 @@ void tLuaCOMTypeHandler::setOutValues(lua_State* L,
                                       stkIndex outvalue
                                       )
 {
-#ifdef __WINE__
-  MessageBoxA(NULL, "FIX - not implemented - VARIANT", "LuaCOM", MB_ICONEXCLAMATION);
-#else
   CHECKPRECOND(outvalue > 0);
 
   const unsigned int num_args = pDispParams->cArgs;
@@ -1239,7 +1217,6 @@ void tLuaCOMTypeHandler::setOutValues(lua_State* L,
       outvalue++;
     }
   }
-#endif
 }
 
 //
@@ -1273,9 +1250,6 @@ void tLuaCOMTypeHandler::put_in_array(SAFEARRAY* safearray,
                          VARTYPE vt
                          )
 {
-#ifdef __WINE__
-  MessageBoxA(NULL, "FIX - not implemented - VARIANT", "LuaCOM", MB_ICONEXCLAMATION);
-#else
   HRESULT hr = S_OK;
   VARIANT var_value;
 
@@ -1367,7 +1341,6 @@ void tLuaCOMTypeHandler::put_in_array(SAFEARRAY* safearray,
   }
 
   CHK_COM_CODE(hr);
-#endif
 }
 
 stkIndex tLuaCOMTypeHandler::get_from_array(lua_State* L,
@@ -1376,9 +1349,6 @@ stkIndex tLuaCOMTypeHandler::get_from_array(lua_State* L,
                                             const VARTYPE& vt
                                             )
 {
-#ifdef __WINE__
-  MessageBoxA(NULL, "FIX - not implemented - VARIANT", "LuaCOM", MB_ICONEXCLAMATION);
-#else
   VARIANTARG varg;
   void *pv = NULL;
 
@@ -1406,7 +1376,6 @@ stkIndex tLuaCOMTypeHandler::get_from_array(lua_State* L,
   com2lua(L, varg);
 
   return lua_gettop(L);
-#endif
 }
 
 
@@ -1446,9 +1415,6 @@ void tLuaCOMTypeHandler::safearray_lua2com(lua_State* L,
                                            VARTYPE vt,
                                            bool from_stack)
 {
-#ifdef __WINE__
-  MessageBoxA(NULL, "FIX - not implemented - VARIANT", "LuaCOM", MB_ICONEXCLAMATION);
-#else
   LUASTACK_SET(L);
 
   HRESULT hr = S_OK;
@@ -1576,14 +1542,10 @@ void tLuaCOMTypeHandler::safearray_lua2com(lua_State* L,
   LUASTACK_CLEAN(L, 0);
 
   return;
-#endif
 }
 
 void tLuaCOMTypeHandler::string2safearray(const char* str, size_t len, VARIANTARG& varg)
 {
-#ifdef __WINE__
-  MessageBoxA(NULL, "FIX - not implemented - VARIANT", "LuaCOM", MB_ICONEXCLAMATION);
-#else
   HRESULT hr = S_OK;
 
   // cria array
@@ -1601,14 +1563,10 @@ void tLuaCOMTypeHandler::string2safearray(const char* str, size_t len, VARIANTAR
   // preenche variantarg
   varg.vt = VT_UI1 | VT_ARRAY;
   varg.parray = safearray;
-#endif
 }
 
 void tLuaCOMTypeHandler::safearray2string(lua_State* L, VARIANTARG & varg)
 {
-#ifdef __WINE__
-  MessageBoxA(NULL, "FIX - not implemented - VARIANT", "LuaCOM", MB_ICONEXCLAMATION);
-#else
   CHECKPRECOND(varg.vt & (VT_ARRAY | VT_UI1));
   CHECKPRECOND(varg.parray->cDims == 1);
 
@@ -1623,7 +1581,6 @@ void tLuaCOMTypeHandler::safearray2string(lua_State* L, VARIANTARG & varg)
   lua_pushlstring(L, (char*) buffer, size);
 
   SafeArrayUnaccessData(varg.parray);
-#endif
 }
 
 
@@ -1645,9 +1602,6 @@ long* tLuaCOMTypeHandler::dimensionsFromBounds(SAFEARRAYBOUND* bounds,
 
 void tLuaCOMTypeHandler::safearray_com2lua(lua_State* L, VARIANTARG & varg)
 {
-#ifdef __WINE__
-  MessageBoxA(NULL, "FIX - not implemented - VARIANT", "LuaCOM", MB_ICONEXCLAMATION);
-#else
   CHECK(varg.vt & VT_ARRAY, PARAMETER_OUT_OF_RANGE);
 
   bool succeeded          = false;
@@ -1754,7 +1708,6 @@ void tLuaCOMTypeHandler::safearray_com2lua(lua_State* L, VARIANTARG & varg)
   delete[] indices;
 
   return;
-#endif
 }
 
 
@@ -1897,9 +1850,6 @@ TYPEDESC tLuaCOMTypeHandler::processUSERDEFINED(ITypeInfo* typeinfo,
 
 void tLuaCOMTypeHandler::releaseVariant(VARIANTARG *pvarg, bool release_memory)
 {
-#ifdef __WINE__
-  MessageBoxA(NULL, "FIX - not implemented - VARIANT", "LuaCOM", MB_ICONEXCLAMATION);
-#else
   if(pvarg->vt & VT_BYREF && pvarg->byref != NULL)
   {
     switch(pvarg->vt & ~VT_BYREF)
@@ -1939,7 +1889,6 @@ void tLuaCOMTypeHandler::releaseVariant(VARIANTARG *pvarg, bool release_memory)
   }
   else
     VariantClear(pvarg);
-#endif
 }
 
 
@@ -2041,9 +1990,6 @@ void tLuaCOMTypeHandler::pushIUnknown(lua_State* L, IUnknown *punk)
 
 void tLuaCOMTypeHandler::initByRefParam(VARIANTARG* pvarg, VARTYPE vt, bool alloc_memory)
 {
-#ifdef __WINE__
-  MessageBoxA(NULL, "FIX - not implemented - VARIANT", "LuaCOM", MB_ICONEXCLAMATION);
-#else
   CHECKPRECOND(!(vt & VT_BYREF));
   VariantClear(pvarg);
 
@@ -2064,14 +2010,10 @@ void tLuaCOMTypeHandler::initByRefParam(VARIANTARG* pvarg, VARTYPE vt, bool allo
   } else {
     pvarg->byref = NULL;
   }
-#endif
 }
 
 void tLuaCOMTypeHandler::toByRefParam(VARIANT &var_source, VARIANTARG* pvarg_dest)
 {
-#ifdef __WINE__
-  MessageBoxA(NULL, "FIX - not implemented - VARIANT", "LuaCOM", MB_ICONEXCLAMATION);
-#else
   CHECKPARAM(pvarg_dest);
   CHECKPRECOND(!(var_source.vt & VT_BYREF));
 
@@ -2104,7 +2046,6 @@ void tLuaCOMTypeHandler::toByRefParam(VARIANT &var_source, VARIANTARG* pvarg_des
   // Does a hard copy of the memory contents,
 
   memcpy(pvarg_dest->byref, &var_source.byref, VariantSize(vt_dest));
-#endif
 }
 
 TYPEDESC tLuaCOMTypeHandler::processSAFEARRAY(ITypeInfo* typeinfo,
