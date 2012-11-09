@@ -8,9 +8,7 @@ static char const * const rcsname = "$Name:  $";
 
 
 #include <assert.h>
-#if !defined(__WINE__) || defined(__MSVCRT__)
-#include <process.h>
-#endif
+#include <process.h>  // spawnlp
 #include <limits.h>
 
 #include "tUtil.h"
@@ -22,6 +20,9 @@ extern "C"
 #include <lauxlib.h>
 }
 
+#ifndef _MSC_VER  // not MSVC++
+# define _spawnlp spawnlp
+#endif
 
 #define MAX_VALID_STRING_SIZE 1000
 
@@ -305,12 +306,7 @@ void tUtil::ShowHelp(const char *filename, unsigned long context)
       sprintf(context_param, "-mapid %d", context);
     else
       context_param[0] = '\0';
-#if !defined(__WINE__) && !defined(__CYGWIN__)
     _spawnlp(_P_NOWAIT, "hh.exe", "hh.exe", context_param, filename, NULL);
-#else
-    MessageBoxA(NULL, "FIX - not implemented - _spawnlp", "LuaCOM", MB_ICONEXCLAMATION);
-    #warning FIX - not implemented - _spawnlp
-#endif
   }
   else if(_stricmp(extension, ".hlp") == 0)
   {
