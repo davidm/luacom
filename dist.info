@@ -3,10 +3,11 @@
 name = "luacom"
 version = "1.4"
 
-desc  = "LuaCOM is an add-on library to the Lua language that allows Lua programs to use and implement objects that follow Microsoft's Component Object Model (COM) specification and use the ActiveX technology for property access and method calls"
+desc = "Use and implement Microsoft Component Object Model (COM)/OLE/ActiveX objects in Lua"
 author = "Vinicius Almendra, Renato Cerqueira"
+license = "MIT/X11"
 url = "http://lua-users.org/wiki/LuaCom"
-maintainer = "Peter Kapec"
+maintainer = "David Manura"
 
 depends = {
 	"lua ~> 5.1"
