@@ -1376,28 +1376,36 @@ tLuaCOMConnPointContainer::tLuaCOMConnPointContainer(lua_State* p_L,
   pUnkOuter = p_pUnkOuter;
   L = p_L;
 
-  // creates connection point for source interface
+   // creates connection point for source interface
   IProvideClassInfo2 *ci2  = NULL;
+  ITypeInfo *coclassinfo = NULL;
 
   hr = pUnkOuter->QueryInterface(IID_IProvideClassInfo2, (void **) &ci2); 
   CHK_COM_CODE(hr);
 
   IID iid;
 
-  hr = ci2->GetGUID(GUIDKIND_DEFAULT_SOURCE_DISP_IID, &iid);
-  CHK_COM_CODE(hr);
+  try
+  {
+    hr = ci2->GetGUID(GUIDKIND_DEFAULT_SOURCE_DISP_IID, &iid);
+    CHK_COM_CODE(hr);
 
-  ITypeInfo *coclassinfo = NULL;
+    hr = ci2->GetClassInfo(&coclassinfo);
+    CHK_COM_CODE(hr);  
 
-  hr = ci2->GetClassInfo(&coclassinfo);
-  CHK_COM_CODE(hr);  
-
-  events_typeinfo = tCOMUtil::GetDefaultInterfaceTypeInfo(coclassinfo, true);
-  CHK_LCOM_ERR(events_typeinfo, "No default source typeinfo.");
+    events_typeinfo = tCOMUtil::GetDefaultInterfaceTypeInfo(coclassinfo, true);
+    CHK_LCOM_ERR(events_typeinfo, "No default source typeinfo.");
+  }
+  catch(class tLuaCOMException& e)
+  {
+    COM_RELEASE(ci2);
+    COM_RELEASE(coclassinfo);
+    throw e;
+  }
 
   COM_RELEASE(ci2);
   COM_RELEASE(coclassinfo);
-
+  
   max_connection_points = 1;
   connection_points = new tLuaCOMConnPoint*[max_connection_points];
   CHKMALLOC(connection_points);
