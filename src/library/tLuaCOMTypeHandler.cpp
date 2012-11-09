@@ -2,11 +2,6 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-// RCS Info
-static char const * const rcsid = "$Id: tLuaCOMTypeHandler.cpp,v 1.10 2008/01/31 17:09:16 ignacio Exp $";
-static char const * const rcsname = "$Name:  $";
-
-
 #include <ole2.h>
 
 extern "C"

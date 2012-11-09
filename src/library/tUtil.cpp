@@ -2,11 +2,6 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-// RCS Info
-static char const * const rcsid = "$Id: tUtil.cpp,v 1.4 2008/01/10 17:44:55 ignacio Exp $";
-static char const * const rcsname = "$Name:  $";
-
-
 #include <assert.h>
 #include <process.h>  // spawnlp
 #include <limits.h>

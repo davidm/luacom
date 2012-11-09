@@ -4,11 +4,6 @@
  * Vinicius Almendra
  */
 
-// RCS Info
-static char const * const rcsid = "$Id: tLuaDispatch $";
-static char const * const rcsname = "$Name:  $";
-
-
 #include "tLuaDispatch.h"
 #include "tLuaCOM.h"
 #include "tLuaCOMException.h"
