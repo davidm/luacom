@@ -10,6 +10,7 @@
 #include <ocidl.h>
 
 #include "tLuaDispatch.h"
+#include "tCOMUtil.h"
 
 class tLuaControl: public tLuaDispatch, public IOleObject,
         public IOleControl,	public IOleInPlaceObject,
@@ -125,16 +126,13 @@ public:
       int ref
     );
 private:
-    IOleAdviseHolder *m_pOleAdviseHolder;          // IOleObject::Advise holder object
-    IAdviseSink      *m_pViewAdviseSink;           // IViewAdvise sink for IViewObject2
-
-    IOleClientSite     *m_pClientSite;             // client site
-    IOleControlSite    *m_pControlSite;            // IOleControlSite ptr on client site
-    IOleInPlaceSite    *m_pInPlaceSite;            // IOleInPlaceSite for managing activation
-    IOleInPlaceFrame   *m_pInPlaceFrame;           // IOleInPlaceFrame ptr on client site
-    IOleInPlaceUIWindow *m_pInPlaceUIWindow;       // for negotiating border space with client
-    ISimpleFrameSite   *m_pSimpleFrameSite;        // simple frame site
-    IDispatch          *m_pDispAmbient;            // ambient dispatch pointer
+    tCOMPtr<IOleAdviseHolder> m_pOleAdviseHolder;          // IOleObject::Advise holder object
+    tCOMPtr<IAdviseSink> m_pViewAdviseSink;           // IViewAdvise sink for IViewObject2
+    tCOMPtr<IOleClientSite> m_pClientSite;             // client site
+    tCOMPtr<IOleControlSite> m_pControlSite;            // IOleControlSite ptr on client site
+    tCOMPtr<IOleInPlaceSite> m_pInPlaceSite;            // IOleInPlaceSite for managing activation
+    tCOMPtr<IOleInPlaceFrame> m_pInPlaceFrame;           // IOleInPlaceFrame ptr on client site
+    tCOMPtr<IOleInPlaceUIWindow> m_pInPlaceUIWindow;       // for negotiating border space with client
     SIZEL               m_Size;                    // the size of this control    
     RECT                m_rcLocation;              // where we at
     HWND                m_hwnd;                    // our window

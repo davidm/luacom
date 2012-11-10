@@ -1,7 +1,6 @@
-/*
- * tLuaControl.cpp
- *
- */
+/**
+  tLuaControl.cpp
+*/
 
 #include <ole2.h>
 #include <oleidl.h>
@@ -55,8 +54,8 @@ const OLEVERB verbs[] = {
 //
 #define CHECK_POINTER(val) if (!(val) || IsBadWritePtr((void *)(val), sizeof(void *))) return E_POINTER
 
-#define RELEASE_OBJECT(ptr)    if (ptr) { IUnknown *pUnk = (ptr); (ptr) = NULL; pUnk->Release(); }
-#define QUICK_RELEASE(ptr)     if (ptr) ((IUnknown *)ptr)->Release();
+//#define RELEASE_OBJECT(ptr)    if (ptr) { IUnknown *pUnk = (ptr); (ptr) = NULL; pUnk->Release(); }
+//#define QUICK_RELEASE(ptr)     if (ptr) ((IUnknown *)ptr)->Release();
 #define ADDREF_OBJECT(ptr)     if (ptr) (ptr)->AddRef()
 
 #define RETURN_ON_FAILURE(hr) if (FAILED(hr)) return hr
@@ -202,15 +201,6 @@ HWND GetParkingWindow(void)
 }
 
 tLuaControl::tLuaControl(lua_State* L, ITypeInfo *pTypeinfo, int ref) : tLuaDispatch(L, pTypeinfo, ref) {
-    // initialize all our variables -- we decided against using a memory-zeroing
-    // memory allocator, so we sort of have to do this work now ...
-    //
-    m_pClientSite = NULL;
-    m_pControlSite = NULL;
-    m_pInPlaceSite = NULL;
-    m_pInPlaceFrame = NULL;
-    m_pInPlaceUIWindow = NULL;
-
     // certain hosts don't like 0,0 as your initial size, so we're going to set
     // our initial size to 100,50 [so it's at least sort of visible on the screen]
     //
@@ -233,11 +223,6 @@ tLuaControl::tLuaControl(lua_State* L, ITypeInfo *pTypeinfo, int ref) : tLuaDisp
     m_hwnd = NULL;
     m_hwndParent = NULL;
 
-    m_pSimpleFrameSite = NULL;
-    m_pOleAdviseHolder = NULL;
-    m_pViewAdviseSink = NULL;
-    m_pDispAmbient = NULL;
-
     m_fDirty = FALSE;
     m_fInPlaceActive = FALSE;
     m_fInPlaceVisible = FALSE;
@@ -258,18 +243,6 @@ tLuaControl::~tLuaControl() {
        DeleteObject(m_hRgn);
        m_hRgn = NULL;
     }
-
-    // clean up all the pointers we're holding around.
-    //
-    QUICK_RELEASE(m_pClientSite);
-    QUICK_RELEASE(m_pControlSite);
-    QUICK_RELEASE(m_pInPlaceSite);
-    QUICK_RELEASE(m_pInPlaceFrame);
-    QUICK_RELEASE(m_pInPlaceUIWindow);
-    QUICK_RELEASE(m_pSimpleFrameSite);
-    QUICK_RELEASE(m_pOleAdviseHolder);
-    QUICK_RELEASE(m_pViewAdviseSink);
-    QUICK_RELEASE(m_pDispAmbient);
 }
 
 void tLuaControl::DestroyWindow() {
@@ -529,19 +502,17 @@ STDMETHODIMP tLuaControl::FreezeEvents(BOOL fFreeze)
 // Notes:
 //
 STDMETHODIMP tLuaControl::SetClientSite(IOleClientSite* pcs) {
-    RELEASE_OBJECT(m_pClientSite);
-    RELEASE_OBJECT(m_pControlSite);
-    RELEASE_OBJECT(m_pSimpleFrameSite);
+    m_pControlSite.Release();
 
     // store away the new client site
     //
-    m_pClientSite = pcs;
+    m_pClientSite.Attach(pcs);
+    if (m_pClientSite) m_pClientSite->AddRef();
 
     // if we've actually got one, then get some other interfaces we want to keep
     // around, and keep a handle on it
     //
     if (m_pClientSite) {
-        m_pClientSite->AddRef();
         m_pClientSite->QueryInterface(IID_IOleControlSite, (void **)&m_pControlSite);
     }
 
@@ -1279,8 +1250,8 @@ STDMETHODIMP tLuaControl::InPlaceDeactivate(void)
         m_hwnd = NULL;
     }
 
-    RELEASE_OBJECT(m_pInPlaceFrame);
-    RELEASE_OBJECT(m_pInPlaceUIWindow);
+    m_pInPlaceFrame.Release();
+    m_pInPlaceUIWindow.Release();
     m_pInPlaceSite->OnInPlaceDeactivate();
     return S_OK;
 }
@@ -1701,8 +1672,7 @@ STDMETHODIMP tLuaControl::SetAdvise(DWORD dwAspects, DWORD dwAdviseFlags, IAdvis
     m_fViewAdvisePrimeFirst = (dwAdviseFlags & ADVF_PRIMEFIRST) ? TRUE : FALSE;
     m_fViewAdviseOnlyOnce = (dwAdviseFlags & ADVF_ONLYONCE) ? TRUE : FALSE;
 
-    RELEASE_OBJECT(m_pViewAdviseSink);
-    m_pViewAdviseSink = pAdviseSink;
+    m_pViewAdviseSink.Attach(pAdviseSink);
     ADDREF_OBJECT(m_pViewAdviseSink);
 
     return S_OK;
