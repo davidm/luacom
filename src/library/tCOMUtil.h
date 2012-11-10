@@ -77,6 +77,7 @@ public:
   T* operator -> () const { return m_p; }
   T** operator & () { return &m_p; }   // useful for QueryInterface
   void Attach(T* p) { if (m_p) m_p->Release(); m_p = p; }
+  void Release() { if (m_p) m_p->Release(); m_p = NULL; }
 private:
   // disable these
   tCOMPtr(T * p);
