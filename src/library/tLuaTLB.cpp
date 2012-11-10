@@ -42,13 +42,12 @@ tLuaTLB::tLuaTLB(lua_State* L, ITypeLib *p_typelib)
   method_table.Add("ExportConstants", ExportConstants, FUNC);
   method_table.Add("ExportEnumerations", ExportEnumerations, FUNC);
 
-  typelib = p_typelib;
+  typelib.Attach(p_typelib);
   typelib->AddRef();
 }
 
 tLuaTLB::~tLuaTLB()
 {
-  COM_RELEASE(typelib);
 }
 
 int tLuaTLB::index(lua_State* L)
@@ -297,7 +296,7 @@ tLuaTypeInfo::tLuaTypeInfo(lua_State* L, ITypeInfo *p_typeinfo)
   method_table.Add("GetImplType", GetImplType, FUNC);
   method_table.Add("GetImplTypeFlags", GetImplTypeFlags, FUNC);
   
-  typeinfo = p_typeinfo;
+  typeinfo.Attach(p_typeinfo);
   typeinfo->AddRef();
 
   typehandler = new tLuaCOMTypeHandler(p_typeinfo);
@@ -306,7 +305,6 @@ tLuaTypeInfo::tLuaTypeInfo(lua_State* L, ITypeInfo *p_typeinfo)
 tLuaTypeInfo::~tLuaTypeInfo()
 {
   delete typehandler;
-  COM_RELEASE(typeinfo);
 }
 
 
