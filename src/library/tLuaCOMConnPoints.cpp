@@ -26,7 +26,7 @@
 ---------------------------------------------------------------------------*/
 
 /**
-  tLuaCOMEnumConnPoints Constructor.
+  Constructor.
 
   Args:     IUnknown* pHostObj
               Pointer to the host object whose connection points are
@@ -54,11 +54,7 @@ tLuaCOMEnumConnPoints::tLuaCOMEnumConnPoints(IUnknown* pHostObj)
 /**
   Destructor.
 
-  Args:     void
-
   Modifies: paConnPts.
-
-  Returns:  void
 */
 tLuaCOMEnumConnPoints::~tLuaCOMEnumConnPoints()
 {
@@ -194,8 +190,7 @@ STDMETHODIMP_(ULONG) tLuaCOMEnumConnPoints::AddRef()
 
   Modifies: cRefs.
 
-  Returns:  ULONG
-              New value of cRefs (COM object's reference count).
+  Returns: New value of cRefs (COM object's reference count).
 */
 STDMETHODIMP_(ULONG) tLuaCOMEnumConnPoints::Release()
 {
@@ -217,11 +212,11 @@ STDMETHODIMP_(ULONG) tLuaCOMEnumConnPoints::Release()
 
 
 /**
-  The Next member method of this IEnumConnectionPoints interface
-   implementation. Called by outside clients of a
-   tLuaCOMEnumConnPoints object to request that a number of next
-   connection point interface pointers be deposited into an array
-   supplied by the caller.
+  IEnumConnectionPoints::Next implementation.
+  Called by outside clients of a
+  tLuaCOMEnumConnPoints object to request that a number of next
+  connection point interface pointers be deposited into an array
+  supplied by the caller.
 
   Args:     ULONG cReq
               Number of connection points requested for return (starting at
@@ -292,8 +287,8 @@ STDMETHODIMP tLuaCOMEnumConnPoints::Next(
 
 
 /**
-  The Skip member method of this IEnumConnectionPoints interface
-  implementation. Starting at the current Enumerator index, skip
+  IEnumConnectionPoints::Skip implementation.
+  Starting at the current Enumerator index, skip
   the specified number of connection point items.
 
   Args:     ULONG cSkip

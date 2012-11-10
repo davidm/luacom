@@ -3,8 +3,6 @@
 
 #include "luabeans.h"
 
-#ifdef __cplusplus
-
 // An enumeration giving symbol names array indexes of the connection
 // points offered by the DllSndBall component in this server.
 enum
@@ -260,25 +258,4 @@ protected:
 };
 
 
-
-#endif // __cplusplus
-
-
-#endif // CONNECT_H
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#endif // __LUACOM_CONNECTIONPOINTS_H
