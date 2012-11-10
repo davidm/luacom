@@ -1,6 +1,6 @@
 /**
- tLuaCOMTypeHandler.cpp: Class tLuaCOMTypeHandler, which handles
- conversion of values between Lua and COM values.
+  tLuaCOMTypeHandler.cpp: Class tLuaCOMTypeHandler, which handles
+  conversion of values between Lua and COM values.
 */
 
 // Required for VARIANT field accessors to compile under wineg++.
@@ -60,10 +60,11 @@ tLuaCOMTypeHandler::~tLuaCOMTypeHandler()
   COM_RELEASE(m_typeinfo);
 }
 
+
 /**
- Pushes onto Lua stack table explicitly representing VARIANT of type `vt` and
- numeric value `val`.  Lua value is of the form {Type=f(vt), Value=val}.
- helper function for com2lua.
+  Pushes onto Lua stack table explicitly representing VARIANT of type `vt` and
+  numeric value `val`.  Lua value is of the form {Type=f(vt), Value=val}.
+  helper function for com2lua.
 */
 void tLuaCOMTypeHandler::pushTableVarNumber(lua_State *L, VARTYPE vt, double val) {
   lua_newtable(L);
@@ -114,10 +115,11 @@ void tLuaCOMTypeHandler::pushTableVarNumber(lua_State *L, VARTYPE vt, double val
   lua_settable(L, -3);
 }
 
+
 /**
- Pushes onto Lua stack representation of VARIANTARG.
- If is_variant, then Lua value will be in table form (e.g. `{Type=...}`),
- which is more explicit.
+  Pushes onto Lua stack representation of VARIANTARG.
+  If is_variant, then Lua value will be in table form (e.g. `{Type=...}`),
+  which is more explicit.
 */
 void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_variant)
 {
@@ -137,7 +139,6 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
 
   // dereferences VARIANTARG (if necessary)
   hr = VariantCopyInd(&varg, &varg_orig);
-
   if(FAILED(hr))
     COM_ERROR(tUtil::GetErrorMessage(hr));
 
@@ -162,7 +163,8 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
       switch (varg.vt)
       {
       case VT_EMPTY:
-        if(is_variant && table_variants) {
+        if(is_variant && table_variants)
+        {
           lua_newtable(L);
           lua_pushstring(L, "Type");
           lua_pushstring(L, "empty");
@@ -171,7 +173,8 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
         else lua_pushnil(L);
         break;
       case VT_NULL:      // SQL's NULL value.
-        if(is_variant && table_variants) {
+        if(is_variant && table_variants)
+        {
           lua_newtable(L);
           lua_pushstring(L, "Type");
           lua_pushstring(L, "null");
@@ -210,12 +213,15 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
           lua_gettable(L, -2);
           tStringBuffer dateformat(lua_tostring(L, -1));
              lua_pop(L, 2);
-          if(dateformat == NULL || (strcmp("string",dateformat)==0)) {
+          if(dateformat == NULL || (strcmp("string",dateformat)==0))
+          {
             HRESULT hr = VariantChangeType(&new_varg, &varg, 0, VT_BSTR);
             CHK_COM_CODE(hr);
 
             lua_pushstring(L, tUtil::bstr2string(new_varg.bstrVal));
-          } else if(strcmp("table",dateformat)==0) {
+          }
+          else if(strcmp("table",dateformat)==0)
+          {
             SYSTEMTIME date;
             VariantTimeToSystemTime(varg.date,&date);
             lua_newtable(L);
@@ -256,8 +262,9 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
             lua_pushstring(L, "Type");
             lua_pushstring(L, "error");
             lua_settable(L, -3);
-        } else
-        lua_pushnil(L);
+        }
+  else
+          lua_pushnil(L);
         break;
 
       case VT_BOOL:
@@ -269,8 +276,9 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
             lua_pushstring(L, "Value");
             lua_pushboolean(L, varg.boolVal);
             lua_settable(L, -3);
-        } else
-        lua_pushboolean(L, varg.boolVal);
+        }
+  else
+          lua_pushboolean(L, varg.boolVal);
         break;
 
       case VT_BSTR:
@@ -331,8 +339,8 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
           // first, tries to get an IDispatch. If not possible,
           // pushes pointer
           IUnknown* punk = varg.punkVal;
-          IDispatch* pdisp = NULL;
-
+  
+          tCOMPtr<IDispatch> pdisp;
           hr = punk->QueryInterface(IID_IDispatch, (void **) &pdisp);
 
           if(SUCCEEDED(hr))
@@ -346,76 +354,45 @@ void tLuaCOMTypeHandler::com2lua(lua_State* L, VARIANTARG varg_orig, bool is_var
 
                tLuaCOM* lcom = NULL;
 
-            try
-            {
-              lcom = tLuaCOM::CreateLuaCOM(L, pdisp);
-            }
+            try { lcom = tLuaCOM::CreateLuaCOM(L, pdisp); }
             catch(class tLuaCOMException& e)
             {
               UNUSED(e);
-              COM_RELEASE(pdisp);
               lua_pushnil(L);
               break;
             }
 
-            COM_RELEASE(pdisp);
             LuaBeans::push(L, lcom);
-
             break;
-
           }
 
-          IEnumVARIANT* pEV = NULL;
-
+          tCOMPtr<IEnumVARIANT> pEV;
           hr = punk->QueryInterface(IID_IEnumVARIANT, (void **) &pEV);
-
           if(SUCCEEDED(hr))
           {
-            tLuaCOMEnumerator* enumerator = NULL;
-
-            try
-            {
-              enumerator =
-                new tLuaCOMEnumerator(pEV);
-            }
-            catch(class tLuaCOMException& e)
-            {
-              UNUSED(e);
-
-              COM_RELEASE(pEV);
-              throw;
-            }
-
-            COM_RELEASE(pEV);
+            tLuaCOMEnumerator* enumerator = new tLuaCOMEnumerator(pEV);
 
             enumerator->push(L);
-
             break;
           }
-
 
           // defaults to pushing and userdata for the IUnknown
           varg.punkVal->AddRef();
           pushIUnknown(L, varg.punkVal);
-
           break;
         }
 
       default:
         {
           char msg[100];
-
           sprintf(msg, "COM->Lua - Type 0x%.2x not implemented.", varg.vt);
-
           TYPECONV_ERROR(msg);
-
           break;
         }
       }
     }
-    catch(class tLuaCOMException& e)
+    catch(class tLuaCOMException&)
     {
-      UNUSED(e);
       VariantClear(&varg);
       throw;
     }
@@ -473,10 +450,11 @@ tLuaCOM *tLuaCOMTypeHandler::convert_table(lua_State *L, stkIndex luaval)
   return lcom;
 }
 
-/**
- Sets VARIANTARG to stack-based Lua value (luaval) converted to VARTYPE.
 
- note: type only used when luaCompat_checkTagToCom(L, luaval)
+/**
+  Sets VARIANTARG to stack-based Lua value (luaval) converted to VARTYPE.
+
+  note: type only used when luaCompat_checkTagToCom(L, luaval)
 */
 void tLuaCOMTypeHandler::lua2com(lua_State* L, stkIndex luaval, VARIANTARG& varg, VARTYPE type)
 {
@@ -765,7 +743,7 @@ int tLuaCOMTypeHandler::pushOutValues(lua_State* L, const DISPPARAMS& dispparams
 
 
 /**
- Destroys DISPPARAMS list.
+  Destroys DISPPARAMS list.
 */
 void tLuaCOMTypeHandler::releaseVariants(DISPPARAMS *pDispParams)
 {
@@ -1040,8 +1018,8 @@ void tLuaCOMTypeHandler::fillDispParams(lua_State* L,
 
 
 /**
- Pushes onto Lua stack representations of non-"out" parameters of DISPPARAMS.
- This can be used to marshall arguments of a COM method into a Lua function.
+  Pushes onto Lua stack representations of non-"out" parameters of DISPPARAMS.
+  This can be used to marshall arguments of a COM method into a Lua function.
 */
 void tLuaCOMTypeHandler::pushLuaArgs(lua_State* L,
                                      DISPPARAMS* pDispParams,
@@ -1127,9 +1105,9 @@ void tLuaCOMTypeHandler::pushLuaArgs(lua_State* L,
 
 
 /**
- Copies representations of Lua values starting at stack index `outvalue`
- into only "out" parameters of DISPARAMS.
- FUNCDESC must be provided to assist in interpreting parameters.
+  Copies representations of Lua values starting at stack index `outvalue`
+  into only "out" parameters of DISPARAMS.
+  FUNCDESC must be provided to assist in interpreting parameters.
 */
 void tLuaCOMTypeHandler::setOutValues(lua_State* L,
                                       FUNCDESC * pFuncDesc,
@@ -1232,6 +1210,7 @@ void tLuaCOMTypeHandler::setOutValues(lua_State* L,
   }
 }
 
+
 //
 // Conversion of SAFEARRAYs to/from Lua tables.
 //
@@ -1256,7 +1235,7 @@ SAFEARRAYBOUND* tLuaCOMTypeHandler::getRightOrderedBounds(
 
 
 /**
- Puts copy of VARIANT coerced to type `vt` to location `indices` in SAFEARRAY.
+  Puts copy of VARIANT coerced to type `vt` to location `indices` in SAFEARRAY.
 */
 void tLuaCOMTypeHandler::put_in_array(SAFEARRAY* safearray,
                          VARIANT var,
@@ -1859,8 +1838,9 @@ TYPEDESC tLuaCOMTypeHandler::processUSERDEFINED(ITypeInfo* typeinfo,
   return newtdesc;
 }
 
+
 /**
- Clears a VARIANT, releasing first the memory allocated
+  Clears a VARIANT, releasing first the memory allocated
 */
 void tLuaCOMTypeHandler::releaseVariant(VARIANTARG *pvarg, bool release_memory)
 {
@@ -1907,7 +1887,7 @@ void tLuaCOMTypeHandler::releaseVariant(VARIANTARG *pvarg, bool release_memory)
 
 
 /**
- Dereferences typedef's in type descriptions
+  Dereferences typedef's in type descriptions
 */
 TYPEDESC tLuaCOMTypeHandler::processAliases(ITypeInfo* typeinfo,
                                             const TYPEDESC &tdesc)
@@ -1949,6 +1929,7 @@ TYPEDESC tLuaCOMTypeHandler::processAliases(ITypeInfo* typeinfo,
   return newtdesc;
 }
 
+
 TYPEDESC tLuaCOMTypeHandler::processTYPEDESC(ITypeInfo* typeinfo,
                                              TYPEDESC tdesc)
 {
@@ -1978,7 +1959,7 @@ TYPEDESC tLuaCOMTypeHandler::processTYPEDESC(ITypeInfo* typeinfo,
 
 
 /**
- Checks whether the Lua value is of tag LuaCOM_IUnknown.
+  Checks whether the Lua value is of tag LuaCOM_IUnknown.
 */
 bool tLuaCOMTypeHandler::isIUnknown(lua_State* L, stkIndex value)
 {
@@ -2107,8 +2088,9 @@ long tLuaCOMTypeHandler::VariantSize(VARTYPE vt)
   }
 }
 
+
 /**
- Converts VARIANT to type `vt`.  Reads from `src` and writes to `dest`.
+  Converts VARIANT to type `vt`.  Reads from `src` and writes to `dest`.
 */
 void tLuaCOMTypeHandler::Coerce(VARIANTARG &dest, VARIANTARG src, VARTYPE vt)
 {
