@@ -11,6 +11,7 @@
 #include "luabeans.h"
 #include "tLuaObjList.h"
 #include "LuaAux.h"
+#include "tCOMUtil.h"
 
 class tLuaCOM;
 
@@ -112,7 +113,7 @@ protected:
   void string2safearray(const char* str, size_t len, VARIANTARG& varg);
   void safearray2string(lua_State* L, VARIANTARG & varg);
 
-  ITypeInfo * m_typeinfo;
+  tCOMPtr<ITypeInfo> m_typeinfo;
 };
 
 #define LUACOM_IUNKNOWN_TAGNAME "_LuaCOM_IUnknown_tag"

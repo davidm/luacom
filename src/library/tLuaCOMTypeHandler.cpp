@@ -49,15 +49,12 @@ static const char *const com_type_names[] = {
 
 tLuaCOMTypeHandler::tLuaCOMTypeHandler(ITypeInfo *ptypeinfo)
 {
-  m_typeinfo = ptypeinfo;
-
-  if(m_typeinfo)
-    m_typeinfo->AddRef();
+  m_typeinfo.Attach(ptypeinfo);
+  if(m_typeinfo) m_typeinfo->AddRef();
 }
 
 tLuaCOMTypeHandler::~tLuaCOMTypeHandler()
 {
-  COM_RELEASE(m_typeinfo);
 }
 
 
