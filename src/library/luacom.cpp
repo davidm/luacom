@@ -1,11 +1,9 @@
-/*
- * LUACOM.cpp
- *
- * Lua binding for COM/OLE.
- *
- * Renato Cerqueira
- * Vinicius Almendra
- */
+/**
+ luacom.cpp
+ Lua binding for COM/OLE.
+
+  original authors: Renato Cerqueira, Vinicius Almendra
+*/
 
 // RCS Info
 static char const * const rcsid = "$Id: luacom$";
@@ -58,16 +56,16 @@ extern "C"
 
 static bool luacom_runningInprocess(lua_State* L);
 
-HINSTANCE    g_hInstance;
-CRITICAL_SECTION    g_CriticalSection;
-HWND     g_hwndParking;
+HINSTANCE g_hInstance;
+CRITICAL_SECTION g_CriticalSection;
+HWND g_hwndParking;
 
 
-////////////////////////
-//
-// Internal functions.
-//
-////////////////////////
+
+///
+/// Internal functions.
+///
+
 
 
 static tLuaCOM* ImplInterface(lua_State* L,
@@ -79,45 +77,35 @@ static tLuaCOM* ImplInterface(lua_State* L,
 {
   CHECKPARAM(typelib && interface_name && L);
 
-  ITypeInfo* interface_typeinfo = 
-    tCOMUtil::GetInterfaceTypeInfo(typelib, interface_name);
-
+  tCOMPtr<ITypeInfo> interface_typeinfo;
+  interface_typeinfo.Attach(tCOMUtil::GetInterfaceTypeInfo(typelib, interface_name));
   if(interface_typeinfo == NULL)
     return NULL;
 
-  tLuaDispatch* iluacom = 
-    tLuaDispatch::CreateLuaDispatch(L, interface_typeinfo, unlocked_ref);
-
+  tCOMPtr<tLuaDispatch> iluacom;
+  iluacom.Attach(tLuaDispatch::CreateLuaDispatch(L, interface_typeinfo, unlocked_ref));
   if(iluacom == NULL)
-  {
-    COM_RELEASE(interface_typeinfo);
     return NULL;
-  }
 
-  tLuaCOM *lcom = NULL;
-
+  tLuaCOM *lcom;
   try
   {
-    lcom =
-      tLuaCOM::CreateLuaCOM(L, iluacom, clsid, interface_typeinfo);
+    lcom = tLuaCOM::CreateLuaCOM(L, iluacom, clsid, interface_typeinfo);
   }
-  catch(class tLuaCOMException& e)
+  catch(class tLuaCOMException&)
   {
-    UNUSED(e);
     lcom = NULL;
   }
-
-  COM_RELEASE(interface_typeinfo);
-  COM_RELEASE(iluacom);
 
   return lcom;
 }
 
-/*
- Deals with runtime errors, calling lua_error or
- logging them, depending on the client's choice
- The message string is left on the top of the
- stack, to allow passing it to the caller
+
+/**
+  Deals with runtime errors, calling lua_error or
+  logging them, depending on the client's choice
+  The message string is left on the top of the
+  stack, to allow passing it to the caller
 */
 static void luacom_err(lua_State* L, const char* message, bool is_API_function)
 {
@@ -153,23 +141,19 @@ static void luacom_APIerror(lua_State* L, const char* message)
 
 
 
+///
+/// Functions exported by Lua.
+///
 
-///////////////////////////////////
-//
-// Functions exported by Lua.
-//
-///////////////////////////////////
 
-/*
- * luacom_ShowHelp
- *
- * Parameters: 
- *
- *  (1) LuaCOM object
- *
- * Shows help from the type library associated with the
- * LuaCOM object.
- */
+
+/**
+  Shows help from the type library associated with the
+  LuaCOM object.
+
+  Parameters: 
+   (1) LuaCOM object
+*/
 static int luacom_ShowHelp(lua_State *L)
 {
   char *pHelpFile = NULL; 
@@ -206,30 +190,24 @@ static int luacom_ShowHelp(lua_State *L)
   return 0;
 }
 
-/*
- * luacom_Connect
- *
- *   Parameters (Lua):
- *
- *    objeto luacom
- *    tabela que implementara a interface de conexao
- *
- *   Returns
- *    objeto luacom que encapsula objeto luacom implementado pela
- *    tabela fornecida ou nil se nao for possível estabelecer a
- *    conexao
- *    cookir do connection point
- *
- *   Cria um connection point utilizando a tabela
- *   passada como parametro e o conecta com o objeto
- *   passado tambem como parametro
- */
 
+/**
+  Parameters (Lua):
+    objeto luacom
+    tabela que implementara a interface de conexao
+
+  Returns
+    objeto luacom que encapsula objeto luacom implementado pela
+    tabela fornecida ou nil se nao for possível estabelecer a
+    conexao
+    cookir do connection point
+
+  Cria um connection point utilizando a tabela
+  passada como parametro e o conecta com o objeto
+  passado tambem como parametro
+ */
 static int luacom_Connect(lua_State *L)
 {
-  tLuaDispatch *server_disp = NULL;
-  ITypeInfo *pTypeinfo = NULL;
-
   // check parameters
   tLuaCOM* client = (tLuaCOM *) LuaBeans::check_tag(L, 1);
 
@@ -240,26 +218,22 @@ static int luacom_Connect(lua_State *L)
 
   tLuaCOM* server = NULL;
   DWORD cookie;
-
   try
   {
-    pTypeinfo = client->GetDefaultEventsInterface();
-
+    tCOMPtr<ITypeInfo> pTypeinfo;
+    pTypeinfo.Attach(client->GetDefaultEventsInterface());
     CHK_LCOM_ERR(pTypeinfo, "Could not get default events interface.");
 
     /* gets a reference to the implementation */
     lua_pushvalue(L, 2);
     int ref = luaL_ref(L, LUA_REGISTRYINDEX);
 
-    server_disp = 
-      tLuaDispatch::CreateLuaDispatch(L, pTypeinfo, ref);
-
+    tCOMPtr<tLuaDispatch> server_disp;
+    server_disp.Attach(tLuaDispatch::CreateLuaDispatch(L, pTypeinfo, ref));
     luaL_unref(L, LUA_REGISTRYINDEX, ref);
-
     CHECKPOSCOND(server_disp);
 
     server = tLuaCOM::CreateLuaCOM(L, server_disp);
-
     CHECKPOSCOND(server);
 
     cookie = client->addConnection(server);
@@ -267,42 +241,33 @@ static int luacom_Connect(lua_State *L)
   }
   catch(class tLuaCOMException& e)
   {
-    COM_RELEASE(server_disp);
-    COM_RELEASE(pTypeinfo);
-
     luacom_APIerror(L, e.getMessage());
-
     return 0;
   }
 
   LuaBeans::push(L, server); 
   lua_pushnumber(L, cookie);
-
-  COM_RELEASE(server_disp);
-  COM_RELEASE(pTypeinfo);
-
   return 2;
 }
 
-/*
- *  luacom_ImplInterfaceFromTypelib (Lua2C)
- *
- *  Parameters:
- *    1. Tabela de implementacao
- *    2. Nome da type library
- *    3. Nome da interface a ser implementada
- *    4. (Opcional) Nome da CoClass da qual a interface faz parte
- *       necessario no caso de se querer expor objetos implementados
- *       com essa interface ou no caso de se querer localizar uma
- *       interface source (eventos)
- *
- *  Returns:
- *    1. Objeto LuaCOM que encapsula a implementacao via Lua
- *        ou nil em caso de erro
- *
- *  Implementa uma interface descrida em uma type library
- *  dada
- */
+
+/**
+  Parameters:
+    1. Tabela de implementacao
+    2. Nome da type library
+    3. Nome da interface a ser implementada
+    4. (Opcional) Nome da CoClass da qual a interface faz parte
+       necessario no caso de se querer expor objetos implementados
+       com essa interface ou no caso de se querer localizar uma
+       interface source (eventos)
+
+ Returns:
+    1. Objeto LuaCOM que encapsula a implementacao via Lua
+        ou nil em caso de erro
+
+  Implementa uma interface descrida em uma type library
+  dada
+*/
 static tLuaCOM *luacom_ImplInterfaceFromTypelibHelper(lua_State *L)
 {
   if(lua_type(L, 1) != LUA_TTABLE && lua_type(L,1) != LUA_TUSERDATA)
@@ -317,46 +282,33 @@ static tLuaCOM *luacom_ImplInterfaceFromTypelibHelper(lua_State *L)
   tStringBuffer pcInterface(luaL_checklstring(L, 3, NULL));
   tStringBuffer coclassname(luaL_optlstring(L, 4, NULL, NULL));
 
-  tLuaCOM* lcom           = NULL;
-  ITypeLib* typelib       = NULL;
-  CLSID clsid             = IID_NULL;
-
+  tLuaCOM* lcom = NULL;
   try
   {
     // gets typelib
-    typelib = tCOMUtil::LoadTypeLibByName(typelib_name);
+    tCOMPtr<ITypeLib> typelib;
+    typelib.Attach(tCOMUtil::LoadTypeLibByName(typelib_name));
     CHK_LCOM_ERR(typelib, "Could not load type library.");
 
-
     // gets coclass typeinfo
-    
+    CLSID clsid = IID_NULL;
     if(coclassname)
     {
-      ITypeInfo* coclassinfo =
-        tCOMUtil::GetCoClassTypeInfo(typelib, coclassname);
+      tCOMPtr<ITypeInfo> coclassinfo;
+      coclassinfo.Attach(tCOMUtil::GetCoClassTypeInfo(typelib, coclassname));
       CHK_LCOM_ERR(coclassinfo, "Could not get ccoclass typeinfo.");
-
       clsid = tCOMUtil::GetCLSID(coclassinfo);
-      COM_RELEASE(coclassinfo);
     }
 
-    lcom = 
-      ImplInterface(L, typelib, clsid, pcInterface, ref);
-
+    lcom = ImplInterface(L, typelib, clsid, pcInterface, ref);
     luaL_unref(L, LUA_REGISTRYINDEX, ref);
-
     CHECKPOSCOND(lcom);
   }
   catch(class tLuaCOMException& e)
   {
-    COM_RELEASE(typelib);
-
     luacom_APIerror(L, e.getMessage());
-
     return 0;
   }
-
-  COM_RELEASE(typelib);
 
   return lcom;
 }
@@ -364,24 +316,25 @@ static tLuaCOM *luacom_ImplInterfaceFromTypelibHelper(lua_State *L)
 static int luacom_ImplInterfaceFromTypelib(lua_State *L)
 {
   tLuaCOM *lcom = luacom_ImplInterfaceFromTypelibHelper(L);
-  if(lcom) {
+  if(lcom)
+  {
     LuaBeans::push(L, lcom);
     return 1;
-  } else return 0;
+  }
+  else
+    return 0;
 }
 
-/* 
- *  luacom_ImplInterface (Lua2C)
- *
- *  Cria uma implementacao IDispatch para um
- *  objeto Lua dado um ProgID e o nome da
- *  interface
- *
- *  In: Implementation: table,
- *      ProgID: string,
- *      Interface: string,
- *
- *  Out: LuaCOM_obj (table with tag LuaCOM)
+
+/**
+  Cria uma implementacao IDispatch para um
+  objeto Lua dado um ProgID e o nome da
+  interface
+ 
+  In: Implementation: table,
+      ProgID: string,
+      Interface: string,
+  Out: LuaCOM_obj (table with tag LuaCOM)
 */
 static tLuaCOM *luacom_ImplInterfaceHelper(lua_State *L)
 {
@@ -399,80 +352,67 @@ static tLuaCOM *luacom_ImplInterfaceHelper(lua_State *L)
   tStringBuffer pcInterface(luaL_checklstring(L, 3, NULL));
 
   tLuaCOM* lcom = NULL;
-  ITypeLib* typelib = NULL;
-
   try
   {
-    // gets typelib
-    CLSID clsid = IID_NULL;
     HRESULT hr  = S_OK;
+    
+    // gets typelib
 
-    hr = tCOMUtil::ProgID2CLSID(&clsid, pcProgID);
+    CLSID clsid = IID_NULL;
+    CHK_COM_CODE(tCOMUtil::ProgID2CLSID(&clsid, pcProgID));
 
-    CHK_COM_CODE(hr);
-
-
-    typelib = tCOMUtil::LoadTypeLibFromCLSID(clsid);
-
+    tCOMPtr<ITypeLib> typelib;
+    typelib.Attach(tCOMUtil::LoadTypeLibFromCLSID(clsid));
     CHK_LCOM_ERR(typelib, "Could not load type library.");
 
-    lcom =
-      ImplInterface(L, typelib, clsid, pcInterface, ref);
+    lcom = ImplInterface(L, typelib, clsid, pcInterface, ref);
 
     luaL_unref(L, LUA_REGISTRYINDEX, ref);
-
-    COM_RELEASE(typelib);
 
     CHECKPOSCOND(lcom);
   }
   catch(class tLuaCOMException& e)
   {
-    COM_RELEASE(typelib);
-
     luacom_APIerror(L, e.getMessage());
-
     return 0;
   }
-
-  COM_RELEASE(typelib);
-
   return lcom;
 }
 
 static int luacom_ImplInterface(lua_State *L)
 {
   tLuaCOM* lcom = luacom_ImplInterfaceHelper(L);
-  
-  if(lcom) {
+  if(lcom)
+  {
     LuaBeans::push(L, lcom);
     return 1;
-  } else return 0;
+  }
+  else return 0;
 }
 
-/*
- * Retorns a string containing the CLSID associated with a ProgID.
- */
+
+/**
+  Returns a string containing the CLSID associated with a ProgID.
+*/
 static int luacom_CLSIDfromProgID(lua_State *L)
 {
   tStringBuffer str(luaL_checklstring(L, 1, NULL));
-  wchar_t* clsid_str  = NULL;
-  wchar_t* progId     = NULL;
-  CLSID clsid         = IID_NULL;
-  HRESULT hr          = S_OK;
-
-  char* id_str = NULL;
   
+  HRESULT hr = S_OK;
+
+  wchar_t* progId = NULL;
+  char* id_str = NULL;
   try
   {
     progId = (wchar_t*) malloc( (strlen(str) + 1) * sizeof(wchar_t));
     mbstowcs(progId,str,strlen(str)+1);
 
-    hr = CLSIDFromProgID(progId, &clsid);
-    CHK_COM_CODE(hr);
+    CLSID clsid = IID_NULL;
+    CHK_COM_CODE(CLSIDFromProgID(progId, &clsid));
 
-    hr = StringFromCLSID(clsid, &clsid_str);
-    CHK_COM_CODE(hr);
-
+    wchar_t* clsid_str = NULL;
+    CHK_COM_CODE(StringFromCLSID(clsid, &clsid_str));
+    
     id_str = (char*) malloc( (wcslen(clsid_str) + 1) * sizeof(char));
     wcstombs(id_str,clsid_str,wcslen(clsid_str)+1);
   }
@@ -482,7 +422,6 @@ static int luacom_CLSIDfromProgID(lua_State *L)
     SAFEFREE(id_str);
 
     luacom_APIerror(L, e.getMessage());
-
     return 0;
   }
 
@@ -494,9 +433,10 @@ static int luacom_CLSIDfromProgID(lua_State *L)
   return 1;
 }
 
-/*
- * Returns a string containing the ProgID associaded with a CLSID.
- */
+
+/**
+  Returns a string containing the ProgID associaded with a CLSID.
+*/
 static int luacom_ProgIDfromCLSID(lua_State *L)
 {
   tStringBuffer str(luaL_checklstring(L, 1, NULL));
@@ -511,11 +451,9 @@ static int luacom_ProgIDfromCLSID(lua_State *L)
     clsid_str = (wchar_t*) malloc( (strlen(str) + 1) * sizeof(wchar_t));
     mbstowcs(clsid_str,str,strlen(str)+1);
 
-    hr = CLSIDFromString(clsid_str, &clsid);
-    CHK_COM_CODE(hr);
+    CHK_COM_CODE(CLSIDFromString(clsid_str, &clsid));
 
-    hr = ProgIDFromCLSID(clsid, &progId);
-    CHK_COM_CODE(hr);
+    CHK_COM_CODE(ProgIDFromCLSID(clsid, &progId));
 
     id_str = (char*) malloc( (wcslen(progId) + 1) * sizeof(char));
     wcstombs(id_str,progId,wcslen(progId)+1);
@@ -526,7 +464,6 @@ static int luacom_ProgIDfromCLSID(lua_State *L)
     SAFEFREE(clsid_str);
 
     luacom_APIerror(L, e.getMessage());
-
     return 0;
   }
 
@@ -538,23 +475,20 @@ static int luacom_ProgIDfromCLSID(lua_State *L)
   return 1;
 }
 
-/*
- * Retorna um objeto LuaCOM que instancia o objeto
- *  COM identificado pelo ProgID dado
- */
 
+/**
+  Retorna um objeto LuaCOM que instancia o objeto
+  COM identificado pelo ProgID dado
+*/
 static int luacom_CreateObject(lua_State *L)
 {
-  HRESULT hr              = S_OK;
-  LPDISPATCH pdisp        = NULL;
-  tLuaCOM* lcom           = NULL;
-  IPersistStreamInit* psi = NULL;
-  DWORD context           = CLSCTX_SERVER;
-
+  HRESULT hr = S_OK;
+  
   tStringBuffer progId(luaL_checklstring(L, 1, NULL));
   tStringBuffer creation_mode(lua_tostring(L, 2));
   const bool untyped = lua_toboolean(L, 3) != 0;
 
+  DWORD context = CLSCTX_SERVER;
   if(creation_mode != NULL)
   {
     if(strcmp(creation_mode, "local_server") == 0)
@@ -563,22 +497,21 @@ static int luacom_CreateObject(lua_State *L)
       context = CLSCTX_INPROC_SERVER;
   }
 
-  CLSID clsid = IID_NULL;
-  IClassFactory* pCF = NULL;
-
+  tLuaCOM* lcom = NULL;
   try
   {
-    hr = tCOMUtil::ProgID2CLSID(&clsid, progId);
-    CHK_COM_CODE(hr);
+    CLSID clsid = IID_NULL;
+    CHK_COM_CODE(tCOMUtil::ProgID2CLSID(&clsid, progId));
 
-    hr = CoCreateInstance(clsid,
+    tCOMPtr<IDispatch> pdisp;
+    CHK_COM_CODE(CoCreateInstance(clsid,
                           NULL,
                           context,
                           IID_IDispatch,
-                          (void**)&pdisp);
-    CHK_COM_CODE(hr);
+                          (void**)&pdisp));
 
     // Initializes object (some require this step to work)
+    tCOMPtr<IPersistStreamInit> psi;
     hr = pdisp->QueryInterface(IID_IPersistStreamInit, (void**) &psi);
     if(SUCCEEDED(hr))
       psi->InitNew();
@@ -587,110 +520,79 @@ static int luacom_CreateObject(lua_State *L)
   }
   catch(class tLuaCOMException& e)
   {
-    COM_RELEASE(psi);
-    COM_RELEASE(pdisp);
-
     luacom_APIerror(L, e.getMessage());
-
     return 0;
   }
 
-  COM_RELEASE(psi);
-  COM_RELEASE(pdisp);
-
   LuaBeans::push(L, lcom);
-
   return 1;
 }
 
 
-/*
- *  luacom_GetObject
- *  Cria um objeto LuaCOM associado a uma instancia
- *  ja' existente do objeto COM identificado pelo 
- *  ProgID dado
- */
-
+/**
+  Cria um objeto LuaCOM associado a uma instancia
+  ja' existente do objeto COM identificado pelo 
+  ProgID dado
+*/
 static int luacom_GetObject(lua_State *L)
 {
-  HRESULT hr        = S_OK;
-  IDispatch* pdisp  = NULL;
-  IUnknown* punk    = NULL;
-  CLSID clsid       = IID_NULL;
+  HRESULT hr;
 
   tStringBuffer progId(luaL_checklstring(L, 1, NULL));
 
   tLuaCOM* lcom = NULL;
-  IBindCtx* pbc = NULL;
-  IMoniker* pmk = NULL;
-
   try
   {
+    CLSID clsid = IID_NULL;
     hr = tCOMUtil::ProgID2CLSID(&clsid, progId);
     
+    tCOMPtr<IUnknown> punk;
     if(SUCCEEDED(hr))
     {
-      hr = GetActiveObject(clsid,NULL,&punk);
-      CHK_COM_CODE(hr);
+      CHK_COM_CODE(GetActiveObject(clsid,NULL,&punk));
     }
     else  // tests whether the user passed in a DisplayName of a moniker
     {
-      BSTR bstr = NULL;
-      ULONG chEaten = 0;
-      
-      hr = CreateBindCtx(0, &pbc);
-      CHK_COM_CODE(hr);
+      tCOMPtr<IBindCtx> pbc;
+      CHK_COM_CODE(CreateBindCtx(0, &pbc));
 
-      bstr = tUtil::string2bstr(progId);
+      tCOMPtr<IMoniker> pmk;
+      BSTR bstr = tUtil::string2bstr(progId);
+      ULONG chEaten = 0;
       hr = MkParseDisplayName(pbc, bstr, &chEaten, &pmk);
       SysFreeString(bstr);
       CHK_COM_CODE(hr);
 
-      hr = pmk->BindToObject(pbc, NULL, IID_IUnknown, (void **) &punk);
-      CHK_COM_CODE(hr);
+      CHK_COM_CODE(pmk->BindToObject(pbc, NULL, IID_IUnknown, (void **) &punk));
     }
 
-    hr = punk->QueryInterface(IID_IDispatch, (void **) &pdisp);
-    CHK_COM_CODE(hr);
+    tCOMPtr<IDispatch> pdisp;
+    CHK_COM_CODE(punk->QueryInterface(IID_IDispatch, (void **) &pdisp));
 
     lcom = tLuaCOM::CreateLuaCOM(L, pdisp, clsid);
     CHECKPOSCOND(lcom);
   }
   catch(class tLuaCOMException& e)
   {
-    COM_RELEASE(punk);
-    COM_RELEASE(pdisp);
-    COM_RELEASE(pbc);
-    COM_RELEASE(pmk);
-
     luacom_APIerror(L, e.getMessage());
-
     return 0;
   }
 
   LuaBeans::push(L, lcom);
-
-  COM_RELEASE(punk);
-  COM_RELEASE(pdisp);
-  COM_RELEASE(pbc);
-  COM_RELEASE(pmk);
-
   return 1;
 }
 
-/*
- *  luacom_addConnection
- *  Associa um connection point de um objeto COM com
- *  outro objeto COM
- */
 
+/**
+  Associa um connection point de um objeto COM com
+  outro objeto COM
+*/
 static int luacom_addConnection(lua_State *L)
 {
   tLuaCOM* client = (tLuaCOM*) LuaBeans::check_tag(L, 1);
   tLuaCOM* server = (tLuaCOM*) LuaBeans::check_tag(L, 2);
 
   DWORD cookie = client->addConnection(server);
-
   if(cookie == 0)
   {
     luacom_APIerror(L, "Could not establish connection");
@@ -698,41 +600,34 @@ static int luacom_addConnection(lua_State *L)
   }
 
   lua_pushnumber(L, cookie);
-
   return 1;
 }
 
-/*
- *  luacom_releaseConnection
- *  Desfaz connection point associado a um objeto LuaCOM
- */
 
+/**
+  Desfaz connection point associado a um objeto LuaCOM
+*/
 static int luacom_releaseConnection(lua_State *L)
 {
   tLuaCOM* lcom = (tLuaCOM*) LuaBeans::check_tag(L, 1);
-  if(lua_gettop(L) > 1) {
+  if(lua_gettop(L) > 1)
+  {
     tLuaCOM* server = (tLuaCOM*) LuaBeans::check_tag(L, 2);
     DWORD cookie = (DWORD)lua_tonumber(L, 3);
 
-    try
-    {
-      lcom->releaseConnection(server, cookie);
-    }
+    try { lcom->releaseConnection(server, cookie); }
     catch(class tLuaCOMException& e)
     {
       luacom_APIerror(L, e.getMessage());
-
       return 0;
     }
-  } else {
-    try
-    {
-      lcom->releaseConnection();
-    }
+  }
+  else
+  {
+    try { lcom->releaseConnection(); }
     catch(class tLuaCOMException& e)
     {
       luacom_APIerror(L, e.getMessage());
-
       return 0;
     }
   }
@@ -740,13 +635,10 @@ static int luacom_releaseConnection(lua_State *L)
   return 0;
 }
 
-//
-// luacom_isMember
-//
-//  Informa se existe algum metodo ou propriedade com
-//  o nome passado como parametro em lua
-//
-
+/**
+  Informa se existe algum metodo ou propriedade com
+  o nome passado como parametro em lua
+*/
 static int luacom_isMember(lua_State *L)
 {
   // objeto luacom
@@ -754,30 +646,18 @@ static int luacom_isMember(lua_State *L)
   tStringBuffer member_name(luaL_checklstring(L, 2, NULL));
 
   lua_pushboolean(L, lcom->isMember(member_name));
-
   return 1;
 }
 
-/*
- * luacom_NewObject
- *
- *  Creates a Component Object implemented in luacom
- *
- */
 
+/**
+  Creates a Component Object implemented in luacom
+*/
 static int luacom_NewObjectOrControl(lua_State *L, int type)
 {
-  tLuaDispatch* iluacom           = NULL;
-  ITypeLib* typelib               = NULL;
-  ITypeInfo* interface_typeinfo   = NULL;
-  ITypeInfo* coclassinfo          = NULL;
-  tLuaCOM *lcom                   = NULL;
-  HRESULT hr                      = S_OK;
-  tLuaCOMConnPointContainer *cpc  = NULL;
-  tLuaCOMConnPoint *cp            = NULL;
+  HRESULT hr = S_OK;
 
   // gets parameters
-
   if(lua_type(L, 1) != LUA_TTABLE && lua_type(L,1) != LUA_TUSERDATA)
   {
     luaL_argerror(L, 1, "Implementation must be a table or a userdata");
@@ -789,95 +669,69 @@ static int luacom_NewObjectOrControl(lua_State *L, int type)
 
   tStringBuffer pcProgID(luaL_checklstring(L, 2, NULL));
 
+  tLuaCOM *lcom = NULL;
+  tLuaCOMConnPoint *cp = NULL;
   try
   {
     // gets typelib
     CLSID clsid = IID_NULL;
-
-    hr = tCOMUtil::ProgID2CLSID(&clsid, pcProgID);
-    CHK_COM_CODE(hr);
-
-    typelib = tCOMUtil::LoadTypeLibFromCLSID(clsid);
+    CHK_COM_CODE(tCOMUtil::ProgID2CLSID(&clsid, pcProgID));
+    //
+    tCOMPtr<ITypeLib> typelib;
+    typelib.Attach(tCOMUtil::LoadTypeLibFromCLSID(clsid));
     CHK_LCOM_ERR(typelib, "Could not load type library.");
-    
 
     // gets coclass typeinfo
-
-    coclassinfo = tCOMUtil::GetCoClassTypeInfo(typelib, clsid);
+    tCOMPtr<ITypeInfo> coclassinfo;
+    coclassinfo.Attach(tCOMUtil::GetCoClassTypeInfo(typelib, clsid));
     CHK_LCOM_ERR(coclassinfo, "CoClass not found in type library.");
 
-
     // gets the default interface typeinfo
-    interface_typeinfo =
-      tCOMUtil::GetDefaultInterfaceTypeInfo(coclassinfo, false);
-
+    tCOMPtr<ITypeInfo> interface_typeinfo;
+    interface_typeinfo.Attach(tCOMUtil::GetDefaultInterfaceTypeInfo(coclassinfo, false));
     CHK_LCOM_ERR(interface_typeinfo, 
       "Could not find a suitable default interface.");
 
-
     // Creates IDispatch implementation
+    tCOMPtr<tLuaDispatch> iluacom;
     if(type) // Control
-      iluacom = 
-        (tLuaDispatch*)tLuaControl::CreateLuaControl(L, interface_typeinfo, ref);
+      iluacom.Attach((tLuaDispatch*)tLuaControl::CreateLuaControl(L, interface_typeinfo, ref));
     else // Object
-      iluacom = 
-        tLuaDispatch::CreateLuaDispatch(L, interface_typeinfo, ref);
+      iluacom.Attach(tLuaDispatch::CreateLuaDispatch(L, interface_typeinfo, ref));
 
     luaL_unref(L, LUA_REGISTRYINDEX, ref);
 
-
     // Creates associated luacom object
     lcom = tLuaCOM::CreateLuaCOM(L, iluacom, clsid);
-
 
     // Informs tLuaDispatch of coclassinfo (this allows implementation of
     // IProvideClassInfo[x]
     iluacom->SetCoClassinfo(coclassinfo);
 
-
     // Create connection points container and tells it to initialize
     // itself from coclassinfo and exports connection point for 
     // default source
-
     iluacom->BeConnectable();
-
     if(iluacom->GetConnPointContainer())
-    {
       cp = iluacom->GetConnPointContainer()->GetDefault();
-    }
     else
       cp = NULL;
   }
   catch(class tLuaCOMException& e)
   {
-    // releases pointers
-    COM_RELEASE(iluacom);
-    COM_RELEASE(interface_typeinfo);
-    COM_RELEASE(coclassinfo);
-    COM_RELEASE(typelib);
-
     luacom_APIerror(L, e.getMessage());
-
     return 0;
   }
 
-  COM_RELEASE(iluacom); 
-  COM_RELEASE(interface_typeinfo);
-  COM_RELEASE(coclassinfo);
-  COM_RELEASE(typelib);
-
   // returns LuaCOM object and connection point
   // for default source interface
-
   int retvals = 1;
   LuaBeans::push(L, lcom);
-
   if(cp)
   {
     cp->push();
     retvals++;
   }
-
   return retvals;
 }
 
@@ -890,35 +744,22 @@ static int luacom_NewControl(lua_State *L) {
 }
 
 
-/*
- *  luacom_ExposeObject
- *
- *    Creates a class factory that exposes a
- *    COM object
- *
- *  Parameters:
- *
- *    1. LuaCOM object
- *
- *  Return values
- *
- *    1. Cookie to unexpose object
- *
- */
+/**
+  Creates a class factory that exposes a COM object
 
+  Parameters:
+    1. LuaCOM object
+  Return values
+    1. Cookie to unexpose object
+*/
 static int luacom_ExposeObject(lua_State *L)
 {
-  tLuaCOMClassFactory* luacom_cf = NULL;
-  DWORD cookie = (DWORD)-1;
-
   // check parameters
   tLuaCOM* luacom = (tLuaCOM *) LuaBeans::check_tag(L, 1);
 
+  DWORD cookie = (DWORD)-1;
   try
   {
-    CLSID clsid = IID_NULL;
-    HRESULT hr = S_OK;
-
     if(luacom_runningInprocess(L)) {
       // Inprocess "registration": stores object in the Lua registry
       lua_pushvalue(L, LUA_REGISTRYINDEX);
@@ -927,57 +768,41 @@ static int luacom_ExposeObject(lua_State *L)
       lua_settable(L,-3);
       lua_pop(L,1);
     } else {
-      luacom_cf = 
-          new tLuaCOMClassFactory(luacom->GetIDispatch());
+      tCOMPtr<tLuaCOMClassFactory> luacom_cf;
+      luacom_cf.Attach(new tLuaCOMClassFactory(luacom->GetIDispatch()));
       luacom_cf->AddRef();
 
-      clsid = luacom->GetCLSID();
+      CLSID clsid = luacom->GetCLSID();
       CHK_LCOM_ERR(clsid != IID_NULL,
         "Object does not have coclass type information");
   
-      hr = CoRegisterClassObject(
+      CHK_COM_CODE(CoRegisterClassObject(
         clsid,
         luacom_cf,
         CLSCTX_LOCAL_SERVER,
         REGCLS_SINGLEUSE,
-        &cookie);
-
-      CHK_COM_CODE(hr);
+        &cookie));
     }
   }
   catch(class tLuaCOMException& e)
   {
-    // releases pointers
-    COM_RELEASE(luacom_cf);
-
     luacom_APIerror(L, e.getMessage());
-
     return 0;
   }
 
-  COM_RELEASE(luacom_cf);
-
   lua_pushnumber(L, cookie);
-
   return 1;
 }
 
 
-/*
- *  luacom_RevokeObject
- *
- *    Revokes a previously registered class factory
- *
- *  Parameters:
- *
- *    1. Cookie
- *
- *  Return values
- *
- *    1. non-nil if succeeded
- *
- */
+/**
+  Revokes a previously registered class factory
 
+  Parameters:
+    1. Cookie
+  Return values
+    1. non-nil if succeeded
+*/
 static int luacom_RevokeObject(lua_State *L)
 {
   // check parameters
@@ -986,38 +811,27 @@ static int luacom_RevokeObject(lua_State *L)
   // revokes class object
   try
   {
-    HRESULT hr = CoRevokeClassObject(cookie);
-    CHK_COM_CODE(hr);
+    CHK_COM_CODE(CoRevokeClassObject(cookie));
   }
   catch(class tLuaCOMException& e)
   {
     luacom_APIerror(L, e.getMessage());
-
     return 0;
   }
 
   lua_pushboolean(L, true);
-
   return 1;
 }
 
 
-/*
- *  luacom_RegisterObject
- *
- *    Registers a COM Object in the system registry
- *
- *  Parameters:
- *
- *    1. registration table or userdata
- *
- *  Return values
- *
- *    1. non-nil if successful
- *
- */
+/**
+  Registers a COM Object in the system registry
 
-
+  Parameters:
+    1. registration table or userdata
+  Return values
+    1. non-nil if successful
+*/
 static int luacom_RegisterObject(lua_State *L)
 {
   if(lua_type(L, 1) != LUA_TTABLE && lua_type(L,1) != LUA_TUSERDATA)
@@ -1025,10 +839,8 @@ static int luacom_RegisterObject(lua_State *L)
     luaL_argerror(L, 1, "Registration info must be a table or userdata");
   }
 
-  ITypeLib *typelib       = NULL;
-  ITypeInfo* coclassinfo  = NULL;
-  HRESULT hr              = S_OK;
-  const int bufsize       = 1000;
+  HRESULT hr = S_OK;
+  const int bufsize = 1000;
 
   try
   {
@@ -1040,7 +852,7 @@ static int luacom_RegisterObject(lua_State *L)
     // gets the registration information from the registration table
     lua_pushstring(L, "VersionIndependentProgID");
     lua_gettable(L, 1);
-	tStringBuffer VersionIndependentProgID(lua_tostring(L, -1));
+	  tStringBuffer VersionIndependentProgID(lua_tostring(L, -1));
 
     // gets the registration information from the registration table
     lua_pushstring(L, "ProgID");
@@ -1071,25 +883,16 @@ static int luacom_RegisterObject(lua_State *L)
       "Incomplete registration table.");
 
     // Loads and registers the typelib
-
-    {
-      wchar_t wcTypelib_path[bufsize];
-    
-      mbstowcs(wcTypelib_path, typelib_path, strlen(typelib_path)+1);
-
-      hr = LoadTypeLibEx(wcTypelib_path, REGKIND_REGISTER, &typelib);
-    }
-    CHK_COM_CODE(hr);
-
+    tCOMPtr<ITypeLib> typelib;
+    wchar_t wcTypelib_path[bufsize];
+    mbstowcs(wcTypelib_path, typelib_path, strlen(typelib_path)+1);
+    CHK_COM_CODE(LoadTypeLibEx(wcTypelib_path, REGKIND_REGISTER, &typelib));
 
     // Gets the type library version and LIBID
-
     char version[30];
     char libId[bufsize];
-
     {
       TLIBATTR *plibattr = NULL;
-
       typelib->GetLibAttr(&plibattr);
 
       // gets version
@@ -1097,9 +900,7 @@ static int luacom_RegisterObject(lua_State *L)
 
       // gets libid
       wchar_t *wcLibId = NULL;
-
-      hr = StringFromCLSID(plibattr->guid, &wcLibId);
-      CHK_COM_CODE(hr);
+      CHK_COM_CODE(StringFromCLSID(plibattr->guid, &wcLibId));
 
       wcstombs(libId, wcLibId, wcslen(wcLibId)+1);
       CoTaskMemFree(wcLibId);
@@ -1108,22 +909,19 @@ static int luacom_RegisterObject(lua_State *L)
     }
 
     // gets the CoClass TypeInfo to get the CLSID
-    coclassinfo = tCOMUtil::GetCoClassTypeInfo(typelib, CoClass);
+    tCOMPtr<ITypeInfo> coclassinfo;
+    coclassinfo.Attach(tCOMUtil::GetCoClassTypeInfo(typelib, CoClass));
     CHK_LCOM_ERR(coclassinfo, "Could not get coclass typeinfo.");
 
-
     // gets the CLSID
-  
     char clsid[bufsize];
-  
     {
       TYPEATTR* ptypeattr = NULL;
       wchar_t* wcClsid=  NULL;
 
       coclassinfo->GetTypeAttr(&ptypeattr);
 
-      hr = StringFromCLSID(ptypeattr->guid, &wcClsid);
-      CHK_COM_CODE(hr);
+      CHK_COM_CODE(StringFromCLSID(ptypeattr->guid, &wcClsid));
 
       wcstombs(clsid, wcClsid,wcslen(wcClsid)+1);
 
@@ -1135,15 +933,9 @@ static int luacom_RegisterObject(lua_State *L)
     //// Now we have all the information needed to perform the registration
 
     // registers ProgID
-    char ID[bufsize];
-    char CLSID[bufsize];
+    
     char ModulePath[bufsize];
-
-    // Be safe with null strings in these stack-allocated strings.
-    ID[0] = 0;
-    CLSID[0] = 0;
     ModulePath[0] = 0;
-
     GetModuleFileNameA(
       NULL,
       ModulePath,
@@ -1162,6 +954,7 @@ static int luacom_RegisterObject(lua_State *L)
     }
 
     // Create some base key strings.
+    char CLSID[bufsize];
     strcpy(CLSID, "CLSID\\");
     strcat(CLSID, clsid);
 
@@ -1268,39 +1061,24 @@ static int luacom_RegisterObject(lua_State *L)
   }
   catch(class tLuaCOMException& e)
   {
-    COM_RELEASE(coclassinfo);
-    COM_RELEASE(typelib);
-
     luacom_APIerror(L, e.getMessage());
-
     return 0;
   }
 
-  COM_RELEASE(coclassinfo);
-  COM_RELEASE(typelib);
-
   // signals success
   lua_pushboolean(L, true);
-
   return 1;
 }
 
-/*
- *  luacom_UnRegisterObject
- *
- *    Unregisters a COM Object in the system registry
- *
- *  Parameters:
- *
- *    1. registration table or userdata
- *
- *  Return values
- *
- *    1. non-nil if successful
- *
- */
 
-
+/**
+  Unregisters a COM Object in the system registry
+ 
+  Parameters:
+    1. registration table or userdata
+  Return values
+    1. non-nil if successful
+*/
 static int luacom_UnRegisterObject(lua_State *L)
 {
   if(lua_type(L, 1) != LUA_TTABLE && lua_type(L,1) != LUA_TUSERDATA)
@@ -1308,10 +1086,8 @@ static int luacom_UnRegisterObject(lua_State *L)
     luaL_argerror(L, 1, "Registration info must be a table or userdata");
   }
 
-  ITypeLib *typelib       = NULL;
-  ITypeInfo* coclassinfo  = NULL;
-  HRESULT hr              = S_OK;
-  const int bufsize       = 1000;
+  HRESULT hr = S_OK;
+  const int bufsize = 1000;
 
   try
   {
@@ -1338,22 +1114,14 @@ static int luacom_UnRegisterObject(lua_State *L)
       "Incomplete registration table.");
 
     // Loads the typelib
-
-    {
-      wchar_t wcTypelib_path[bufsize];
-    
-      mbstowcs(wcTypelib_path, typelib_path, strlen(typelib_path)+1);
-
-      hr = LoadTypeLibEx(wcTypelib_path, REGKIND_NONE, &typelib);
-    }
-    CHK_COM_CODE(hr);
-
+    tCOMPtr<ITypeLib> typelib;
+    wchar_t wcTypelib_path[bufsize];
+    mbstowcs(wcTypelib_path, typelib_path, strlen(typelib_path)+1);
+    CHK_COM_CODE(LoadTypeLibEx(wcTypelib_path, REGKIND_NONE, &typelib));
 
     // Unregisters the typelib
-
     {
       TLIBATTR *plibattr = NULL;
-
       typelib->GetLibAttr(&plibattr);
 
       UnRegisterTypeLib(plibattr->guid, plibattr->wMajorVerNum, plibattr->wMinorVerNum,
@@ -1363,22 +1131,19 @@ static int luacom_UnRegisterObject(lua_State *L)
     }
 
     // gets the CoClass TypeInfo to get the CLSID
-    coclassinfo = tCOMUtil::GetCoClassTypeInfo(typelib, CoClass);
+    tCOMPtr<ITypeInfo> coclassinfo;
+    coclassinfo.Attach(tCOMUtil::GetCoClassTypeInfo(typelib, CoClass));
     CHK_LCOM_ERR(coclassinfo, "Could not get coclass typeinfo.");
 
-
     // gets the CLSID
-  
     char clsid[bufsize];
-  
     {
       TYPEATTR* ptypeattr = NULL;
-      wchar_t* wcClsid=  NULL;
+      wchar_t* wcClsid = NULL;
 
       coclassinfo->GetTypeAttr(&ptypeattr);
 
-      hr = StringFromCLSID(ptypeattr->guid, &wcClsid);
-      CHK_COM_CODE(hr);
+      CHK_COM_CODE(StringFromCLSID(ptypeattr->guid, &wcClsid));
 
       wcstombs(clsid, wcClsid,wcslen(wcClsid)+1);
 
@@ -1390,12 +1155,9 @@ static int luacom_UnRegisterObject(lua_State *L)
     //// Now we have all the information needed to perform the unregistration
 
     // unregisters ProgID
-    char CLSID[bufsize];
-
-    // Be safe with null strings in these stack-allocated strings.
-    CLSID[0] = 0;
-
+    
     // Create some base key strings.
+    char CLSID[bufsize];
     strcpy(CLSID, "CLSID\\");
     strcat(CLSID, clsid);
 
@@ -1417,41 +1179,24 @@ static int luacom_UnRegisterObject(lua_State *L)
   }
   catch(class tLuaCOMException& e)
   {
-    COM_RELEASE(coclassinfo);
-    COM_RELEASE(typelib);
-
     luacom_APIerror(L, e.getMessage());
-
     return 0;
   }
 
-  COM_RELEASE(coclassinfo);
-  COM_RELEASE(typelib);
-
   // signals success
   lua_pushboolean(L, true);
-
   return 1;
 }
 
 
-/*
- *  luacom_GetIUnknown
- *
- *    Returns the a IUnknown interface for a
- *    LuaCOM object
- *
- *  Parameters:
- *
- *    1. LuaCOM object
- *
- *  Return values
- *
- *    1. IUnknown pointer (a userdata)
- *
- */
+/**
+  Returns the a IUnknown interface for a LuaCOM object.
 
-
+  Parameters:
+    1. LuaCOM object
+  Return values
+    1. IUnknown pointer (a userdata)
+*/
 static int luacom_GetIUnknown(lua_State *L)
 {
   // check parameters
@@ -1522,8 +1267,9 @@ static int luacom_DumpTypeInfo(lua_State *L)
 }
 
 
-
-// Starts logging
+/**
+  Starts logging
+*/
 static int luacom_StartLog(lua_State* L)
 {
   tStringBuffer filename(luaL_checklstring(L, 1, NULL));
@@ -1535,7 +1281,10 @@ static int luacom_StartLog(lua_State* L)
   return 1;
 }
 
-// Ends logging
+
+/**
+  Ends logging
+*/
 static int luacom_EndLog(lua_State* L)
 {
   UNUSED(L);
@@ -1546,27 +1295,24 @@ static int luacom_EndLog(lua_State* L)
 }
 
 
-
-// Gets the IEnumVariant interface for
-// an LuaCOM object
+/**
+  Gets the IEnumVariant interface for an LuaCOM object.
+*/
 static int luacom_GetEnumerator(lua_State *L)
 {
   // check parameters
   tLuaCOM* luacom = (tLuaCOM *) LuaBeans::check_tag(L, 1);
+  
   int retvals = 0;
-
   try
   {
     retvals = 
       luacom->call(L, DISPID_NEWENUM, INVOKE_PROPERTYGET, NULL, tLuaObjList());
-
     CHECKPOSCOND(retvals != 0);
-
   }
   catch(class tLuaCOMException& e)
   {
     luacom_APIerror(L, e.getMessage());
-
     return 0;
   }
 
@@ -1575,57 +1321,43 @@ static int luacom_GetEnumerator(lua_State *L)
 
 
 
-/*
- *  luacom_LoadTypeLibrary (Lua2C)
- *
- */
-
 static int luacom_LoadTypeLibrary(lua_State *L)
 {
   tStringBuffer typelib_name(luaL_checklstring(L, -1, NULL));
 
-  ITypeLib* typelib = NULL;
-
   try
   {
     // tries to get the typelib by filename
-    typelib = tCOMUtil::LoadTypeLibByName(typelib_name);
+    tCOMPtr<ITypeLib> typelib;
+    typelib.Attach(tCOMUtil::LoadTypeLibByName(typelib_name));
 
     if(typelib == NULL)
     {
+      HRESULT hr  = S_OK;
+      
       // tries to get by ProgID
       CLSID clsid = IID_NULL;
-      HRESULT hr  = S_OK;
-
       hr = tCOMUtil::ProgID2CLSID(&clsid, typelib_name);
-
       if(SUCCEEDED(hr))
-        typelib = tCOMUtil::LoadTypeLibFromCLSID(clsid);
+        typelib.Attach(tCOMUtil::LoadTypeLibFromCLSID(clsid));
     }
 
     CHK_LCOM_ERR(typelib, "Could not load type library.");
+    
+    tLuaTLB::pushNew(L, typelib);
+    return 1;
   }
   catch(class tLuaCOMException& e)
   {
-    COM_RELEASE(typelib);
-
     luacom_APIerror(L, e.getMessage());
-
     return 0;
   }
-
-  tLuaTLB::pushNew(L, typelib);
-
-  COM_RELEASE(typelib);
-
-  return 1;
 }
 
-/*
- * Creates a luacom object using an
- * IUnknown pointer
- */
 
+/**
+  Creates a luacom object using an IUnknown pointer.
+*/
 int luacom_CreateLuaCOM(lua_State* L)
 {
   // checks whether to object on the stack is of this type
@@ -1635,34 +1367,24 @@ int luacom_CreateLuaCOM(lua_State* L)
     return 0;
   }
 
-  IUnknown* punk    = NULL;
-  IDispatch* pdisp  = NULL;
-  tLuaCOM* lcom     = NULL;
-
   try
   {
-    punk = (IUnknown *)*(void **)lua_touserdata(L, -1);
+    IUnknown* punk = (IUnknown *)*(void **)lua_touserdata(L, -1);
     CHECKPOSCOND(punk);
 
-    HRESULT hr = punk->QueryInterface(IID_IDispatch, (void **) &pdisp);
-    CHK_COM_CODE(hr);
+    tCOMPtr<IDispatch> pdisp;
+    CHK_COM_CODE(punk->QueryInterface(IID_IDispatch, (void **) &pdisp));
 
-    lcom = tLuaCOM::CreateLuaCOM(L, pdisp);
+    tLuaCOM* lcom = tLuaCOM::CreateLuaCOM(L, pdisp);
+    
+    LuaBeans::push(L, lcom);
+    return 1;
   }
   catch(class tLuaCOMException& e)
   {
-    COM_RELEASE(pdisp);
-
     luacom_APIerror(L, e.getMessage());
-   
     return 0;
   }
-
-  COM_RELEASE(pdisp);
-
-  LuaBeans::push(L, lcom);
-
-  return 1;
 }
 
 int luacom_StartMessageLoop(lua_State *L)
@@ -1690,9 +1412,10 @@ int luacom_StartMessageLoop(lua_State *L)
   return 0;
 }
 
-/*
- * Detects automation in a pure Lua server
- */
+
+/**
+  Detects automation in a pure Lua server
+*/
 int luacom_LuaDetectAutomation(lua_State* L)
 {
   lua_getglobal(L,"arg");
@@ -1758,10 +1481,10 @@ int luacom_LuaDetectAutomation(lua_State* L)
   }
 }
 
-/*
- * Transforms a pointer into
- * an IUnknown typed object
- */
+
+/**
+  Transforms a pointer into an IUnknown typed object.
+*/
 int luacom_ImportIUnknown(lua_State* L)
 {
   IUnknown* punk = (IUnknown*) luaCompat_getPointer(L, -1);
@@ -1786,13 +1509,13 @@ int luacom_ImportIUnknown(lua_State* L)
     punk->Release();
   }
 
-
   return 1;
 }
 
 
-
-// Returns current directory
+/**
+  Returns current directory
+*/
 int luacom_GetCurrentDirectory(lua_State* L)
 {
   char buffer[1025];
@@ -1803,21 +1526,20 @@ int luacom_GetCurrentDirectory(lua_State* L)
     return 0;
 
   lua_pushstring(L, buffer);
-
   return 1;
 }
 
 
 
-//////////////////////////////////////
-//                                  //
-//  TAG METHODS DO USERTAG IUNKNOWN //
-//                                  //
-//////////////////////////////////////
+///
+/// TAG METHODS DO USERTAG IUNKNOWN //
+///
 
-/*
- * Tag method that manages garbage collection.
- */
+
+
+/**
+  Tag method that manages garbage collection.
+*/
 static int IUnknown_tag_gc(lua_State *L)
 {
   IUnknown* punk = (IUnknown*)*(void **)lua_touserdata(L, -1);
@@ -1828,9 +1550,9 @@ static int IUnknown_tag_gc(lua_State *L)
    return 0;
 }
 
-/*
- * Checks for IUnknown equality
- */
+/**
+  Checks for IUnknown equality
+*/
 static int IUnknown_eq(lua_State *L)
 {
   LUASTACK_SET(L);
@@ -1847,19 +1569,18 @@ static int IUnknown_eq(lua_State *L)
 
 
 
-////////////////////////////////////
-//
-//  TAG METHODS FOR LUACOM OBJECT
-//
-////////////////////////////////////
+///
+///  TAG METHODS FOR LUACOM OBJECT
+///
 
-/*
- * Tag method that manages garbage collection.
- */
+
+
+/**
+ Tag method that manages garbage collection.
+*/
 static int tagmeth_gc(lua_State *L)
 {
   tLuaCOM* lcom = (tLuaCOM*)*(void **)lua_touserdata(L, -1);
-
   assert(lcom);
 
   if(lcom != NULL) {
@@ -1869,16 +1590,15 @@ static int tagmeth_gc(lua_State *L)
   return 0;
 }
 
-/*
- * tag method que gerencia atribuicoes a campos
- * do objeto luacom
- */
+
+/**
+  tag method que gerencia atribuicoes a campos
+  do objeto luacom
+*/
 static int tagmeth_settable(lua_State *L)
 {
   DISPID dispid;
-  HRESULT hr              = S_OK;
-  FUNCDESC* pfuncdesc     = NULL;
-  bool set = false;
+  HRESULT hr = S_OK;
 
   /* indexes to the parameters coming from lua */
   const int table_param = 1; 
@@ -1903,6 +1623,8 @@ static int tagmeth_settable(lua_State *L)
 
       return 0;
     }
+    
+    bool set = false;
 
     // Here we have two possible situations: the object
     // has type info or the object does not have
@@ -1922,12 +1644,10 @@ static int tagmeth_settable(lua_State *L)
         // to redefine the field, he should use a lua function instead
 
         luacom_error(L, "LuaCOM error: trying to set a read-only field in a COM object.");
-
         return 0;
       }
       else if(found)
       {
-
         lcom->call(L, funcinfo.propput->memid,
                    INVOKE_PROPERTYPUT,
                    funcinfo.propput,
@@ -1936,7 +1656,6 @@ static int tagmeth_settable(lua_State *L)
 
         set = true;
       }
-
     }
 
     if(!set && lcom->getDISPID(field_name, &dispid))
@@ -1959,7 +1678,6 @@ static int tagmeth_settable(lua_State *L)
   catch(class tLuaCOMException& e)
   {
     luacom_error(L, e.getMessage());
-
     return 0;
   }
 
@@ -1967,20 +1685,12 @@ static int tagmeth_settable(lua_State *L)
 }
 
 
-/*
- * Closure que gerencia chamadas de metodos
- */
+/**
+  Closure que gerencia chamadas de metodos
+*/
 static int callhook(lua_State *L)
 {
-  tLuaCOM* lcom       = NULL;
-  HRESULT hr          = S_OK;
-  DISPID dispid       = -1;
-  FUNCDESC *pfuncdesc = NULL;
-  long invkind  = INVOKE_FUNC;
-
-  int num_return_values = -1;
-
-try
+  try
   {
     // upvalues
     const int luacom_obj_param  = lua_upvalueindex(1);
@@ -1994,28 +1704,25 @@ try
 
     // number of lua parameters, excluding the self param
     const int num_params = lua_gettop(L) - 1;
-
     CHECKPARAM_MSG(num_params >= 0, "self parameter not found.");
 
     // retrieves parameters from lua stack
-    lcom      = (tLuaCOM *) lua_touserdata(L, luacom_obj_param);
-    dispid    = (DISPID) lua_tonumber(L, dispid_param);
-    invkind   = (long) lua_tonumber(L, invkind_param);
-    pfuncdesc = (FUNCDESC*) lua_touserdata(L, funcdesc_param);
+    tLuaCOM* lcom = (tLuaCOM *) lua_touserdata(L, luacom_obj_param);
+    DISPID dispid = (DISPID) lua_tonumber(L, dispid_param);
+    long invkind   = (long) lua_tonumber(L, invkind_param);
+    FUNCDESC * pfuncdesc = (FUNCDESC*) lua_touserdata(L, funcdesc_param);
 
     CHECK(lcom, INTERNAL_ERROR);
 
       // sets the parameter list excluding the 'self' param
     tLuaObjList params = tLuaObjList(first_param, num_params);
 
-    num_return_values = lcom->call(L, dispid, invkind, pfuncdesc, params);
-
+    int num_return_values = lcom->call(L, dispid, invkind, pfuncdesc, params);
     return num_return_values;
   }
   catch(class tLuaCOMException& e)
   {
     luacom_error(L, e.getMessage());
-
     return 0;
   }
 }
@@ -2045,7 +1752,7 @@ static int untyped_tagmeth_index(lua_State *L,
                                  const char *field_name)
 {
   DISPID dispid;
-  HRESULT hr         = S_OK;
+  HRESULT hr = S_OK;
   INVOKEKIND invkind = INVOKE_FUNC;
 
   // tries to get the DISPID
@@ -2286,28 +1993,24 @@ static int typed_tagmeth_index(lua_State *L,
 }
 
 
-
-/*
- * Tag method that manages reading LuaCOM object fields.
- *
- * In: table, index
- */
+/**
+  Tag method that manages reading LuaCOM object fields.
+ 
+  In: table, index
+*/
 static int tagmeth_index(lua_State *L)
 {
-  // used variables
-  tLuaCOM* lcom           = NULL;
-  LuaBeans *lbeans        = NULL;
-  int retval              = 0;
-  bool isnumber           = false;
+  const bool isnumber = false;
 
   // indexes for the parameters in the Lua stack
   const int table_param = 1;
   const int index_param = 2; 
 
+  int retval = 0;
   try
   {
     // retrieves LuaCOM object
-    lcom = (tLuaCOM*) LuaBeans::from_lua(L, table_param);
+    tLuaCOM* lcom = (tLuaCOM*) LuaBeans::from_lua(L, table_param);
     CHECK(lcom, INTERNAL_ERROR);
 
     // retrieves the field name
@@ -2346,9 +2049,7 @@ static int tagmeth_index(lua_State *L)
     case tLuaCOMException::UNSUPPORTED_FEATURE:
     default:
       luacom_error(L, e.getMessage());
-
       return 0;
-
       break;
     }
 
@@ -2378,30 +2079,23 @@ static bool luacom_runningInprocess(lua_State* L) {
 }
 
 
-//
-// call_event
-//
-//  Triggered when someone tries to use a LuaCOM object
-//  as a function. Calls the default method of the LuaCOM
-//  object in question.
-//
-
+/**
+  Triggered when someone tries to use a LuaCOM object
+  as a function. Calls the default method of the LuaCOM
+  object in question.
+*/
 static int call_event(lua_State *L)
 {
-  // used variables
-  tLuaCOM* lcom           = NULL;
-  LuaBeans *lbeans        = NULL;
-  int retval              = 0;
-
   // indexes for the parameters in the Lua stack
   const int luacom_object_param = 1;
-  const int first_user_param   = 2;
-  const int num_user_params     = lua_gettop(L) - 1;
+  const int first_user_param = 2;
+  const int num_user_params = lua_gettop(L) - 1;
 
+  int retval = 0;
   try
   {
     // retrieves LuaCOM object
-    lcom = (tLuaCOM*) LuaBeans::from_lua(L, luacom_object_param);
+    tLuaCOM* lcom = (tLuaCOM*) LuaBeans::from_lua(L, luacom_object_param);
     CHECK(lcom, INTERNAL_ERROR);
 
     retval = lcom->call(L, DISPID_VALUE,
@@ -2413,7 +2107,6 @@ static int call_event(lua_State *L)
   catch(class tLuaCOMException& e)
   {
     luacom_error(L, e.getMessage());
-
     return 0;
   }
 
@@ -2428,14 +2121,17 @@ static int luacom_RoundTrip(lua_State *L) {
   handler->lua2com(L, 1, v);
   handler->com2lua(L, v);
   delete handler;
+
   return 1;
 }
 
-/////////////////////////////////////////////
-//
-// Table of functions exported by Lua.
-//
-/////////////////////////////////////////////
+
+
+///
+/// Table of functions exported by Lua.
+///
+
+
 
 static struct luaL_Reg functions_tb []= 
 {
@@ -2473,21 +2169,21 @@ static struct luaL_Reg functions_tb []=
 };
   
 
-/////////////////////////////////////
-//
-// Functions exported by C/C++.
-//
-/////////////////////////////////////
 
-/*
- *  luacom_IDispatch2LuaCOM
- *  Recebe um ponteiro void* que deve ser
- *  um ponteiro para uma implementacao de uma
- *  interface IDispatch. E' criado um objeto
- *  LuaCOM cuja implementacao e' dada por essa
- *  interface. O objeto criado e' colocado na
- *  pilha de Lua
- */
+///
+/// Functions exported by C/C++.
+///
+
+
+
+/**
+  Recebe um ponteiro void* que deve ser
+  um ponteiro para uma implementacao de uma
+  interface IDispatch. E' criado um objeto
+  LuaCOM cuja implementacao e' dada por essa
+  interface. O objeto criado e' colocado na
+  pilha de Lua
+*/
 LUACOM_API int luacom_IDispatch2LuaCOM(lua_State *L, void *pdisp_arg)
 {
   if(pdisp_arg == NULL)
@@ -2497,7 +2193,6 @@ LUACOM_API int luacom_IDispatch2LuaCOM(lua_State *L, void *pdisp_arg)
   }
 
   tLuaCOM* lcom = NULL;
-
   try
   {
     lcom = tLuaCOM::CreateLuaCOM(L, (IDispatch*)pdisp_arg);
@@ -2510,9 +2205,9 @@ LUACOM_API int luacom_IDispatch2LuaCOM(lua_State *L, void *pdisp_arg)
   }
 
   LuaBeans::push(L, lcom);
-
   return 1;
 }
+
 
 /*
  * Initializes the library.
@@ -2606,17 +2301,18 @@ LUACOM_API void luacom_open(lua_State *L)
   LUASTACK_CLEAN(L, 0);
 }
 
-/*
- * Closes the library.
- */
+
+/**
+ Closes the library.
+*/
 LUACOM_API void luacom_close(lua_State *L)
 {
 }
 
 
-/*
- * Helper for implementing automation servers with LuaCOM
- */
+/**
+  Helper for implementing automation servers with LuaCOM
+*/
 LUACOM_API int luacom_detectAutomation(lua_State *L, int argc, char *argv[])
 {
   int automation_result = LUACOM_NOAUTOMATION;
@@ -2625,7 +2321,6 @@ LUACOM_API int luacom_detectAutomation(lua_State *L, int argc, char *argv[])
   int top = lua_gettop(L);
 
   // expects a table with the callback functions
-
   luaL_checktype (L, -1, LUA_TTABLE);
 
   // processes command line, looking for automation switches and

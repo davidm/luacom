@@ -61,6 +61,32 @@ protected:
 
 #define COM_RELEASE(x) {if(x){(x)->Release(); (x) = NULL;}}
 
+/**
+ Smart pointer for COM objects.
+ Calls Release() on destruction.
+ Has some similarities to CComPtr (atlcomcli.h) in ATL but does not require ATL.
+*/
+template <class T>
+class tCOMPtr
+{
+public:
+  tCOMPtr() : m_p(NULL) { }
+  ~tCOMPtr() { if (m_p) m_p->Release(); }
+  operator T* () const { return m_p; }
+  T& operator * () const { return *m_p; }
+  T* operator -> () const { return m_p; }
+  T** operator & () { return &m_p; }   // useful for QueryInterface
+  void Attach(T* p) { if (m_p) m_p->Release(); m_p = p; }
+private:
+  // disable these
+  tCOMPtr(T * p);
+  void operator=(const tCOMPtr & o);
+  void operator=(tCOMPtr & o);
+  void operator=(T * p);  // warning: CComPtr does AddRef() here.
+  void operator=(const T * p);
+
+  T * m_p;
+};
 
 
 #endif // __TCOMUTIL_H
