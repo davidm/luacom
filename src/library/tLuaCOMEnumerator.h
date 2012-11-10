@@ -1,6 +1,6 @@
-// tLuaCOMEnumerator.h: interface for the tLuaCOMEnumerator class.
-//
-//////////////////////////////////////////////////////////////////////
+/**
+  tLuaCOMEnumerator.h: interface for the tLuaCOMEnumerator class.
+*/
 
 #ifndef _TLUACOMENUMERATOR_H
 #define _TLUACOMENUMERATOR_H
@@ -15,6 +15,7 @@ extern "C"
 
 #include "tLuaCOMTypeHandler.h"
 #include "luabeans.h"
+#include "tCOMUtil.h"
 
 
 class tLuaCOMEnumerator  
@@ -34,7 +35,7 @@ protected:
   static const char* type_name;
   static const char module_name_key;
   static const char* pointer_type_name;
-  IEnumVARIANT* pEV;
+  tCOMPtr<IEnumVARIANT> pEV;
 
   tLuaCOMTypeHandler* typehandler;
 };

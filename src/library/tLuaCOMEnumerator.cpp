@@ -1,6 +1,6 @@
-// tLuaCOMEnumerator.cpp: implementation of the tLuaCOMEnumerator class.
-//
-//////////////////////////////////////////////////////////////////////
+/**
+  tLuaCOMEnumerator.cpp: tLuaCOMEnumerator class.
+*/
 
 #include "tLuaCOMEnumerator.h"
 
@@ -24,16 +24,13 @@ const char tLuaCOMEnumerator::module_name_key = 'k';
 
 #define ENUMERATOR_FIELD "__TLUACOMENUMERATOR__internal"
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 tLuaCOMEnumerator::tLuaCOMEnumerator(IEnumVARIANT* pEV_param)
 {
   CHECKPRECOND(pEV_param);
   
   // stores enumerator
-  pEV = pEV_param;
+  pEV.Attach(pEV_param);
   pEV->AddRef();
 
   typehandler = new tLuaCOMTypeHandler(NULL);
@@ -41,7 +38,6 @@ tLuaCOMEnumerator::tLuaCOMEnumerator(IEnumVARIANT* pEV_param)
 
 tLuaCOMEnumerator::~tLuaCOMEnumerator()
 {
-  COM_RELEASE(pEV);
   delete typehandler;
 }
 
@@ -178,7 +174,6 @@ int tLuaCOMEnumerator::call_method(lua_State *L)
 
   // call method
   int retval = 0;
-
   try
   {
     retval = enumerator->callCOMmethod(L, method_name, user_first_param, num_params);
@@ -195,36 +190,32 @@ int tLuaCOMEnumerator::call_method(lua_State *L)
 
 int tLuaCOMEnumerator::callCOMmethod(lua_State* L, const char *name, int first_param, int num_params)
 {
-    HRESULT hr = S_OK;
+  HRESULT hr = S_OK;
 
   // Next method
   if(strcmp(name, "Next") == 0)
   {
-    VARIANT* pVar = NULL;
-    unsigned long num_elements = 1, counter = 0;
-    ULONG fetched = 0;
-
-
+    unsigned long num_elements = 1;
     if(num_params > 0)
     {
       num_elements = (unsigned long) lua_tonumber(L, first_param);
     }
 
-    pVar = new VARIANT[num_elements];
+    VARIANT* pVar = new VARIANT[num_elements];
 
-    for(counter = 0; counter <  num_elements; counter++)
+    for(unsigned long counter = 0; counter <  num_elements; counter++)
       VariantInit(&pVar[counter]);
 
-
+    ULONG fetched = 0;
     hr = pEV->Next(num_elements, pVar, &fetched);
     
-    for(counter = 0; counter < fetched; counter++)
+    for(unsigned long counter = 0; counter < fetched; counter++)
     {
       typehandler->com2lua(L, pVar[counter]);
       typehandler->releaseVariant(&pVar[counter]);
     }
 
-    for(counter = 0; counter <  num_elements; counter++)
+    for(unsigned long counter = 0; counter <  num_elements; counter++)
       VariantClear(&pVar[counter]);
 
     delete[] pVar;
@@ -251,27 +242,19 @@ int tLuaCOMEnumerator::callCOMmethod(lua_State* L, const char *name, int first_p
     hr = pEV->Skip(num_elements);
 
     lua_pushboolean(L, hr == S_OK);
-
     return 1;
   }
 
   if(strcmp(name, "Clone") == 0)
   {
-    IEnumVARIANT* p_newEV = NULL;
-
-    hr = pEV->Clone(&p_newEV);
-    CHK_COM_CODE(hr);
+    tCOMPtr<IEnumVARIANT> p_newEV;
+    CHK_COM_CODE(pEV->Clone(&p_newEV));
 
     tLuaCOMEnumerator* enumerator = new tLuaCOMEnumerator(p_newEV);
     
-    COM_RELEASE(p_newEV);
-
     enumerator->push(L);
-
     return 1;
   }
-
-
 
   return 0;
 }
