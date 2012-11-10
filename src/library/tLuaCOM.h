@@ -79,8 +79,8 @@ public:
 
   volatile static long NEXT_ID;
 protected:
-  ITypeComp* ptcomp;
-  ITypeComp* plib_tcomp;
+  tCOMPtr<ITypeComp> ptcomp;
+  tCOMPtr<ITypeComp> plib_tcomp;
   long lock_count;
   CLSID clsid;
   IConnectionPoint *conn_point;
@@ -96,8 +96,8 @@ protected:
   tLuaCOMTypeHandler * typehandler;
 
 
-  LPDISPATCH pdisp;
-  ITypeInfo* ptinfo;
+  tCOMPtr<IDispatch> pdisp;
+  tCOMPtr<ITypeInfo> ptinfo;
 
   // struct to hold all type information for a
   // member

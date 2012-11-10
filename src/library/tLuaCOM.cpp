@@ -29,18 +29,16 @@ tLuaCOM::tLuaCOM(lua_State* L,
                  )
 {
   HRESULT hr = S_OK;
-
+	
   // initialization
-  plib_tcomp              = NULL;
-  ptcomp                  = NULL;
   clsid                   = IID_NULL;
   lock_count              = 0;
   conn_point              = NULL;
 
-  pdisp = pdisp_arg;
+  pdisp.Attach(pdisp_arg);
   pdisp->AddRef(); 
 
-  ptinfo = ptinfo_arg;
+  ptinfo.Attach(ptinfo_arg);
 
   if(ptinfo)
   {
@@ -63,11 +61,11 @@ tLuaCOM::tLuaCOM(lua_State* L,
       if(SUCCEEDED(hr))
       {
         //ptlib->GetTypeComp(&plib_tcomp);
-        COM_RELEASE(plib_tcomp);
+        plib_tcomp.Release();
       }
     }
     else
-      COM_RELEASE(ptinfo);  // BUG!!!
+      ptinfo.Release();  // BUG!!!
   }
 
   typehandler = new tLuaCOMTypeHandler(ptinfo_arg);
@@ -131,11 +129,6 @@ tLuaCOM::~tLuaCOM()
 
   delete typehandler;
   typehandler = NULL;
-
-  COM_RELEASE(ptcomp);
-  COM_RELEASE(plib_tcomp);
-  COM_RELEASE(ptinfo);
-  COM_RELEASE(pdisp);
 
   tUtil::log_verbose("tLuaCOM", "%.4d:destroyed", ID);
 }
