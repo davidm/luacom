@@ -1,3 +1,7 @@
+/**
+  tLuaCOMConnPoints.cpp
+*/
+
 #include <windows.h>
 #include <ole2.h>
 #include <olectl.h>
@@ -22,17 +26,13 @@
 ---------------------------------------------------------------------------*/
 
 /**
-  Method:   tLuaCOMEnumConnPoints::tLuaCOMEnumConnPoints
-
-  Summary:  tLuaCOMEnumConnPoints Constructor.
+  tLuaCOMEnumConnPoints Constructor.
 
   Args:     IUnknown* pHostObj
               Pointer to the host object whose connection points are
               being enumerated.
 
   Modifies: cRefs, pHostObj, iEnumIndex, cConnPts, and paConnPts.
-
-  Returns:  void
 */
 tLuaCOMEnumConnPoints::tLuaCOMEnumConnPoints(IUnknown* pHostObj)
 {
@@ -52,9 +52,7 @@ tLuaCOMEnumConnPoints::tLuaCOMEnumConnPoints(IUnknown* pHostObj)
 
 
 /**
-  Method:   tLuaCOMEnumConnPoints::~tLuaCOMEnumConnPoints
-
-  Summary:  tLuaCOMEnumConnPoints Destructor.
+  Destructor.
 
   Args:     void
 
@@ -82,10 +80,8 @@ tLuaCOMEnumConnPoints::~tLuaCOMEnumConnPoints(void)
 
 
 /**
-  Method:   tLuaCOMEnumConnPoints::Init
-
-  Summary:  tLuaCOMEnumConnPoints Initialization method.  Create any
-            necessary arrays, structures, and objects.
+  Initialization method.  Create any
+  necessary arrays, structures, and objects.
 
   Args:     ULONG cConnPts,
               Number of Connections Points.
@@ -96,8 +92,7 @@ tLuaCOMEnumConnPoints::~tLuaCOMEnumConnPoints(void)
 
   Modifies: cConnPts, paConnPts, iEnumIndex.
 
-  Returns:  HRESULT
-              Standard result code. NOERROR for success.
+  Returns:  HRESULT standard result code. NOERROR for success.
 */
 HRESULT tLuaCOMEnumConnPoints::Init(
           ULONG cConnPts,
@@ -135,10 +130,8 @@ HRESULT tLuaCOMEnumConnPoints::Init(
 
 
 /**
-  Method:   tLuaCOMEnumConnPoints::QueryInterface
-
-  Summary:  QueryInterface of the tLuaCOMEnumConnPoints non-delegating
-            IUnknown implementation.
+  QueryInterface of the tLuaCOMEnumConnPoints non-delegating
+  IUnknown implementation.
 
   Args:     REFIID riid,
               [in] GUID of the Interface being requested.
@@ -148,8 +141,7 @@ HRESULT tLuaCOMEnumConnPoints::Init(
 
   Modifies: .
 
-  Returns:  HRESULT
-              Standard result code. NOERROR for success.
+  Returns:  HRESULT standard result code. NOERROR for success.
 */
 STDMETHODIMP tLuaCOMEnumConnPoints::QueryInterface(
                REFIID riid,
@@ -177,17 +169,12 @@ STDMETHODIMP tLuaCOMEnumConnPoints::QueryInterface(
 
 
 /**
-  Method:   tLuaCOMEnumConnPoints::AddRef
-
-  Summary:  AddRef of the tLuaCOMEnumConnPoints non-delegating IUnknown
-            implementation.
-
-  Args:     void
+  AddRef of the tLuaCOMEnumConnPoints non-delegating IUnknown
+  implementation.
 
   Modifies: cRefs.
 
-  Returns:  ULONG
-              New value of cRefs (COM object's reference count).
+  Returns:  New value of cRefs (COM object's reference count).
 */
 STDMETHODIMP_(ULONG) tLuaCOMEnumConnPoints::AddRef(void)
 {
@@ -202,12 +189,8 @@ STDMETHODIMP_(ULONG) tLuaCOMEnumConnPoints::AddRef(void)
 
 
 /**
-  Method:   tLuaCOMEnumConnPoints::Release
-
-  Summary:  Release of the tLuaCOMEnumConnPoints non-delegating IUnknown
-            implementation.
-
-  Args:     void
+  Release of the tLuaCOMEnumConnPoints non-delegating IUnknown
+  implementation.
 
   Modifies: cRefs.
 
@@ -234,13 +217,11 @@ STDMETHODIMP_(ULONG) tLuaCOMEnumConnPoints::Release(void)
 
 
 /**
-  Method:   tLuaCOMEnumConnPoints::Next
-
-  Summary:  The Next member method of this IEnumConnectionPoints interface
-            implementation. Called by outside clients of a
-            tLuaCOMEnumConnPoints object to request that a number of next
-            connection point interface pointers be deposited into an array
-            supplied by the caller.
+  The Next member method of this IEnumConnectionPoints interface
+   implementation. Called by outside clients of a
+   tLuaCOMEnumConnPoints object to request that a number of next
+   connection point interface pointers be deposited into an array
+   supplied by the caller.
 
   Args:     ULONG cReq
               Number of connection points requested for return (starting at
@@ -254,8 +235,7 @@ STDMETHODIMP_(ULONG) tLuaCOMEnumConnPoints::Release(void)
 
   Modifies: .
 
-  Returns:  HRESULT
-              Standard result code. NOERROR for success.
+  Returns:  HRESULT standard result code. NOERROR for success.
 */
 STDMETHODIMP tLuaCOMEnumConnPoints::Next(
                ULONG cReq,
@@ -312,19 +292,16 @@ STDMETHODIMP tLuaCOMEnumConnPoints::Next(
 
 
 /**
-  Method:   tLuaCOMEnumConnPoints::Skip
-
-  Summary:  The Skip member method of this IEnumConnectionPoints interface
-            implementation. Starting at the current Enumerator index, skip
-            the specified number of connection point items.
+  The Skip member method of this IEnumConnectionPoints interface
+  implementation. Starting at the current Enumerator index, skip
+  the specified number of connection point items.
 
   Args:     ULONG cSkip
               Number of Connection Point items to skip.
 
   Modifies: .
 
-  Returns:  HRESULT
-              Standard result code. NOERROR for success.
+  Returns:  HRESULT standard result code. NOERROR for success.
 */
 STDMETHODIMP tLuaCOMEnumConnPoints::Skip(
                ULONG cSkip)
@@ -344,13 +321,8 @@ STDMETHODIMP tLuaCOMEnumConnPoints::Skip(
 
 
 /**
-  Method:   tLuaCOMEnumConnPoints::Reset
-
-  Summary:  The Reset member method of the IEnumConnectionPoints interface
-            implementation. Resets the Enumeration index to the first
-            connection point item in the array.
-
-  Args:     void.
+  IEnumConnectionPoints::Reset implementation.
+  Resets the Enumeration index to the first connection point item in the array.
 
   Modifies: .
 
@@ -368,11 +340,8 @@ STDMETHODIMP tLuaCOMEnumConnPoints::Reset(
 
 
 /**
-  Method:   tLuaCOMEnumConnPoints::Clone
-
-  Summary:  The Clone member method of this IEnumConnectionPoints
-            interface implementation. Creates a new clone of this entire
-            Connection Point enumerator COM object.
+  IEnumConnectionPoints::Clone implementation.
+  Creates a new clone of this entire Connection Point enumerator COM object.
 
   Args:     IEnumConnectionPoints** ppIEnum
               Address of the caller's output pointer variable that will
@@ -381,8 +350,7 @@ STDMETHODIMP tLuaCOMEnumConnPoints::Reset(
 
   Modifies: ...
 
-  Returns:  HRESULT
-              Standard result code. NOERROR for success.
+  Returns:  HRESULT standard result code. NOERROR for success.
 */
 STDMETHODIMP tLuaCOMEnumConnPoints::Clone(
                IEnumConnectionPoints** ppIEnum)
@@ -424,17 +392,13 @@ STDMETHODIMP tLuaCOMEnumConnPoints::Clone(
 ---------------------------------------------------------------------------*/
 
 /**
-  Method:   tLuaCOMConnPoint::tLuaCOMConnPoint
-
-  Summary:  tLuaCOMConnPoint Constructor.
+  Constructor.
 
   Args:     IUnknown* pHostObj
               Pointer to IUnknown of the connectable object offering this
               connection point.
 
   Modifies: ...
-
-  Returns:  void
 */
 tLuaCOMConnPoint::tLuaCOMConnPoint(lua_State *p_L,
                                    IUnknown* pHostObj)
@@ -579,21 +543,18 @@ STDMETHODIMP_(ULONG) tLuaCOMConnPoint::Release(void)
 
 
 /**
-  Method:   tLuaCOMConnPoint::GetSlot
-
-  Summary:  An internal private utility member method to obtain a free
-            slot in the dynamic connections array. GetSlot will expand the
-            dynamic array for more entries if needed. To guarantee thread
-            safety, this private method should always be called within the
-            protection of a bracketed OwnThis, UnOwnThis pair.
+  An internal private utility member method to obtain a free
+  slot in the dynamic connections array. GetSlot will expand the
+  dynamic array for more entries if needed. To guarantee thread
+  safety, this private method should always be called within the
+  protection of a bracketed OwnThis, UnOwnThis pair.
 
   Args:     UINT* puiFreeSlot
               Address of an output variable to receive the free slot index.
 
   Modifies: uiMaxIndex, paConnections.
 
-  Returns:  HRESULT
-              Standard result code. NOERROR for success.
+  Returns:  HRESULT standard result code. NOERROR for success.
 */
 HRESULT tLuaCOMConnPoint::GetSlot(
           UINT* puiFreeSlot)
@@ -628,11 +589,9 @@ HRESULT tLuaCOMConnPoint::GetSlot(
 
 
 /**
-  Method:   tLuaCOMConnPoint::FindSlot
-
-  Summary:  An internal private utility member method to find an existing
-            slot (identified by the specified dwCookie value) in the
-            dynamic connections array.
+  An internal private utility member method to find an existing
+  slot (identified by the specified dwCookie value) in the
+  dynamic connections array.
 
   Args:     DWORD dwCookie,
               The connection key (cookie) to find.
@@ -641,8 +600,7 @@ HRESULT tLuaCOMConnPoint::GetSlot(
 
   Modifies: ...
 
-  Returns:  HRESULT
-              Standard result code. NOERROR for success.
+  Returns:  HRESULT standard result code. NOERROR for success.
 */
 HRESULT tLuaCOMConnPoint::FindSlot(
           DWORD dwCookie,
@@ -668,20 +626,17 @@ HRESULT tLuaCOMConnPoint::FindSlot(
 
 
 /**
-  Method:   tLuaCOMConnPoint::GetConnectionInterface
-
-  Summary:  The GetConnectionInterface member method of this
-            IConnPoint interface implementation. Called to get the
-            IID of the Sink interface associated with this connection
-            point.
+  The GetConnectionInterface member method of this
+  IConnPoint interface implementation. Called to get the
+  IID of the Sink interface associated with this connection
+  point.
 
   Args:     IID* piidSink
               Pointer to the IID of the associated sink interface.
 
   Modifies: .
 
-  Returns:  HRESULT
-              Standard result code. NOERROR for success.
+  Returns:  HRESULT standard result code. NOERROR for success.
 */
 STDMETHODIMP tLuaCOMConnPoint::GetConnectionInterface(
                IID* piidSink)
@@ -698,12 +653,9 @@ STDMETHODIMP tLuaCOMConnPoint::GetConnectionInterface(
 
 
 /**
-  Method:   tLuaCOMConnPoint::GetConnPointContainer
-
-  Summary:  The GetConnPointContainer member method of this
-            IConnPoint interface implementation. Called to get the
-            connection point container that contains this connection
-            point.
+  IConnPoint::GetConnPointContainer implementation.
+  Called to get the connection point container that contains
+  this connection point.
 
   Args:     IConnPointContainer** ppConnPtCon
               Address of the pointer variable that will recieve the
@@ -711,8 +663,7 @@ STDMETHODIMP tLuaCOMConnPoint::GetConnectionInterface(
 
   Modifies: .
 
-  Returns:  HRESULT
-              Standard result code. NOERROR for success.
+  Returns:  HRESULT standard result code. NOERROR for success.
 */
 STDMETHODIMP tLuaCOMConnPoint::GetConnectionPointContainer(
                IConnectionPointContainer** ppConnPtCon)
@@ -730,13 +681,11 @@ STDMETHODIMP tLuaCOMConnPoint::GetConnectionPointContainer(
 
 
 /**
-  Method:   tLuaCOMConnPoint::Advise
-
-  Summary:  The Advise member method of this IConnPoint interface
-            implementation. Called by clients to establish a connection of
-            their sink to this connection point. Uses the CThreaded
-            OwnThis mechanism to provide mutually exclusive access by
-            multiple threads.
+  IConnPoint::Advise implementation.
+  Called by clients to establish a connection of
+  their sink to this connection point. Uses the CThreaded
+  OwnThis mechanism to provide mutually exclusive access by
+  multiple threads.
 
   Args:     IUnknown* pUnkSink
               IUnknown interface pointer of the Sink object in the client.
@@ -747,8 +696,7 @@ STDMETHODIMP tLuaCOMConnPoint::GetConnectionPointContainer(
 
   Modifies: ...
 
-  Returns:  HRESULT
-              Standard result code. NOERROR for success.
+  Returns:  HRESULT standard result code. NOERROR for success.
 */
 STDMETHODIMP tLuaCOMConnPoint::Advise(
                IUnknown* pUnkSink,
@@ -812,22 +760,19 @@ STDMETHODIMP tLuaCOMConnPoint::Advise(
 
 
 /**
-  Method:   tLuaCOMConnPoint::Unadvise
-
-  Summary:  The Unadvise member method of this IConnPoint interface
-            implementation. Called by clients to disconnect a connection
-            of their sink to this connection point. The connection is
-            identified by the dwCookie argument (obtained by a previous
-            Advise call). Uses the CThreaded OwnThis mechanism to provide
-            mutually exclusive access by multiple threads.
+  IConnPoint::Unadvise implementation.
+  Called by clients to disconnect a connection
+  of their sink to this connection point. The connection is
+  identified by the dwCookie argument (obtained by a previous
+  Advise call). Uses the CThreaded OwnThis mechanism to provide
+  mutually exclusive access by multiple threads.
 
   Args:     DWORD dwCookie
               Connection key that was obtained by a previous Advise call.
 
   Modifies: .
 
-  Returns:  HRESULT
-              Standard result code. NOERROR for success.
+  Returns:  HRESULT standard result code. NOERROR for success.
 */
 STDMETHODIMP tLuaCOMConnPoint::Unadvise(
                DWORD dwCookie)
@@ -861,14 +806,12 @@ STDMETHODIMP tLuaCOMConnPoint::Unadvise(
 
 
 /**
-  Method:   tLuaCOMConnPoint::EnumConnections
-
-  Summary:  The EnumConnections member method of this IConnPoint
-            interface implementation. Called to obtain an IEnumConnections
-            enumerator interface that can be used to enumerate the
-            connections of this connection point. Uses the CThreaded
-            OwnThis mechanism to ensure mutually exclusive access by
-            multiple threads.
+  IConnPoint::EnumConnections implementation.
+  Called to obtain an IEnumConnections
+  enumerator interface that can be used to enumerate the
+  connections of this connection point. Uses the CThreaded
+  OwnThis mechanism to ensure mutually exclusive access by
+  multiple threads.
 
   Args:     IEnumConnections** ppIEnum
               Address of the caller's output pointer variable that will
@@ -876,8 +819,7 @@ STDMETHODIMP tLuaCOMConnPoint::Unadvise(
 
   Modifies: ...
 
-  Returns:  HRESULT
-              Standard result code. NOERROR for success.
+  Returns:  HRESULT standard result code. NOERROR for success.
 */
 STDMETHODIMP tLuaCOMConnPoint::EnumConnections(
                IEnumConnections** ppIEnum)
@@ -949,9 +891,7 @@ STDMETHODIMP tLuaCOMConnPoint::EnumConnections(
 ---------------------------------------------------------------------------*/
 
 /**
-  Method:   tLuaCOMEnumConnections::tLuaCOMEnumConnections
-
-  Summary:  tLuaCOMEnumConnections Constructor.
+  Constructor.
 
   Args:     IUnknown* pHostObj
               Pointer to IUnknown interface of the host Connection Point
@@ -959,8 +899,6 @@ STDMETHODIMP tLuaCOMConnPoint::EnumConnections(
 
   Modifies: cRefs, pHostObj, iEnumIndex, cConnections,
             and paConnections.
-
-  Returns:  void
 */
 tLuaCOMEnumConnections::tLuaCOMEnumConnections(
   IUnknown* pHostObj)
@@ -981,15 +919,9 @@ tLuaCOMEnumConnections::tLuaCOMEnumConnections(
 
 
 /**
-  Method:   tLuaCOMEnumConnections::~tLuaCOMEnumConnections
-
-  Summary:  tLuaCOMEnumConnections Destructor.
-
-  Args:     void
+  Destructor.
 
   Modifies: paConnections.
-
-  Returns:  void
 */
 tLuaCOMEnumConnections::~tLuaCOMEnumConnections(void)
 {
@@ -1010,10 +942,8 @@ tLuaCOMEnumConnections::~tLuaCOMEnumConnections(void)
 
 
 /**
-  Method:   tLuaCOMEnumConnections::Init
-
-  Summary:  tLuaCOMEnumConnections Initialization method.  Create any
-            necessary arrays, structures, and objects.
+  tLuaCOMEnumConnections Initialization method.  Create any
+  necessary arrays, structures, and objects.
 
   Args:     ULONG cConnections
               Number of Connections.
@@ -1024,8 +954,7 @@ tLuaCOMEnumConnections::~tLuaCOMEnumConnections(void)
 
   Modifies: cConnections, paConnections, pHostObj, iEnumIndex.
 
-  Returns:  HRESULT
-              Standard result code. NOERROR for success.
+  Returns:  HRESULT standard result code. NOERROR for success.
 */
 HRESULT tLuaCOMEnumConnections::Init(
           ULONG cConnections,
@@ -1063,10 +992,7 @@ HRESULT tLuaCOMEnumConnections::Init(
 
 
 /**
-  Method:   tLuaCOMEnumConnections::QueryInterface
-
-  Summary:  QueryInterface of the tLuaCOMEnumConnections non-delegating
-            IUnknown implementation.
+  IUnknown::QueryInterface implementation.
 
   Args:     REFIID riid,
               [in] GUID of the Interface being requested.
@@ -1076,8 +1002,7 @@ HRESULT tLuaCOMEnumConnections::Init(
 
   Modifies: .
 
-  Returns:  HRESULT
-              Standard result code. NOERROR for success.
+  Returns:  HRESULT standard result code. NOERROR for success.
 */
 STDMETHODIMP tLuaCOMEnumConnections::QueryInterface(
                REFIID riid,
@@ -1105,17 +1030,11 @@ STDMETHODIMP tLuaCOMEnumConnections::QueryInterface(
 
 
 /**
-  Method:   tLuaCOMEnumConnections::AddRef
-
-  Summary:  AddRef of the tLuaCOMEnumConnections non-delegating IUnknown
-            implementation.
-
-  Args:     void
+  IUnknown::AddRef implementation.
 
   Modifies: cRefs.
 
-  Returns:  ULONG
-              New value of cRefs (COM object's reference count).
+  Returns: New value of cRefs (COM object's reference count).
 */
 STDMETHODIMP_(ULONG) tLuaCOMEnumConnections::AddRef(void)
 {
@@ -1130,17 +1049,11 @@ STDMETHODIMP_(ULONG) tLuaCOMEnumConnections::AddRef(void)
 
 
 /**
-  Method:   tLuaCOMEnumConnections::Release
-
-  Summary:  Release of the tLuaCOMEnumConnections non-delegating IUnknown
-            implementation.
-
-  Args:     void
+  IUnknown::Release implementation.
 
   Modifies: cRefs.
 
-  Returns:  ULONG
-              New value of cRefs (COM object's reference count).
+  Returns: New value of cRefs (COM object's reference count).
 */
 STDMETHODIMP_(ULONG) tLuaCOMEnumConnections::Release(void)
 {
@@ -1162,12 +1075,10 @@ STDMETHODIMP_(ULONG) tLuaCOMEnumConnections::Release(void)
 
 
 /**
-  Method:   tLuaCOMEnumConnections::Next
-
-  Summary:  The Next member method of this IEnumConnections interface
-            implementation. Called by outside clients of a
-            tLuaCOMEnumConnections object to request a number of next
-            connections be returned in an array supplied by the caller.
+  IEnumConnections::Next implementation.
+  Called by outside clients of a
+  tLuaCOMEnumConnections object to request a number of next
+  connections be returned in an array supplied by the caller.
 
   Args:     ULONG cReq
               Number of connection points requested for return (starting at
@@ -1181,8 +1092,7 @@ STDMETHODIMP_(ULONG) tLuaCOMEnumConnections::Release(void)
 
   Modifies: .
 
-  Returns:  HRESULT
-              Standard result code. NOERROR for success.
+  Returns:  HRESULT standard result code. NOERROR for success.
 */
 STDMETHODIMP tLuaCOMEnumConnections::Next(
                ULONG cReq,
@@ -1241,19 +1151,16 @@ STDMETHODIMP tLuaCOMEnumConnections::Next(
 
 
 /**
-  Method:   tLuaCOMEnumConnections::Skip
-
-  Summary:  The Skip member method of this IEnumConnections interface
-            implementation. Starting at the current Enumerator index, skip
-            the specified number of connection items.
+  IEnumConnections::Skip implementation.
+  Starting at the current Enumerator index, skip
+  the specified number of connection items.
 
   Args:     ULONG cSkip
               Number of Connection items to skip.
 
   Modifies: .
 
-  Returns:  HRESULT
-              Standard result code. NOERROR for success.
+  Returns:  HRESULT standard result code. NOERROR for success.
 */
 STDMETHODIMP tLuaCOMEnumConnections::Skip(
                ULONG cSkip)
@@ -1273,18 +1180,12 @@ STDMETHODIMP tLuaCOMEnumConnections::Skip(
 
 
 /**
-  Method:   tLuaCOMEnumConnections::Reset
-
-  Summary:  The Reset member method of the IEnumConnections interface
-            implementation. Resets the Enumeration index to the first
-            connection item in the array.
-
-  Args:     void.
+  IEnumConnections::Reset implementation.
+  Resets the Enumeration index to the first connection item in the array.
 
   Modifies: .
 
-  Returns:  HRESULT
-              Standard result code. NOERROR for success.
+  Returns:  HRESULT standard result code. NOERROR for success.
 */
 STDMETHODIMP tLuaCOMEnumConnections::Reset(
                void)
@@ -1297,12 +1198,10 @@ STDMETHODIMP tLuaCOMEnumConnections::Reset(
 
 
 /**
-  Method:   tLuaCOMEnumConnections::Clone
-
-  Summary:  The Clone member method of this IEnumConnections interface
-            implementation. Creates a new clone of this entire Connection
-            enumerator COM object and returns a pointer to its
-            IEnumConnections interface.
+  IEnumConnections::Clone implementation.
+  Creates a new clone of this entire Connection
+  enumerator COM object and returns a pointer to its
+  IEnumConnections interface.
 
   Args:     IEnumConnections** ppIEnum
               Address of the caller's output pointer variable that will
@@ -1311,8 +1210,7 @@ STDMETHODIMP tLuaCOMEnumConnections::Reset(
 
   Modifies: ...
 
-  Returns:  HRESULT
-              Standard result code. NOERROR for success.
+  Returns:  HRESULT standard result code. NOERROR for success.
 */
 STDMETHODIMP tLuaCOMEnumConnections::Clone(
                IEnumConnections** ppIEnum)
@@ -1346,14 +1244,8 @@ STDMETHODIMP tLuaCOMEnumConnections::Clone(
 }
 
 
-
-
 /**
-  Method:   tLuaCOMConnPointContainer
-              ::tLuaCOMConnPointContainer
-
-  Summary:  Constructor for the tLuaCOMConnPointContainer interface
-            instantiation.
+  Constructor.
 
   Args:     COBall* pBackObj,
               Back pointer to the parent outer object.
@@ -1361,8 +1253,6 @@ STDMETHODIMP tLuaCOMEnumConnections::Clone(
               Pointer to the outer Unknown.  For delegation.
 
   Modifies: pBackObj, pUnkOuter.
-
-  Returns:  void
 */
 tLuaCOMConnPointContainer::tLuaCOMConnPointContainer(lua_State* p_L,
                                                      IUnknown* p_pUnkOuter)
@@ -1462,10 +1352,8 @@ STDMETHODIMP_(ULONG) tLuaCOMConnPointContainer::Release(void)
 
 
 /**
-  Method:   tLuaCOMConnPointContainer::FindConnectionPoint
-
-  Summary:  Given an IID for a connection point sink find and return the
-            interface pointer for that connection point sink.
+  Given an IID for a connection point sink find and return the
+  interface pointer for that connection point sink.
 
   Args:     REFIID riid
               Reference to an IID
@@ -1474,8 +1362,7 @@ STDMETHODIMP_(ULONG) tLuaCOMConnPointContainer::Release(void)
 
   Modifies: .
 
-  Returns:  HRESULT
-              Standard result code. NOERROR for success.
+  Returns:  HRESULT standard result code. NOERROR for success.
 */
 STDMETHODIMP tLuaCOMConnPointContainer::FindConnectionPoint(
                REFIID riid,
@@ -1509,10 +1396,8 @@ STDMETHODIMP tLuaCOMConnPointContainer::FindConnectionPoint(
 
 
 /**
-  Method:   tLuaCOMConnPointContainer::EnumConnectionPoints
-
-  Summary:  Return Enumerator for the connectable object's contained
-            connection points.
+  Return Enumerator for the connectable object's contained
+  connection points.
 
   Args:     IEnumConnectionPoints** ppIEnum
               Pointer to the caller's Enumerator pointer variable.
@@ -1521,8 +1406,7 @@ STDMETHODIMP tLuaCOMConnPointContainer::FindConnectionPoint(
 
   Modifies: .
 
-  Returns:  HRESULT
-              Standard result code. NOERROR for success.
+  Returns:  HRESULT standard result code. NOERROR for success.
 */
 STDMETHODIMP tLuaCOMConnPointContainer::EnumConnectionPoints(
                        IEnumConnectionPoints** ppIEnum)
