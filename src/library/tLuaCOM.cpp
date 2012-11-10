@@ -57,15 +57,12 @@ tLuaCOM::tLuaCOM(lua_State* L,
       // tries to get typecomp for type library
       // (useful to bind to constants)
 
-      ITypeLib* ptlib = NULL;
+      tCOMPtr<ITypeLib> ptlib;
       unsigned int dumb = 0;
-
       hr = ptinfo->GetContainingTypeLib(&ptlib, &dumb);
-
       if(SUCCEEDED(hr))
       {
         //ptlib->GetTypeComp(&plib_tcomp);
-        COM_RELEASE(ptlib);
         COM_RELEASE(plib_tcomp);
       }
     }
@@ -266,7 +263,6 @@ bool tLuaCOM::getConstant(lua_State* L, const char* name)
   BINDPTR bindptr;
   DESCKIND desckind;
   BSTR wName;
-  ITypeInfo *info = NULL;
   bool result = false;
 
   unsigned int dumb = 0;
@@ -275,6 +271,7 @@ bool tLuaCOM::getConstant(lua_State* L, const char* name)
 
   unsigned long lhashval = LHashValOfName(LOCALE_SYSTEM_DEFAULT, wName);
 
+  tCOMPtr<ITypeInfo> info;
   hr = plib_tcomp->Bind(wName, lhashval, INVOKE_PROPERTYGET,
     &info, &desckind, &bindptr);
 
@@ -289,8 +286,6 @@ bool tLuaCOM::getConstant(lua_State* L, const char* name)
   }
   else
     result = false;
-
-  COM_RELEASE(info);
 
   return result;
 }
@@ -688,17 +683,15 @@ tLuaCOM * tLuaCOM::CreateLuaCOM(lua_State* L,
 ITypeInfo * tLuaCOM::GetDefaultEventsInterface()
 {
   CLSID clsid = GetCLSID();
-
   if(clsid == IID_NULL)
     return NULL;
   
-  ITypeInfo* coclassinfo = tCOMUtil::GetCoClassTypeInfo(pdisp, clsid);
-
+  tCOMPtr<ITypeInfo> coclassinfo;
+  coclassinfo.Attach(tCOMUtil::GetCoClassTypeInfo(pdisp, clsid));
   if(!coclassinfo)
     return NULL;
   
   ITypeInfo *ptinfo = tCOMUtil::GetDefaultInterfaceTypeInfo(coclassinfo, true);
-  COM_RELEASE(coclassinfo);
 
   return ptinfo;
 }
@@ -736,20 +729,17 @@ CLSID tLuaCOM::GetCLSID()
     return clsid;
 
   // tries to find the CLSID using IProvideClassInfo
-  ITypeInfo* coclassinfo = tCOMUtil::GetCoClassTypeInfo(pdisp);
-
+  tCOMPtr<ITypeInfo> coclassinfo;
+  coclassinfo.Attach(tCOMUtil::GetCoClassTypeInfo(pdisp));
   if(coclassinfo)
   {
     clsid = tCOMUtil::GetCLSID(coclassinfo);
-    COM_RELEASE(coclassinfo);
-
     if(clsid != IID_NULL)
       return clsid;
   }
 
   // Now searches the type library seeking the coclass to which
   // this interface belongs
-
   clsid = tCOMUtil::FindCLSID(ptinfo);
 
   return clsid;
