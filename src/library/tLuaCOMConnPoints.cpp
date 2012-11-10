@@ -60,7 +60,7 @@ tLuaCOMEnumConnPoints::tLuaCOMEnumConnPoints(IUnknown* pHostObj)
 
   Returns:  void
 */
-tLuaCOMEnumConnPoints::~tLuaCOMEnumConnPoints(void)
+tLuaCOMEnumConnPoints::~tLuaCOMEnumConnPoints()
 {
   if (NULL != paConnPts)
   {
@@ -176,7 +176,7 @@ STDMETHODIMP tLuaCOMEnumConnPoints::QueryInterface(
 
   Returns:  New value of cRefs (COM object's reference count).
 */
-STDMETHODIMP_(ULONG) tLuaCOMEnumConnPoints::AddRef(void)
+STDMETHODIMP_(ULONG) tLuaCOMEnumConnPoints::AddRef()
 {
   cRefs = ++cRefs;
 
@@ -197,7 +197,7 @@ STDMETHODIMP_(ULONG) tLuaCOMEnumConnPoints::AddRef(void)
   Returns:  ULONG
               New value of cRefs (COM object's reference count).
 */
-STDMETHODIMP_(ULONG) tLuaCOMEnumConnPoints::Release(void)
+STDMETHODIMP_(ULONG) tLuaCOMEnumConnPoints::Release()
 {
   // Pass this release along to the Host object being enumerated.
   pHostObj->Release();
@@ -435,7 +435,7 @@ tLuaCOMConnPoint::tLuaCOMConnPoint(lua_State *p_L,
 }
 
 
-tLuaCOMConnPoint::~tLuaCOMConnPoint(void)
+tLuaCOMConnPoint::~tLuaCOMConnPoint()
 {
   UINT i;
 
@@ -517,7 +517,7 @@ STDMETHODIMP tLuaCOMConnPoint::QueryInterface(
 }
 
 
-STDMETHODIMP_(ULONG) tLuaCOMConnPoint::AddRef(void)
+STDMETHODIMP_(ULONG) tLuaCOMConnPoint::AddRef()
 {
   cRefs = ++cRefs;
 
@@ -525,7 +525,7 @@ STDMETHODIMP_(ULONG) tLuaCOMConnPoint::AddRef(void)
 }
 
 
-STDMETHODIMP_(ULONG) tLuaCOMConnPoint::Release(void)
+STDMETHODIMP_(ULONG) tLuaCOMConnPoint::Release()
 {
   cRefs = --cRefs;
 
@@ -923,7 +923,7 @@ tLuaCOMEnumConnections::tLuaCOMEnumConnections(
 
   Modifies: paConnections.
 */
-tLuaCOMEnumConnections::~tLuaCOMEnumConnections(void)
+tLuaCOMEnumConnections::~tLuaCOMEnumConnections()
 {
   if (NULL != paConnections)
   {
@@ -1036,7 +1036,7 @@ STDMETHODIMP tLuaCOMEnumConnections::QueryInterface(
 
   Returns: New value of cRefs (COM object's reference count).
 */
-STDMETHODIMP_(ULONG) tLuaCOMEnumConnections::AddRef(void)
+STDMETHODIMP_(ULONG) tLuaCOMEnumConnections::AddRef()
 {
   cRefs = ++cRefs;
 
@@ -1055,7 +1055,7 @@ STDMETHODIMP_(ULONG) tLuaCOMEnumConnections::AddRef(void)
 
   Returns: New value of cRefs (COM object's reference count).
 */
-STDMETHODIMP_(ULONG) tLuaCOMEnumConnections::Release(void)
+STDMETHODIMP_(ULONG) tLuaCOMEnumConnections::Release()
 {
   // Pass this release along to the Host object being enumerated.
   pHostObj->Release();
@@ -1257,7 +1257,6 @@ STDMETHODIMP tLuaCOMEnumConnections::Clone(
 tLuaCOMConnPointContainer::tLuaCOMConnPointContainer(lua_State* p_L,
                                                      IUnknown* p_pUnkOuter)
 {
-  HRESULT hr = S_OK;
   ITypeInfo *events_typeinfo = NULL;
 
   CHECKPARAM(p_L); CHECKPARAM(p_pUnkOuter);
@@ -1267,35 +1266,19 @@ tLuaCOMConnPointContainer::tLuaCOMConnPointContainer(lua_State* p_L,
   L = p_L;
 
    // creates connection point for source interface
-  IProvideClassInfo2 *ci2  = NULL;
-  ITypeInfo *coclassinfo = NULL;
 
-  hr = pUnkOuter->QueryInterface(IID_IProvideClassInfo2, (void **) &ci2); 
-  CHK_COM_CODE(hr);
+  tCOMPtr<IProvideClassInfo2> ci2;
+  CHK_COM_CODE(pUnkOuter->QueryInterface(IID_IProvideClassInfo2, (void **) &ci2)); 
 
   IID iid;
+  CHK_COM_CODE(ci2->GetGUID(GUIDKIND_DEFAULT_SOURCE_DISP_IID, &iid));
 
-  try
-  {
-    hr = ci2->GetGUID(GUIDKIND_DEFAULT_SOURCE_DISP_IID, &iid);
-    CHK_COM_CODE(hr);
+  tCOMPtr<ITypeInfo> coclassinfo;
+  CHK_COM_CODE(ci2->GetClassInfo(&coclassinfo));
 
-    hr = ci2->GetClassInfo(&coclassinfo);
-    CHK_COM_CODE(hr);  
-
-    events_typeinfo = tCOMUtil::GetDefaultInterfaceTypeInfo(coclassinfo, true);
-    CHK_LCOM_ERR(events_typeinfo, "No default source typeinfo.");
-  }
-  catch(class tLuaCOMException& e)
-  {
-    COM_RELEASE(ci2);
-    COM_RELEASE(coclassinfo);
-    throw e;
-  }
-
-  COM_RELEASE(ci2);
-  COM_RELEASE(coclassinfo);
-  
+  events_typeinfo = tCOMUtil::GetDefaultInterfaceTypeInfo(coclassinfo, true);
+  CHK_LCOM_ERR(events_typeinfo, "No default source typeinfo.");
+ 
   max_connection_points = 1;
   connection_points = new tLuaCOMConnPoint*[max_connection_points];
   CHKMALLOC(connection_points);
@@ -1307,8 +1290,7 @@ tLuaCOMConnPointContainer::tLuaCOMConnPointContainer(lua_State* p_L,
   
   num_connection_points = 1;
 
-  hr = connection_points[0]->Init(iid, events_typeinfo);
-  CHK_COM_CODE(hr);  
+  CHK_COM_CODE(connection_points[0]->Init(iid, events_typeinfo));
 
   default_connection = connection_points[0];
 
@@ -1317,7 +1299,7 @@ tLuaCOMConnPointContainer::tLuaCOMConnPointContainer(lua_State* p_L,
 
 
 
-tLuaCOMConnPointContainer::~tLuaCOMConnPointContainer(void)
+tLuaCOMConnPointContainer::~tLuaCOMConnPointContainer()
 {
   while(num_connection_points--)
   {
@@ -1339,13 +1321,13 @@ STDMETHODIMP tLuaCOMConnPointContainer::QueryInterface(
 
 
 
-STDMETHODIMP_(ULONG) tLuaCOMConnPointContainer::AddRef(void)
+STDMETHODIMP_(ULONG) tLuaCOMConnPointContainer::AddRef()
 {
   return pUnkOuter->AddRef();
 }
 
 
-STDMETHODIMP_(ULONG) tLuaCOMConnPointContainer::Release(void)
+STDMETHODIMP_(ULONG) tLuaCOMConnPointContainer::Release()
 {
   return pUnkOuter->Release();
 }
