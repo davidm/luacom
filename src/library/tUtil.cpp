@@ -42,8 +42,7 @@ void CSInit()
 
 bool tUtil::IsValidString(LPCTSTR string)
 {
-  bool return_value = string != NULL &&
-    !IsBadStringPtr(string, MAX_VALID_STRING_SIZE);
+  bool return_value = string != NULL;
 
   assert(return_value);
 

@@ -123,7 +123,7 @@ protected:
     char *name;
   } *funcinfo;
 
-  class ProvideClassInfo2 : IProvideClassInfo2
+  class ProvideClassInfo2 : public IProvideClassInfo2
   {
   public:
     ProvideClassInfo2(ITypeInfo* p_coclassinfo, IUnknown* p_pUnk);
