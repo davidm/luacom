@@ -71,13 +71,14 @@ __FILE__, __LINE__, ((x) == NULL ? "Unknown error" : (x)))
 
 #define CHK_LCOM_ERR(x, y) ((x) ? (void) 0 : LUACOM_ERROR(y))
 
-#define CHK_COM_ERR(x, y) (((x) == S_OK) ? (void) 0 : COM_ERROR(y))
-
 #define CHKMALLOC(x) ((x) ? (void) 0 : LUACOM_EXCEPTION(MALLOC_ERROR))
 
-#define CHK_COM_CODE(hr) CHK_COM_ERR(hr, tLuaCOMException::GetErrorMessage(hr))
-
-
+inline void chk_com_code(HRESULT hr, const char * filename, int linenum) {
+  if (hr != S_OK)
+    throw tLuaCOMException(tLuaCOMException::COM_ERROR,
+             filename, linenum, tLuaCOMException::GetErrorMessage(hr));
+}
+#define CHK_COM_CODE(hr) chk_com_code(hr, __FILE__, __LINE__)
 
 
 #endif // !defined(AFX_TLUACOMEXCEPTION_H__26509908_AFD8_11D4_B882_0000B45D7541__INCLUDED_)
