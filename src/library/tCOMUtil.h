@@ -71,6 +71,9 @@ class tCOMPtr
 {
 public:
   tCOMPtr() : m_p(NULL) { }
+  tCOMPtr(const tCOMPtr & o) : m_p(o.m_p) { AddRef();};
+  tCOMPtr(T * p) : m_p(p) { AddRef();};
+  void operator=(const  tCOMPtr<T> & o) { Attach(o.m_p); AddRef(); }
   ~tCOMPtr() { if (m_p) m_p->Release(); }
   operator T* () const { return m_p; }
   T& operator * () const { return *m_p; }
@@ -78,14 +81,9 @@ public:
   T** operator & () { return &m_p; }   // useful for QueryInterface
   void Attach(T* p) { if (m_p) m_p->Release(); m_p = p; }
   void Release() { if (m_p) m_p->Release(); m_p = NULL; }
+  T * Raw() { return m_p; }
 private:
-  // disable these
-  tCOMPtr(T * p);
-  void operator=(const tCOMPtr & o);
-  void operator=(tCOMPtr & o);
-  void operator=(T * p);  // warning: CComPtr does AddRef() here.
-  void operator=(const T * p);
-
+  void AddRef() { if (m_p) m_p->AddRef(); }
   T * m_p;
 };
 

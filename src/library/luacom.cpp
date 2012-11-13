@@ -2256,7 +2256,7 @@ LUACOM_API void luacom_open(lua_State *L)
   luaCompat_newLuaType(L, MODULENAME, LCOM_CONNPOINT_TYPENAME);
 
   luaCompat_pushTypeByName(L, MODULENAME, LCOM_CONNPOINT_TYPENAME);
-  lua_pushcfunction(L, tLuaCOMConnPoint::tagmeth_index);
+  lua_pushcfunction(L, tLuaCOMConnPoint::l_tagmeth_index);
 
   lua_setfield(L, -2, "__index");
 
