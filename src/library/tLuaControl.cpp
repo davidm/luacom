@@ -110,13 +110,14 @@ static HWND GetParkingWindow()
   wndclass.lpszClassName = "LuaCOM_Parking";
   if (! ::RegisterClassA(&wndclass)) {
     FAIL("Couldn't register parking window class!");
-    return g_hwndParking;
+    return g_NULL;
   }
 
   // create window
   g_hwndParking = ::CreateWindowA("LuaCOM_Parking", NULL, WS_POPUP,
                                   0, 0, 0, 0, NULL, NULL, g_hInstance, NULL);
   ASSERT(g_hwndParking, "Couldn't create global parking window!");
+  return g_hwndParking;
 }
 
 tLuaControl::tLuaControl(lua_State* L, ITypeInfo *pTypeinfo, int ref) :
