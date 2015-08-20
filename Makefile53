@@ -1,0 +1,3 @@
+# warning: This is a Microsoft nmake makefile.
+
+include Makefile53.win

@@ -701,7 +701,7 @@ int tLuaCOMConnPoint::l_call_sinks(lua_State *L)
   const int connpoint         = lua_upvalueindex(1);
   const int event             = lua_upvalueindex(2);
 
-  int num_params = std::max(0, user_last_param - user_first_param + 1);
+  int num_params = (std::max)(0, user_last_param - user_first_param + 1);
 
   // gets connection point
   tLuaCOMConnPoint* cp = 
