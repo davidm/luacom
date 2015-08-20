@@ -110,7 +110,7 @@ static HWND GetParkingWindow()
   wndclass.lpszClassName = "LuaCOM_Parking";
   if (! ::RegisterClassA(&wndclass)) {
     FAIL("Couldn't register parking window class!");
-    return g_NULL;
+    return NULL;
   }
 
   // create window

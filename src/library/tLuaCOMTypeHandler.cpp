@@ -470,7 +470,11 @@ void tLuaCOMTypeHandler::lua2com(lua_State* L, stkIndex luaval, VARIANTARG& varg
   case LUA_TSTRING:
     {
       tStringBuffer str;
+#if defined(NLUA51)
+      size_t l_len = lua_rawlen(L, luaval);		// For > Lua 5.1
+#else
       size_t l_len = lua_strlen(L, luaval);
+#endif
       str.copyToBuffer(lua_tostring(L, luaval), l_len);
       varg.vt = VT_BSTR;
       varg.bstrVal = tUtil::string2bstr(str, l_len);
@@ -1416,7 +1420,11 @@ void tLuaCOMTypeHandler::safearray_lua2com(lua_State* L,
     {
       string2safearray(
         lua_tostring(L, luaval),
+#if defined(NLUA51)
+        lua_rawlen(L, luaval),		// For > Lua 5.1
+#else
         lua_strlen(L, luaval),
+#endif
         varg
         );
       return;
